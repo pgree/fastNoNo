@@ -50,9 +50,9 @@ run_fortran <- function(dir) {
 
   # if the object file already exists, don't recompile
   if (file.exists(f_obj_file)) {
-    run(compiled_exe, dir, wd=inst_dir, error_on_status = FALSE)
+    processx::run(compiled_exe, dir, wd=inst_dir, error_on_status = FALSE)
   } else {
-    run(fortran_exe, dir, wd=inst_dir, error_on_status = FALSE)
+    processx::run(fortran_exe, dir, wd=inst_dir, error_on_status = FALSE)
   }
 
 }
@@ -69,7 +69,7 @@ read_output <- function(dir) {
   derr <- df_out$V1[1]
 
   # remove row with error
-  df_out <- df_out %>% slice(2:length(df_out$V1))
+  df_out <- df_out[2:nrow(df_out), , drop=FALSE]
   k <- dim(df_out)[1]-3
   df_out$cols <- c(1:k, 'sig1', 'sig2', 'sig3')
 
