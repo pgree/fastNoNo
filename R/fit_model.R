@@ -14,7 +14,7 @@ fit_model <- function(X, k1, k2, y) {
 
   # write data to temp file to be read by fortran
   tmp_dir <- tempdir()
-  filename <- file.path(tmp_dir, "abort_params.dat")
+  filename <- file.path(tmp_dir, "params.dat")
   write_data(n, k1, k2, X, y, filename)
 
   # run fortran
@@ -27,6 +27,10 @@ fit_model <- function(X, k1, k2, y) {
 }
 
 write_data <- function(n, k1, k2, a, y, filename) {
+  # make sure arguments are of correct type
+  stopifnot(is.matrix(a))
+  stopifnot(n > (k1+k2))
+
   # write data to file in tempdir()
   nj <- sprintf("%012d", c(n, k1, k2))
   write.table(nj, file=filename, row.names = FALSE, col.names = FALSE, sep=',', quote=FALSE)
@@ -73,5 +77,5 @@ read_output <- function(dir) {
   colnames(df_out)[1] <- "mean"
   colnames(df_out)[2] <- "std"
 
-  return(c(df_out, accuracy=derr))
+  return(c(df_out, error=derr))
 }

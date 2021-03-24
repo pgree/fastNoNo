@@ -5,7 +5,7 @@
            prini.f quaplot.f legeexps.f svdpivot.f \
 	   qleigen_trid.f pplot2.f jaceig.f \
 	   corrand.f qerrfun.f lapack_wrap.f90 \
-           test93.f
+           test94.f
   ./int2 $1
 
 

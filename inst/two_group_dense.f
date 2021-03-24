@@ -27,8 +27,7 @@ c
 c
 c        parameters
 c
-        filename = 'abort_params.dat'
-        filename = dir // '/abort_params.dat'
+        filename = dir // '/params.dat'
         call read_params(filename, n, k1, k2, a, y)
         k = k1+k2
         call prinf('n*', n, 1)
@@ -63,7 +62,6 @@ c
 c
 c        write results to file
 c
-        filename = 'exps.dat'
         filename = dir // '/exps.dat'
         call write_dd_exps_stds(filename, k, dd_max1, dsums, stds)
 
