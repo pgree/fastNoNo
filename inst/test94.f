@@ -5,14 +5,16 @@ c
 c
         subroutine test_integration()
         implicit real *8 (a-h,o-z)
-        real*8 a(10 000 000), x(100 000), y(1000 000), dexps(10 000),
-     1     dsums2(10 000), dsums(100 000), dds(10 000), stds(10 000),
-     1     stds2(10 000)
+        real*8 a(20 000 000), y(500 000)
+        real *8, allocatable :: dsums(:), dexps(:),
+     1     dsums2(:), dds(:), stds(:), stds2(:)
         character(100) csv_file, filename
 
 c
 c        parameters
 c
+        csv_file = 'test_dense_params.dat'
+        csv_file = 'abort_params.dat'
         csv_file = 'params.dat'
         call read_params(csv_file, n, k1, k2, a, y)
 ccc        call prin2('a = *',a,n*k)
@@ -22,11 +24,20 @@ ccc        call prin2('y = *',y,n)
         call prinf('k1*', k1, 1)
         call prinf('k2*', k2, 1)
 
+        k3 = k+3
+        allocate(dsums(k3))
+        allocate(dsums2(k3))
+        allocate(dexps(k3))
+        allocate(dds(k3))
+        allocate(stds(k3))
+        allocate(stds2(k3))
+
 c
 c        integrate
 c
         nn = 60
         nn_theta = 20
+        nn_theta = 4
         call dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums, dsum, 
      1     stds)
 
@@ -212,19 +223,16 @@ c
         subroutine dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums, 
      1     dsum, stds)
         implicit real *8 (a-h,o-z)
-        real*8 a(*), y(*), dsums(*),
-     1     thetas(nn_theta+10),rhos(nn+10),phis(nn+10),phis0(nn+10),
-     1     s(100 000),s2(100 000), whts_phis0(nn+10),
-     1     ysmall(100 000),ys2(100 000),xs(k1+k2),
-     1     vmoms(100 000),ys(100 000),dsumsi(k1+k2+3+10),
+        real*8 a(*), y(*), dsums(*), stds(*),
+     1     thetas(nn_theta),rhos(nn),phis(nn), s(k1+k2),s2(k1+k2), 
+     1     xs(k1+k2),
+     1     ysmall(k1+k2),ys2(k1+k2),vmoms(100 000), dsumsi(k1+k2+3+10),
      1     whts_thetas(nn_theta+10),whts_phis(nn+10),whts_rhos(nn+10),
-     1     dsum_xsi(k1+k2+10), dsum_vars(10 000),
-     1     ztilde(10 000),xtilde(10 000), prefacts(10 000),
-     1     stds(10 000), tmp_mat(10 000)
+     1     dsum_xsi(k1+k2+10), dsum_vars(k1+k2+10)
         real *8, allocatable :: u(:,:),vt(:,:),asca(:,:),ut(:,:),
      1     b(:,:),ynew(:),v(:,:),bb(:,:), fmaxs(:), fs(:,:),
      1     dsums_cov(:,:), dsums_covi(:,:), wwti(:,:), xxti(:,:),
-     1     gs(:,:), c(:,:), ct(:,:)
+     1     gs(:,:), c(:,:), ct(:,:), tmp_mat(:,:)
 
 c
 c        this subroutine computes posterior expectations of the two
@@ -250,7 +258,7 @@ c
         k = k1+k2
 
         allocate (u(n,k))
-        allocate (ut(n,k))
+        allocate (ut(k,n))
         allocate (vt(k,k))
         allocate (v(k,k))
         allocate (asca(n,k))
@@ -266,6 +274,7 @@ c
         allocate (xxti(k,k))
         allocate (c(k,k))
         allocate (ct(k,k))
+        allocate (tmp_mat(k,k))
 
 c
 c        before computing integral find least squares solution to
@@ -301,7 +310,6 @@ c
         do 130 i=1,nn_theta
         t = thetas(i)
         wht_theta = whts_thetas(i)
-
 c
 c        compute the diagonal form of a^t*a for each theta which
 c        will be used to convert the integrand to a diagonal 
@@ -356,7 +364,6 @@ c          rho integral
 c
         call eval_rho_int(nn, n, k, exp_fact, 
      1     dsum_rho, dsum_rho1, dsum_rho2, fmax)
-
 c
 c        for fixed theta, compute integral over phi by a sum of 
 c        the form \sum_i exp(fi)*gi so that
@@ -1647,6 +1654,7 @@ c
         real*8 dsums(*), stds(*)
         character(*) file_out
 
+ccc        csv_file = 'expectations.dat'
         open (2, file=file_out)
 
  210    format(f22.16,','f22.16)

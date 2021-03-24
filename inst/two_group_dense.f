@@ -38,7 +38,7 @@ c
 c        integrate
 c
         nn = 60
-        nn_theta = 20
+        nn_theta = 10
         call dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums, dsum, 
      1     stds)
 
