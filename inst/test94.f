@@ -216,6 +216,12 @@ c   dense_eval - evaluates two-group normal normal model with
 c         normal+(0, 1) hyperpriors on the scale parameters 
 c 
 c
+c   eval_rho_int - compute the inner integral after a change of 
+c         variables of the density of this problem 
+c
+c
+c
+c
 c
 c
 c
@@ -1090,44 +1096,6 @@ ccc        endif
 
         return
         end
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
 c
 c
 c

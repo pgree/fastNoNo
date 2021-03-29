@@ -2,23 +2,31 @@
 % Please edit documentation in R/fit_model.R
 \name{fit_model}
 \alias{fit_model}
-\title{Fit a two-group normal-normal model}
+\title{Two-group normal-normal model fit}
 \usage{
-fit_model(X, k1, k2, y)
+fit_model(X1, X2, y)
 }
 \arguments{
-\item{X}{The matrix of data of size n x (k1+k2)}
+\item{X1}{data matrix corresponding to group 1}
 
-\item{k1}{size of first group}
-
-\item{k2}{size of second group}
+\item{X2}{data matrix corresponding to group 2}
 
 \item{y}{outcome}
 }
 \value{
-fit a list containing posterior means, standard devations,
-and accuracy
+a list containing posterior means, standard deviations,
+and the approximate accuracy of the standard deviations and means. The `mean`
+and `std` vectors in the list are of length k+3. The first k entries
+correspond to posterior means and standard deviations of the k parameters
+\eqn{\beta} and the final three correspond to the scale parameters
+\eqn{\sigma_1, \sigma_2, \sigma_3}
 }
 \description{
-Fit a two-group normal-normal model
+This function fits the Bayesian two-group linear regression model
+\deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_3)}
+\deqn{\beta_1 ~ normal(0, \sigma_1)}
+\deqn{\beta_2 ~ normal(0, \sigma_2)}
+\deqn{\sigma_1 ~ normal+(0, 1)}
+\deqn{\sigma_2 ~ normal+(0, 1)}
+\deqn{\sigma_3 ~ normal+(0, 1)}
 }
