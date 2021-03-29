@@ -60,14 +60,15 @@ write_data <- function(n, k1, k2, a, y, filename) {
 
 run_fortran <- function(tmp_dir) {
   # locations of executables
-  compiled_exe <- system.file("two_group_dense_compiled", package = "fastNN")
   fortran_exe <- system.file("two_group_dense", package = "fastNN")
   fortran_exe2 <- file.path(tmp_dir, "int2")
   inst_dir <- system.file("", package = "fastNN")
 
   # if the executable already exists, don't recompile
+  # the second argument in the command below provides the location of the
+  # params.dat file that is read by the fortran
   if (file.exists(fortran_exe2)) {
-    processx::run(compiled_exe, tmp_dir, wd=tmp_dir, error_on_status = FALSE)
+    processx::run(fortran_exe2, tmp_dir, wd=tmp_dir, error_on_status = FALSE)
   } else {
     processx::run(fortran_exe, tmp_dir, wd=inst_dir, error_on_status = FALSE)
   }
