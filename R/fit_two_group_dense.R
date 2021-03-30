@@ -73,21 +73,22 @@ write_data <- function(n, k1, k2, a, y, filename) {
 }
 
 
-run_fortran <- function(tmp_dir) {
+run_fortran <- function(compile_dir) {
   # locations of executables
-  fortran_exe <- system.file("two_group_dense", package = "fastNoNo")
-  fortran_exe2 <- file.path(tmp_dir, "int2")
+  create_fortran_exe <- system.file("two_group_dense", package = "fastNoNo")
+  fortran_exe <- file.path(compile_dir, "int2")
   inst_dir <- system.file("", package = "fastNoNo")
 
   # if the executable already exists, don't recompile
   # the second argument in the command below provides the location of the
   # params.dat file that is read by the fortran
-  if (file.exists(fortran_exe2)) {
-    processx::run(fortran_exe2, tmp_dir, wd=tmp_dir, error_on_status = FALSE)
-  } else {
+  if (!file.exists(fortran_exe)) {
     message("Compiling fortran code. This may take a moment...")
-    processx::run(fortran_exe, tmp_dir, wd=inst_dir, error_on_status = FALSE)
+    processx::run(create_fortran_exe, compile_dir, wd=inst_dir, error_on_status = FALSE)
   }
+
+  # run exectuable
+  processx::run(fortran_exe, compile_dir, wd=compile_dir, error_on_status = FALSE)
 
 }
 
@@ -113,9 +114,7 @@ read_output <- function(dir, k1, k2) {
   df_beta_2 <- df_out[(k1+1):(k1+k2), ]
   df_sigma <- df_out[(nrow(df_out)-2):nrow(df_out), ]
 
-  # FIX THIS WHEN SIGMA SDs ARE AVAILABLE IN FORTRAN
-  df_sigma$sd <- NA
-
+  # add row names
   rownames(df_beta_1) <- paste0("beta_1_", 1:k1)
   rownames(df_beta_2) <- paste0("beta_2_", 1:k2)
   rownames(df_sigma) <- c("sigma_y", "sigma_1", "sigma_2")
