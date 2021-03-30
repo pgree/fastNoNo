@@ -1,4 +1,4 @@
-#' Two-group normal-normal model fit
+#' Fast two-group normal-normal model
 #'
 #' @description
 #' This function fits a fast approximation to the

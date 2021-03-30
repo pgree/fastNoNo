@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_two_group_dense.R
 \name{fit_two_group_dense}
 \alias{fit_two_group_dense}
-\title{Two-group normal-normal model fit}
+\title{Fast two-group normal-normal model}
 \usage{
 fit_two_group_dense(X1, X2, y, compile_dir = tempdir())
 }
