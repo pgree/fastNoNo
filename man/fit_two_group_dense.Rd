@@ -27,13 +27,21 @@ standard deviation estimates.
 }
 }
 \description{
-This function fits the Bayesian two-group linear regression model
+This function fits a fast approximation to the
+Bayesian two-group hierarchical linear regression model
+
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
 \deqn{\beta_2 ~ normal(0, \sigma_2)}
 \deqn{\sigma_1 ~ normal+(0, 1)}
 \deqn{\sigma_2 ~ normal+(0, 1)}
 \deqn{\sigma_y ~ normal+(0, 1)}
+
+using numerical linear algebra and low dimensional Gaussian quadrature.
+
+Currently the algorithm is implemented in Fortran and using the package
+requires the ability to compile Fortran code. Eventually the Fortran code may
+come pre-compiled.
 }
 \examples{
 \dontrun{
