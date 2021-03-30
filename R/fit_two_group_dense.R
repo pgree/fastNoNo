@@ -1,32 +1,32 @@
 #' Two-group normal-normal model fit
 #'
 #' This function fits the Bayesian two-group linear regression model
-#' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_3)}
+#' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
 #' \deqn{\beta_2 ~ normal(0, \sigma_2)}
 #' \deqn{\sigma_1 ~ normal+(0, 1)}
 #' \deqn{\sigma_2 ~ normal+(0, 1)}
-#' \deqn{\sigma_3 ~ normal+(0, 1)}
+#' \deqn{\sigma_y ~ normal+(0, 1)}
 #'
 #' @export
-#' @param X1 data matrix corresponding to group 1
-#' @param X2 data matrix corresponding to group 2
-#' @param y outcome
-#' @return a list containing posterior means, standard deviations,
+#' @param X1 Data matrix corresponding to group 1.
+#' @param X2 Data matrix corresponding to group 2.
+#' @param y Outcome vector.
+#' @return A list containing posterior means, standard deviations,
 #' and the approximate accuracy of the standard deviations and means. The `mean`
 #' and `std` vectors in the list are of length k+3. The first k entries
 #' correspond to posterior means and standard deviations of the k parameters
-#' \eqn{\beta} and the final three correspond to the scale parameters
-#' \eqn{\sigma_1, \sigma_2, \sigma_3}
+#' \eqn{\beta_1, \beta_2} and the final three correspond to the scale parameters
+#' \eqn{\sigma_1, \sigma_2, \sigma_y}.
 #'
-fit_model <- function(X1, X2, y) {
+fit_two_group_dense <- function(X1, X2, y) {
   # check matrices are same length
-  stopifnot(dim(X1)[1] == dim(X2)[1])
+  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
   # extract number of observations
-  n <- dim(X1)[1]
-  k1 <- dim(X1)[2]
-  k2 <- dim(X2)[2]
+  n <- nrow(X1)
+  k1 <- ncol(X1)
+  k2 <- ncol(X2)
   X <- cbind(X1, X2)
 
   # write data to temp file to be read by fortran
@@ -38,9 +38,7 @@ fit_model <- function(X1, X2, y) {
   run_fortran(tmp_dir)
 
   # read results
-  fit <- read_output(tmp_dir)
-
-  return(fit)
+  read_output(tmp_dir)
 }
 
 write_data <- function(n, k1, k2, a, y, filename) {
@@ -60,9 +58,9 @@ write_data <- function(n, k1, k2, a, y, filename) {
 
 run_fortran <- function(tmp_dir) {
   # locations of executables
-  fortran_exe <- system.file("two_group_dense", package = "fastNN")
+  fortran_exe <- system.file("two_group_dense", package = "fastNoNo")
   fortran_exe2 <- file.path(tmp_dir, "int2")
-  inst_dir <- system.file("", package = "fastNN")
+  inst_dir <- system.file("", package = "fastNoNo")
 
   # if the executable already exists, don't recompile
   # the second argument in the command below provides the location of the
@@ -70,6 +68,7 @@ run_fortran <- function(tmp_dir) {
   if (file.exists(fortran_exe2)) {
     processx::run(fortran_exe2, tmp_dir, wd=tmp_dir, error_on_status = FALSE)
   } else {
+    message("Compiling fortran code. This may take a moment...")
     processx::run(fortran_exe, tmp_dir, wd=inst_dir, error_on_status = FALSE)
   }
 
