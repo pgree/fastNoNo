@@ -22,6 +22,20 @@
 #' * `error`: A scalar. The approximate accuracy of the posterior mean and
 #' standard deviation estimates.
 #'
+#' @examples
+#' \dontrun{
+#' k1 <- 50
+#' k2 <- 60
+#' n <- 10000
+#'
+#' y <- rnorm(n)
+#' X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
+#' X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
+#'
+#' fit <- fit_two_group_dense(X1, X2, y)
+#' str(fit)
+#' }
+#'
 fit_two_group_dense <- function(X1, X2, y) {
   # check matrices are same length
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))

@@ -35,3 +35,18 @@ This function fits the Bayesian two-group linear regression model
 \deqn{\sigma_2 ~ normal+(0, 1)}
 \deqn{\sigma_y ~ normal+(0, 1)}
 }
+\examples{
+\dontrun{
+k1 <- 50
+k2 <- 60
+n <- 10000
+
+y <- rnorm(n)
+X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
+X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
+
+fit <- fit_two_group_dense(X1, X2, y)
+str(fit)
+}
+
+}
