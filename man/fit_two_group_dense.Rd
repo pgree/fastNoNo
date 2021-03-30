@@ -14,12 +14,17 @@ fit_two_group_dense(X1, X2, y)
 \item{y}{Outcome vector.}
 }
 \value{
-A list containing posterior means, standard deviations,
-and the approximate accuracy of the standard deviations and means. The `mean`
-and `std` vectors in the list are of length k+3. The first k entries
-correspond to posterior means and standard deviations of the k parameters
-\eqn{\beta_1, \beta_2} and the final three correspond to the scale parameters
-\eqn{\sigma_1, \sigma_2, \sigma_y}.
+A named list with the following components:
+\itemize{
+\item \code{beta_1}: A data frame of posterior means and standard deviations for
+the vector \eqn{\beta_1}, the coefficients on \code{X1}.
+\item \code{beta_2}: A data frame of posterior means and standard deviations for
+the vector \eqn{\beta_2}, the coefficients on \code{X2}.
+\item \code{sigma}: A data frame with posterior means and standard deviations for
+\eqn{\sigma_y}, \eqn{\sigma_1}, and \eqn{\sigma_2}.
+\item \code{error}: A scalar. The approximate accuracy of the posterior mean and
+standard deviation estimates.
+}
 }
 \description{
 This function fits the Bayesian two-group linear regression model

@@ -12,12 +12,15 @@
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
 #' @param y Outcome vector.
-#' @return A list containing posterior means, standard deviations,
-#' and the approximate accuracy of the standard deviations and means. The `mean`
-#' and `std` vectors in the list are of length k+3. The first k entries
-#' correspond to posterior means and standard deviations of the k parameters
-#' \eqn{\beta_1, \beta_2} and the final three correspond to the scale parameters
-#' \eqn{\sigma_1, \sigma_2, \sigma_y}.
+#' @return A named list with the following components:
+#' * `beta_1`: A data frame of posterior means and standard deviations for
+#' the vector \eqn{\beta_1}, the coefficients on `X1`.
+#' * `beta_2`: A data frame of posterior means and standard deviations for
+#' the vector \eqn{\beta_2}, the coefficients on `X2`.
+#' * `sigma`: A data frame with posterior means and standard deviations for
+#' \eqn{\sigma_y}, \eqn{\sigma_1}, and \eqn{\sigma_2}.
+#' * `error`: A scalar. The approximate accuracy of the posterior mean and
+#' standard deviation estimates.
 #'
 fit_two_group_dense <- function(X1, X2, y) {
   # check matrices are same length
@@ -38,7 +41,7 @@ fit_two_group_dense <- function(X1, X2, y) {
   run_fortran(tmp_dir)
 
   # read results
-  read_output(tmp_dir)
+  read_output(tmp_dir, k1, k2)
 }
 
 write_data <- function(n, k1, k2, a, y, filename) {
@@ -74,7 +77,7 @@ run_fortran <- function(tmp_dir) {
 
 }
 
-read_output <- function(dir) {
+read_output <- function(dir, k1, k2) {
   # read the posterior means and stds written to a text file in tmp_dir
   # by fortran
   filename <- file.path(dir, "exps.dat")
@@ -83,16 +86,30 @@ read_output <- function(dir) {
   df_out <- read.csv(file=filename, header=FALSE)
 
   # get error
-  derr <- df_out$V1[1]
+  err <- df_out$V1[1]
 
   # remove row with error
   df_out <- df_out[2:nrow(df_out), , drop=FALSE]
-  ###k <- dim(df_out)[1]-3
-  ###df_out$cols <- c(1:k, 'sig1', 'sig2', 'sig3')
 
   # add columns names
   colnames(df_out)[1] <- "mean"
-  colnames(df_out)[2] <- "std"
+  colnames(df_out)[2] <- "sd"
 
-  return(c(df_out, error=derr))
+  df_beta_1 <- df_out[1:k1, ]
+  df_beta_2 <- df_out[(k1+1):(k1+k2), ]
+  df_sigma <- df_out[(nrow(df_out)-2):nrow(df_out), ]
+
+  # FIX THIS WHEN SIGMA SDs ARE AVAILABLE IN FORTRAN
+  df_sigma$sd <- NA
+
+  rownames(df_beta_1) <- paste0("beta_1_", 1:k1)
+  rownames(df_beta_2) <- paste0("beta_2_", 1:k2)
+  rownames(df_sigma) <- c("sigma_y", "sigma_1", "sigma_2")
+
+  list(
+    beta_1 = df_beta_1,
+    beta_2 = df_beta_2,
+    sigma = df_sigma,
+    error = err
+  )
 }
