@@ -21,6 +21,9 @@
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
 #' @param y Outcome vector.
+#' @param compile_dir Path to a directory to store the compiled executable. The
+#'   default is [tempdir()], in which case compilation will happen once per R
+#'   session.
 #' @return A named list with the following components:
 #' * `beta_1`: A data frame of posterior means and standard deviations for
 #' the vector \eqn{\beta_1}, the coefficients on `X1`.
@@ -45,93 +48,104 @@
 #' str(fit)
 #' }
 #'
-fit_two_group_dense <- function(X1, X2, y) {
-  # check matrices are same length
+fit_two_group_dense <- function(X1, X2, y,
+                                compile_dir = tempdir()) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
-  # extract number of observations
-  n <- nrow(X1)
-  k1 <- ncol(X1)
-  k2 <- ncol(X2)
-  X <- cbind(X1, X2)
+  # hard code this for now but maybe we want to expose it later?
+  # this is where data and results are written
+  output_dir <- tempdir()
 
-  # write data to temp file to be read by fortran
-  tmp_dir <- tempdir()
-  filename <- file.path(tmp_dir, "params.dat")
-  write_data(n, k1, k2, X, y, filename)
-
-  # run fortran
-  run_fortran(tmp_dir)
-
-  # read results
-  read_output(tmp_dir, k1, k2)
-}
-
-write_data <- function(n, k1, k2, a, y, filename) {
-  # make sure arguments are of correct type
-  stopifnot(is.matrix(a))
-  stopifnot(n > (k1+k2))
-
-  # write data to file in tempdir()
-  nj <- sprintf("%012d", c(n, k1, k2))
-  write.table(nj, file=filename, row.names = FALSE, col.names = FALSE, sep=',', quote=FALSE)
-  A2 <- sprintf("%012.6f", a)
-  write.table(A2, file=filename, append=TRUE, row.names=FALSE, col.names=FALSE, quote=FALSE)
-  y2 <- sprintf("%012.6f", y)
-  write.table(y2, file=filename, append=TRUE, row.names=FALSE, col.names=FALSE, quote=FALSE)
+  write_data(
+    n = nrow(X1),
+    k1 = ncol(X1),
+    k2 = ncol(X2),
+    X = cbind(X1, X2),
+    y = y,
+    file = file.path(output_dir, "params.dat")
+  )
+  run_fortran(compile_dir, output_dir)
+  read_output(output_dir, k1 = ncol(X1), k2 = ncol(X2))
 }
 
 
-run_fortran <- function(compile_dir) {
-  # locations of executables
-  create_fortran_exe <- system.file("two_group_dense", package = "fastNoNo")
-  fortran_exe <- file.path(compile_dir, "int2")
-  inst_dir <- system.file("", package = "fastNoNo")
+# internal ----------------------------------------------------------------
 
-  # if the executable already exists, don't recompile
-  # the second argument in the command below provides the location of the
-  # params.dat file that is read by the fortran
-  if (!file.exists(fortran_exe)) {
+write_data <- function(n, k1, k2, X, y, file) {
+  stopifnot(is.matrix(X), n > (k1+k2))
+  write.table(
+    sprintf("%012d", c(n, k1, k2)),
+    file = file,
+    row.names = FALSE,
+    col.names = FALSE,
+    sep = ',',
+    quote = FALSE
+  )
+  write.table(
+    sprintf("%012.6f", X),
+    file = file,
+    append = TRUE,
+    row.names = FALSE,
+    col.names = FALSE,
+    quote = FALSE
+  )
+  write.table(
+    sprintf("%012.6f", y),
+    file = file,
+    append = TRUE,
+    row.names = FALSE,
+    col.names = FALSE,
+    quote = FALSE
+  )
+}
+
+compile_fortran <- function(compile_dir, quiet = FALSE) {
+  if (!quiet) {
     message("Compiling fortran code. This may take a moment...")
-    processx::run(create_fortran_exe, compile_dir, wd=inst_dir, error_on_status = FALSE)
   }
+  processx::run(
+    command = system.file("two_group_dense", package = "fastNoNo"),
+    args = compile_dir,
+    wd = system.file("", package = "fastNoNo"),
+    error_on_status = FALSE
+  )
+}
 
-  # run exectuable
-  processx::run(fortran_exe, compile_dir, wd=compile_dir, error_on_status = FALSE)
+run_fortran <- function(compile_dir, output_dir) {
+  fortran_exe <- file.path(compile_dir, "int2")
+  if (!file.exists(fortran_exe)) {
+    compile_fortran(compile_dir)
+  }
+  processx::run(
+    command = fortran_exe,
+    args = output_dir,
+    wd = compile_dir,
+    error_on_status = FALSE
+  )
 
 }
 
-read_output <- function(dir, k1, k2) {
-  # read the posterior means and stds written to a text file in tmp_dir
-  # by fortran
-  filename <- file.path(dir, "exps.dat")
+read_output <- function(output_dir, k1, k2) {
+  df_out <- read.csv(file = file.path(output_dir, "exps.dat"), header = FALSE)
 
-  # read results from fortran
-  df_out <- read.csv(file=filename, header=FALSE)
+  error <- df_out$V1[1]
 
-  # get error
-  err <- df_out$V1[1]
+  estimates <- df_out[2:nrow(df_out), , drop=FALSE]
+  colnames(estimates) <- c("mean", "sd")
 
-  # remove row with error
-  df_out <- df_out[2:nrow(df_out), , drop=FALSE]
+  beta_1 <- estimates[1:k1, ]
+  rownames(beta_1) <- paste0("beta_1_", 1:k1)
 
-  # add columns names
-  colnames(df_out)[1] <- "mean"
-  colnames(df_out)[2] <- "sd"
+  beta_2 <- estimates[(k1+1):(k1+k2), ]
+  rownames(beta_2) <- paste0("beta_2_", 1:k2)
 
-  df_beta_1 <- df_out[1:k1, ]
-  df_beta_2 <- df_out[(k1+1):(k1+k2), ]
-  df_sigma <- df_out[(nrow(df_out)-2):nrow(df_out), ]
-
-  # add row names
-  rownames(df_beta_1) <- paste0("beta_1_", 1:k1)
-  rownames(df_beta_2) <- paste0("beta_2_", 1:k2)
-  rownames(df_sigma) <- c("sigma_y", "sigma_1", "sigma_2")
+  sigma <- estimates[(nrow(estimates)-2):nrow(estimates), ]
+  rownames(sigma) <- c("sigma_y", "sigma_1", "sigma_2")
 
   list(
-    beta_1 = df_beta_1,
-    beta_2 = df_beta_2,
-    sigma = df_sigma,
-    error = err
+    beta_1 = beta_1,
+    beta_2 = beta_2,
+    sigma = sigma,
+    error = error
   )
 }
