@@ -1,6 +1,6 @@
   rm two_group_dense.o
-  gfortran -std=legacy -w -O3 -c two_group_dense.f
-  gfortran -std=legacy -w -O3 -o "$1/int2" two_group_dense.o -framework Accelerate \
+  gfortran -std=legacy -w -O3 -c two_group_dense.f -o "$1/two_group_dense.o"
+  gfortran -std=legacy -w -O3 -o "$1/int2" "$1/two_group_dense.o" -framework Accelerate \
            prini.f quaplot.f legeexps.f svdpivot.f \
 	   qleigen_trid.f pplot2.f jaceig.f \
 	   corrand.f qerrfun.f lapack_wrap.f90 \
