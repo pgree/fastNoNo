@@ -4,7 +4,7 @@
 \alias{fit_two_group_dense}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group_dense(X1, X2, y, compile_dir = tempdir())
+fit_two_group_dense(X1, X2, y)
 }
 \arguments{
 \item{X1}{Data matrix corresponding to group 1.}
@@ -12,10 +12,6 @@ fit_two_group_dense(X1, X2, y, compile_dir = tempdir())
 \item{X2}{Data matrix corresponding to group 2.}
 
 \item{y}{Outcome vector.}
-
-\item{compile_dir}{Path to a directory to store the compiled executable. The
-default is \code{\link[=tempdir]{tempdir()}}, in which case compilation will happen once per R
-session.}
 }
 \value{
 A named list with the following components:
@@ -43,9 +39,10 @@ Bayesian two-group hierarchical linear regression model
 
 using numerical linear algebra and low dimensional Gaussian quadrature.
 
-Currently the algorithm is implemented in Fortran and using the package
-requires the ability to compile Fortran code. Eventually the Fortran code may
-come pre-compiled.
+\strong{NOTE:} Currently the algorithm is implemented in Fortran and must be
+compiled the first time the function is called in an R session. Subsequent
+calls to the function in the same R session do not require recompilation.
+In future versions of the package the Fortran code will come pre-compiled.
 }
 \examples{
 \dontrun{

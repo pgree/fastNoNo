@@ -13,17 +13,16 @@
 #'
 #' using numerical linear algebra and low dimensional Gaussian quadrature.
 #'
-#' Currently the algorithm is implemented in Fortran and using the package
-#' requires the ability to compile Fortran code. Eventually the Fortran code may
-#' come pre-compiled.
+#' **NOTE:** Currently the algorithm is implemented in Fortran and must be
+#' compiled the first time the function is called in an R session. Subsequent
+#' calls to the function in the same R session do not require recompilation.
+#' In future versions of the package the Fortran code will come pre-compiled.
 #'
 #' @export
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
 #' @param y Outcome vector.
-#' @param compile_dir Path to a directory to store the compiled executable. The
-#'   default is [tempdir()], in which case compilation will happen once per R
-#'   session.
+#'
 #' @return A named list with the following components:
 #' * `beta_1`: A data frame of posterior means and standard deviations for
 #' the vector \eqn{\beta_1}, the coefficients on `X1`.
@@ -48,13 +47,12 @@
 #' str(fit)
 #' }
 #'
-fit_two_group_dense <- function(X1, X2, y,
-                                compile_dir = tempdir()) {
+fit_two_group_dense <- function(X1, X2, y) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
-  # hard code this for now but maybe we want to expose it later?
-  # this is where data and results are written
-  output_dir <- tempdir()
+  # hard code these for now but maybe we want to expose them
+  compile_dir <- tempdir()  # where to compile
+  output_dir <- tempdir()   # where to write data and results
 
   write_data(
     n = nrow(X1),
@@ -101,7 +99,11 @@ write_data <- function(n, k1, k2, X, y, file) {
 
 compile_fortran <- function(compile_dir, quiet = FALSE) {
   if (!quiet) {
-    message("Compiling fortran code. This may take a moment...")
+    message(
+      "Compiling fortran code before fitting the model. " ,
+      "This is only necessary the first time the function ",
+      "is run in an R session."
+    )
   }
   processx::run(
     command = system.file("two_group_dense", package = "fastNoNo"),
