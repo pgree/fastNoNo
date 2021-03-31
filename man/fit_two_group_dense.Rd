@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_two_group_dense.R
 \name{fit_two_group_dense}
 \alias{fit_two_group_dense}
-\title{Two-group normal-normal model fit}
+\title{Fast two-group normal-normal model}
 \usage{
 fit_two_group_dense(X1, X2, y)
 }
@@ -39,9 +39,10 @@ Bayesian two-group hierarchical linear regression model
 
 using numerical linear algebra and low dimensional Gaussian quadrature.
 
-Currently the algorithm is implemented in Fortran and using the package
-requires the ability to compile Fortran code. Eventually the Fortran code may
-come pre-compiled.
+\strong{NOTE:} Currently the algorithm is implemented in Fortran and must be
+compiled the first time the function is called in an R session. Subsequent
+calls to the function in the same R session do not require recompilation.
+In future versions of the package the Fortran code will come pre-compiled.
 }
 \examples{
 \dontrun{
