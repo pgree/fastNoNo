@@ -4,14 +4,14 @@
 \alias{fit_two_group_dense}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group_dense(X1, X2, y)
+fit_two_group_dense(y, X1, X2)
 }
 \arguments{
+\item{y}{Outcome vector.}
+
 \item{X1}{Data matrix corresponding to group 1.}
 
 \item{X2}{Data matrix corresponding to group 2.}
-
-\item{y}{Outcome vector.}
 }
 \value{
 A named list with the following components:
@@ -54,7 +54,7 @@ y <- rnorm(n)
 X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
 X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
 
-fit <- fit_two_group_dense(X1, X2, y)
+fit <- fit_two_group_dense(y, X1, X2)
 str(fit)
 }
 

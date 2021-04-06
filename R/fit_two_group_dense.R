@@ -19,9 +19,9 @@
 #' In future versions of the package the Fortran code will come pre-compiled.
 #'
 #' @export
+#' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
-#' @param y Outcome vector.
 #'
 #' @return A named list with the following components:
 #' * `beta_1`: A data frame of posterior means and standard deviations for
@@ -43,11 +43,11 @@
 #' X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
 #' X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
 #'
-#' fit <- fit_two_group_dense(X1, X2, y)
+#' fit <- fit_two_group_dense(y, X1, X2)
 #' str(fit)
 #' }
 #'
-fit_two_group_dense <- function(X1, X2, y) {
+fit_two_group_dense <- function(y, X1, X2) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
   # hard code these for now but maybe we want to expose them
