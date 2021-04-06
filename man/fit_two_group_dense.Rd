@@ -46,16 +46,29 @@ In future versions of the package the Fortran code will come pre-compiled.
 }
 \examples{
 \dontrun{
-k1 <- 50
-k2 <- 60
+# Simulate data
 n <- 10000
+k_1 <- 50
+k_2 <- 60
 
-y <- rnorm(n)
-X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
-X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
+sigma_y <- 1
+sigma_1 <- 0.5
+sigma_2 <- 2
+beta_1 <- rnorm(k_1, 0, sigma_1)
+beta_2 <- rnorm(k_2, 0, sigma_2)
 
-fit <- fit_two_group_dense(y, X1, X2)
+X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
+X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
+y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
+
+# Fit model
+fit <- fit_two_group_dense(y, X_1, X_2)
 str(fit)
+
+# Plot estimates vs truth
+plot(fit$beta_1$mean, beta_1)
+plot(fit$beta_2$mean, beta_2)
+plot(fit$sigma$mean, c(sigma_y, sigma_1, sigma_2))
 }
 
 }
