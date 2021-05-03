@@ -60,11 +60,11 @@
 #' plot(fit$sigma$mean, c(sigma_y, sigma_1, sigma_2))
 #' }
 #'
+#' @useDynLib fastNoNo dense_eval
 fit_two_group_dense <- function(y, X1, X2) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
   # hard code these for now but maybe we want to expose them
-  compile_dir <- tempdir()  # where to compile
   output_dir <- tempdir()   # where to write data and results
 
   write_data(
@@ -75,7 +75,7 @@ fit_two_group_dense <- function(y, X1, X2) {
     y = y,
     file = file.path(output_dir, "params.dat")
   )
-  run_fortran(compile_dir, output_dir)
+  run_fortran()
   read_output(output_dir, k1 = ncol(X1), k2 = ncol(X2))
 }
 
@@ -110,34 +110,8 @@ write_data <- function(n, k1, k2, X, y, file) {
   )
 }
 
-compile_fortran <- function(compile_dir, quiet = FALSE) {
-  if (!quiet) {
-    message(
-      "Compiling fortran code before fitting the model. " ,
-      "This is only necessary the first time the function ",
-      "is run in an R session."
-    )
-  }
-  processx::run(
-    command = system.file("two_group_dense", package = "fastNoNo"),
-    args = compile_dir,
-    wd = system.file("", package = "fastNoNo"),
-    error_on_status = FALSE
-  )
-}
-
-run_fortran <- function(compile_dir, output_dir) {
-  fortran_exe <- file.path(compile_dir, "int2")
-  if (!file.exists(fortran_exe)) {
-    compile_fortran(compile_dir)
-  }
-  processx::run(
-    command = fortran_exe,
-    args = output_dir,
-    wd = compile_dir,
-    error_on_status = FALSE
-  )
-
+run_fortran <- function() {
+  .Fortran(dense_eval, ...)
 }
 
 read_output <- function(output_dir, k1, k2) {
