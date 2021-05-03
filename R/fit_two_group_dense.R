@@ -64,58 +64,48 @@
 fit_two_group_dense <- function(y, X1, X2) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
-  # hard code these for now but maybe we want to expose them
-  output_dir <- tempdir()   # where to write data and results
-
-  write_data(
-    n = nrow(X1),
-    k1 = ncol(X1),
-    k2 = ncol(X2),
-    X = cbind(X1, X2),
-    y = y,
-    file = file.path(output_dir, "params.dat")
-  )
-  run_fortran()
-  read_output(output_dir, k1 = ncol(X1), k2 = ncol(X2))
+  # TODO:
+  # - preprocess data
+  # - add the arguments we need to run_two_group_dense
+  output <- run_two_group_dense()
+  # - read_output(output)
 }
 
 
 # internal ----------------------------------------------------------------
 
-write_data <- function(n, k1, k2, X, y, file) {
-  stopifnot(is.matrix(X), n > (k1+k2))
-  write.table(
-    sprintf("%012d", c(n, k1, k2)),
-    file = file,
-    row.names = FALSE,
-    col.names = FALSE,
-    sep = ',',
-    quote = FALSE
-  )
-  write.table(
-    sprintf("%012.6f", X),
-    file = file,
-    append = TRUE,
-    row.names = FALSE,
-    col.names = FALSE,
-    quote = FALSE
-  )
-  write.table(
-    sprintf("%012.6f", y),
-    file = file,
-    append = TRUE,
-    row.names = FALSE,
-    col.names = FALSE,
-    quote = FALSE
-  )
+run_two_group_dense <- function() {
+  n <- 10000
+  k_1 <- 50
+  k_2 <- 60
+
+  sigma_y <- 1
+  sigma_1 <- 0.5
+  sigma_2 <- 2
+  beta_1 <- rnorm(k_1, 0, sigma_1)
+  beta_2 <- rnorm(k_2, 0, sigma_2)
+
+  X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
+  X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
+  y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
+
+  nnt <- 20
+  nn <- 80
+  dsum <- 0.0
+  dsums <- as.double(rep(-7, k_1+k_2+3))
+  stds <- as.double(rep(-7, k_1+k_2+3))
+  n <- dim(X_1)[1]
+  X <- cbind(X_1, X_2)
+  sigs <- c(1.0, 1.0, 1.0)
+  out <- .Fortran("dense_eval",as.integer(nnt), as.integer(nn), as.integer(n), as.integer(k_1),
+           as.integer(k_2), X, y, dsums, dsum, stds)
+
+  # TODO: only return the useful stuff
+  # get rid of data generation inside this function
 }
 
-run_fortran <- function() {
-  .Fortran(dense_eval, ...)
-}
-
-read_output <- function(output_dir, k1, k2) {
-  df_out <- read.csv(file = file.path(output_dir, "exps.dat"), header = FALSE)
+read_output <- function(fortran_output) {
+  # instead of df_out need to use fortran output
 
   error <- df_out$V1[1]
 
