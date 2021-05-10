@@ -22,8 +22,8 @@ the vector \eqn{\beta_1}, the coefficients on \code{X1}.
 the vector \eqn{\beta_2}, the coefficients on \code{X2}.
 \item \code{sigma}: A data frame with posterior means and standard deviations for
 \eqn{\sigma_y}, \eqn{\sigma_1}, and \eqn{\sigma_2}.
-\item \code{error}: A scalar. The approximate accuracy of the posterior mean and
-standard deviation estimates.
+\item \code{errors_means}: A data frame with approximate accuracy of the posterior
+mean and standard deviation estimates
 }
 }
 \description{

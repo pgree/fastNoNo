@@ -30,8 +30,8 @@
 #' the vector \eqn{\beta_2}, the coefficients on `X2`.
 #' * `sigma`: A data frame with posterior means and standard deviations for
 #' \eqn{\sigma_y}, \eqn{\sigma_1}, and \eqn{\sigma_2}.
-#' * `error`: A scalar. The approximate accuracy of the posterior mean and
-#' standard deviation estimates.
+#' * `errors_means`: A data frame with approximate accuracy of the posterior
+#' mean and standard deviation estimates
 #'
 #' @examples
 #' \dontrun{
@@ -64,67 +64,67 @@
 fit_two_group_dense <- function(y, X1, X2) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
 
-  # TODO:
-  # - preprocess data
-  # - add the arguments we need to run_two_group_dense
-  output <- run_two_group_dense()
-  # - read_output(output)
-}
+  # nodes in theta direction
+  nnt <- 10
+  out1 <- run_two_group_dense(y, X1, X2, nnt)
 
+  nnt2 <- 2*nnt
+  out2 <- run_two_group_dense(y, X1, X2, nnt2)
 
-# internal ----------------------------------------------------------------
+  # process output
+  k1 <- ncol(X1)
+  k2 <- ncol(X2)
+  k <- k1+k2
 
-run_two_group_dense <- function() {
-  n <- 10000
-  k_1 <- 50
-  k_2 <- 60
+  # compute errors
+  error_means <- out1$means - out2$means
+  error_stds <- out1$stds - out2$stds
+  errors <- data.frame(error_means, error_stds)
+  print(errors)
+  print(c(paste0("beta_1_", 1:k1), paste0("beta_2_", 1:k2)))
+  rownames(errors) <- c(paste0("beta_1_", 1:k1), paste0("beta_2_", 1:k2),
+                        "sigma_y", "sigma_1", "sigma_2")
 
-  sigma_y <- 1
-  sigma_1 <- 0.5
-  sigma_2 <- 2
-  beta_1 <- rnorm(k_1, 0, sigma_1)
-  beta_2 <- rnorm(k_2, 0, sigma_2)
-
-  X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
-  X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
-  y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
-
-  nnt <- 20
-  nn <- 80
-  dsum <- 0.0
-  dsums <- as.double(rep(-7, k_1+k_2+3))
-  stds <- as.double(rep(-7, k_1+k_2+3))
-  n <- dim(X_1)[1]
-  X <- cbind(X_1, X_2)
-  sigs <- c(1.0, 1.0, 1.0)
-  out <- .Fortran("dense_eval",as.integer(nnt), as.integer(nn), as.integer(n), as.integer(k_1),
-           as.integer(k_2), X, y, dsums, dsum, stds)
-
-  # TODO: only return the useful stuff
-  # get rid of data generation inside this function
-}
-
-read_output <- function(fortran_output) {
-  # instead of df_out need to use fortran output
-
-  error <- df_out$V1[1]
-
-  estimates <- df_out[2:nrow(df_out), , drop=FALSE]
-  colnames(estimates) <- c("mean", "sd")
-
-  beta_1 <- estimates[1:k1, ]
+  # means for first group
+  beta_1 <- data.frame(out2$means[1:k1], out2$stds[1:k1])
   rownames(beta_1) <- paste0("beta_1_", 1:k1)
+  colnames(beta_1) <- c("mean", "std")
 
-  beta_2 <- estimates[(k1+1):(k1+k2), ]
+  # means for second group
+  beta_2 <- data.frame(out2$means[(k1+1):k], out2$stds[(k1+1):k])
   rownames(beta_2) <- paste0("beta_2_", 1:k2)
+  colnames(beta_2) <- c("mean", "std")
 
-  sigma <- estimates[(nrow(estimates)-2):nrow(estimates), ]
+  # scale parameters
+  sigma <- data.frame(out2$means[(k+1):(k+3)], out2$stds[(k+1):(k+3)])
   rownames(sigma) <- c("sigma_y", "sigma_1", "sigma_2")
+  colnames(sigma) <- c("mean", "std")
 
   list(
     beta_1 = beta_1,
     beta_2 = beta_2,
     sigma = sigma,
-    error = error
+    errors = errors
   )
+}
+
+
+# internal ----------------------------------------------------------------
+
+run_two_group_dense <- function(y, X1, X2, nnt) {
+  # extract parameters from inputs
+  n <- length(y)
+  k1 <- ncol(X1)
+  k2 <- ncol(X2)
+
+  nn <- 80
+  dsum <- 0.0
+  dsums <- as.double(rep(-7, k1+k2+3))
+  stds <- as.double(rep(-7, k1+k2+3))
+  X <- cbind(X1, X2)
+  fit <- .Fortran("dense_eval",as.integer(nnt), as.integer(nn), as.integer(n), as.integer(k1),
+           as.integer(k2), X, y, means=dsums, dsum, stds=stds)
+
+  out <- list(means=fit$means, stds=fit$stds)
+  # TODO: get rid of data generation inside this function
 }
