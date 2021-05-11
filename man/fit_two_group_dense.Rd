@@ -4,7 +4,7 @@
 \alias{fit_two_group_dense}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group_dense(y, X1, X2)
+fit_two_group_dense(y, X1, X2, nnt = 10)
 }
 \arguments{
 \item{y}{Outcome vector.}
@@ -12,6 +12,9 @@ fit_two_group_dense(y, X1, X2)
 \item{X1}{Data matrix corresponding to group 1.}
 
 \item{X2}{Data matrix corresponding to group 2.}
+
+\item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
+for details.}
 }
 \value{
 A named list with the following components:

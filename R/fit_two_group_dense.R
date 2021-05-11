@@ -22,6 +22,8 @@
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
+#' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
+#'   for details.
 #'
 #' @return A named list with the following components:
 #' * `beta_1`: A data frame of posterior means and standard deviations for
@@ -61,44 +63,38 @@
 #' }
 #'
 #' @useDynLib fastNoNo dense_eval
-fit_two_group_dense <- function(y, X1, X2) {
-  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
+fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
+  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
+            length(nnt) == 1)
 
-  # nodes in theta direction
-  nnt <- 10
   out1 <- run_two_group_dense(y, X1, X2, nnt)
+  out2 <- run_two_group_dense(y, X1, X2, nnt = 2*nnt)
 
-  nnt2 <- 2*nnt
-  out2 <- run_two_group_dense(y, X1, X2, nnt2)
-
-  # process output
   k1 <- ncol(X1)
   k2 <- ncol(X2)
   k <- k1+k2
 
   # compute errors
   error_means <- out1$means - out2$means
-  error_stds <- out1$stds - out2$stds
-  errors <- data.frame(error_means, error_stds)
-  print(errors)
-  print(c(paste0("beta_1_", 1:k1), paste0("beta_2_", 1:k2)))
+  error_sds <- out1$sds - out2$sds
+  errors <- data.frame(error_means, error_sds)
   rownames(errors) <- c(paste0("beta_1_", 1:k1), paste0("beta_2_", 1:k2),
                         "sigma_y", "sigma_1", "sigma_2")
 
   # means for first group
-  beta_1 <- data.frame(out2$means[1:k1], out2$stds[1:k1])
+  beta_1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
   rownames(beta_1) <- paste0("beta_1_", 1:k1)
-  colnames(beta_1) <- c("mean", "std")
+  colnames(beta_1) <- c("mean", "sd")
 
   # means for second group
-  beta_2 <- data.frame(out2$means[(k1+1):k], out2$stds[(k1+1):k])
+  beta_2 <- data.frame(out2$means[(k1+1):k], out2$sds[(k1+1):k])
   rownames(beta_2) <- paste0("beta_2_", 1:k2)
-  colnames(beta_2) <- c("mean", "std")
+  colnames(beta_2) <- c("mean", "sd")
 
   # scale parameters
-  sigma <- data.frame(out2$means[(k+1):(k+3)], out2$stds[(k+1):(k+3)])
+  sigma <- data.frame(out2$means[(k+1):(k+3)], out2$sds[(k+1):(k+3)])
   rownames(sigma) <- c("sigma_y", "sigma_1", "sigma_2")
-  colnames(sigma) <- c("mean", "std")
+  colnames(sigma) <- c("mean", "sd")
 
   list(
     beta_1 = beta_1,
@@ -117,14 +113,20 @@ run_two_group_dense <- function(y, X1, X2, nnt) {
   k1 <- ncol(X1)
   k2 <- ncol(X2)
 
-  nn <- 80
-  dsum <- 0.0
-  dsums <- as.double(rep(-7, k1+k2+3))
-  stds <- as.double(rep(-7, k1+k2+3))
-  X <- cbind(X1, X2)
-  fit <- .Fortran("dense_eval",as.integer(nnt), as.integer(nn), as.integer(n), as.integer(k1),
-           as.integer(k2), X, y, means=dsums, dsum, stds=stds)
+  fit <- .Fortran(
+    "dense_eval",
+    nnt = as.integer(nnt),  # number of quadrature in theta direction
+    nn = as.integer(80),    # number of quadrature nodes in other directions
+    n = n,
+    k1 = as.integer(k1),
+    k2 = as.integer(k2),
+    X = cbind(X1, X2),
+    y = y,
+    # these are dummy objects for fortran to use for the results
+    means = as.double(rep(-99, k1+k2+3)),
+    dsum = 0.0,
+    sds = as.double(rep(-99, k1+k2+3))
+  )
 
-  out <- list(means=fit$means, stds=fit$stds)
-  # TODO: get rid of data generation inside this function
+  list(means=fit$means, sds=fit$sds)
 }
