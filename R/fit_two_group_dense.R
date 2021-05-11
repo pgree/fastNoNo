@@ -13,11 +13,6 @@
 #'
 #' using numerical linear algebra and low dimensional Gaussian quadrature.
 #'
-#' **NOTE:** Currently the algorithm is implemented in Fortran and must be
-#' compiled the first time the function is called in an R session. Subsequent
-#' calls to the function in the same R session do not require recompilation.
-#' In future versions of the package the Fortran code will come pre-compiled.
-#'
 #' @export
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.

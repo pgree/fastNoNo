@@ -41,11 +41,6 @@ Bayesian two-group hierarchical linear regression model
 \deqn{\sigma_y ~ normal+(0, 1)}
 
 using numerical linear algebra and low dimensional Gaussian quadrature.
-
-\strong{NOTE:} Currently the algorithm is implemented in Fortran and must be
-compiled the first time the function is called in an R session. Subsequent
-calls to the function in the same R session do not require recompilation.
-In future versions of the package the Fortran code will come pre-compiled.
 }
 \examples{
 \dontrun{
