@@ -22,6 +22,8 @@
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
+#' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
+#'   for details.
 #'
 #' @return A named list with the following components:
 #' * `beta_1`: A data frame of posterior means and standard deviations for
@@ -30,8 +32,8 @@
 #' the vector \eqn{\beta_2}, the coefficients on `X2`.
 #' * `sigma`: A data frame with posterior means and standard deviations for
 #' \eqn{\sigma_y}, \eqn{\sigma_1}, and \eqn{\sigma_2}.
-#' * `error`: A scalar. The approximate accuracy of the posterior mean and
-#' standard deviation estimates.
+#' * `errors_means`: A data frame with approximate accuracy of the posterior
+#' mean and standard deviation estimates
 #'
 #' @examples
 #' \dontrun{
@@ -60,107 +62,71 @@
 #' plot(fit$sigma$mean, c(sigma_y, sigma_1, sigma_2))
 #' }
 #'
-fit_two_group_dense <- function(y, X1, X2) {
-  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1))
+#' @useDynLib fastNoNo dense_eval
+fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
+  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
+            length(nnt) == 1)
 
-  # hard code these for now but maybe we want to expose them
-  compile_dir <- tempdir()  # where to compile
-  output_dir <- tempdir()   # where to write data and results
+  out1 <- run_two_group_dense(y, X1, X2, nnt)
+  out2 <- run_two_group_dense(y, X1, X2, nnt = 2*nnt)
 
-  write_data(
-    n = nrow(X1),
-    k1 = ncol(X1),
-    k2 = ncol(X2),
-    X = cbind(X1, X2),
-    y = y,
-    file = file.path(output_dir, "params.dat")
-  )
-  run_fortran(compile_dir, output_dir)
-  read_output(output_dir, k1 = ncol(X1), k2 = ncol(X2))
-}
+  k1 <- ncol(X1)
+  k2 <- ncol(X2)
+  k <- k1+k2
 
+  # compute errors
+  error_means <- out1$means - out2$means
+  error_sds <- out1$sds - out2$sds
+  errors <- data.frame(error_means, error_sds)
+  rownames(errors) <- c(paste0("beta_1_", 1:k1), paste0("beta_2_", 1:k2),
+                        "sigma_y", "sigma_1", "sigma_2")
 
-# internal ----------------------------------------------------------------
-
-write_data <- function(n, k1, k2, X, y, file) {
-  stopifnot(is.matrix(X), n > (k1+k2))
-  write.table(
-    sprintf("%012d", c(n, k1, k2)),
-    file = file,
-    row.names = FALSE,
-    col.names = FALSE,
-    sep = ',',
-    quote = FALSE
-  )
-  write.table(
-    sprintf("%012.6f", X),
-    file = file,
-    append = TRUE,
-    row.names = FALSE,
-    col.names = FALSE,
-    quote = FALSE
-  )
-  write.table(
-    sprintf("%012.6f", y),
-    file = file,
-    append = TRUE,
-    row.names = FALSE,
-    col.names = FALSE,
-    quote = FALSE
-  )
-}
-
-compile_fortran <- function(compile_dir, quiet = FALSE) {
-  if (!quiet) {
-    message(
-      "Compiling fortran code before fitting the model. " ,
-      "This is only necessary the first time the function ",
-      "is run in an R session."
-    )
-  }
-  processx::run(
-    command = system.file("two_group_dense", package = "fastNoNo"),
-    args = compile_dir,
-    wd = system.file("", package = "fastNoNo"),
-    error_on_status = FALSE
-  )
-}
-
-run_fortran <- function(compile_dir, output_dir) {
-  fortran_exe <- file.path(compile_dir, "int2")
-  if (!file.exists(fortran_exe)) {
-    compile_fortran(compile_dir)
-  }
-  processx::run(
-    command = fortran_exe,
-    args = output_dir,
-    wd = compile_dir,
-    error_on_status = FALSE
-  )
-
-}
-
-read_output <- function(output_dir, k1, k2) {
-  df_out <- read.csv(file = file.path(output_dir, "exps.dat"), header = FALSE)
-
-  error <- df_out$V1[1]
-
-  estimates <- df_out[2:nrow(df_out), , drop=FALSE]
-  colnames(estimates) <- c("mean", "sd")
-
-  beta_1 <- estimates[1:k1, ]
+  # means for first group
+  beta_1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
   rownames(beta_1) <- paste0("beta_1_", 1:k1)
+  colnames(beta_1) <- c("mean", "sd")
 
-  beta_2 <- estimates[(k1+1):(k1+k2), ]
+  # means for second group
+  beta_2 <- data.frame(out2$means[(k1+1):k], out2$sds[(k1+1):k])
   rownames(beta_2) <- paste0("beta_2_", 1:k2)
+  colnames(beta_2) <- c("mean", "sd")
 
-  sigma <- estimates[(nrow(estimates)-2):nrow(estimates), ]
+  # scale parameters
+  sigma <- data.frame(out2$means[(k+1):(k+3)], out2$sds[(k+1):(k+3)])
   rownames(sigma) <- c("sigma_y", "sigma_1", "sigma_2")
+  colnames(sigma) <- c("mean", "sd")
 
   list(
     beta_1 = beta_1,
     beta_2 = beta_2,
     sigma = sigma,
-    error = error
+    errors = errors
   )
+}
+
+
+# internal ----------------------------------------------------------------
+
+run_two_group_dense <- function(y, X1, X2, nnt) {
+  # extract parameters from inputs
+  n <- length(y)
+  k1 <- ncol(X1)
+  k2 <- ncol(X2)
+
+  fit <- .Fortran(
+    "dense_eval",
+    nnt = as.integer(nnt),  # number of quadrature in theta direction
+    nn = as.integer(80),    # number of quadrature nodes in other directions
+    n = n,
+    k1 = as.integer(k1),
+    k2 = as.integer(k2),
+    X = cbind(X1, X2),
+    y = y,
+    # these are dummy objects for fortran to use for the results
+    means = as.double(rep(-99, k1+k2+3)),
+    dsum = 0.0,
+    sds = as.double(rep(-99, k1+k2+3))
+  )
+
+  list(means=fit$means, sds=fit$sds)
 }
