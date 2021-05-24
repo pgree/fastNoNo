@@ -28,7 +28,7 @@
 #' * `sigma`: A data frame with posterior means and standard deviations for
 #' \eqn{\sigma_y} and \eqn{\sigma_beta_1}.
 #' * `cov`: The posterior covariance matrix of `beta_1` and `beta_2`.
-#' * `errors_means`: A data frame with approximate accuracy of the posterior
+#' * `errors`: A data frame with approximate accuracy of the posterior
 #' mean and standard deviation estimates
 #'
 #' @examples

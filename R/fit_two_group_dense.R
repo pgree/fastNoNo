@@ -27,8 +27,8 @@
 #' the vector \eqn{\beta_2}, the coefficients on `X2`.
 #' * `sigma`: A data frame with posterior means and standard deviations for
 #' \eqn{\sigma_y}, \eqn{\sigma_1}, and \eqn{\sigma_2}.
-#' * `errors_means`: A data frame with approximate accuracy of the posterior
-#' mean and standard deviation estimates
+#' * `errors`: A data frame with approximate accuracy of the posterior
+#' mean and standard deviation estimates.
 #'
 #' @examples
 #' \dontrun{
