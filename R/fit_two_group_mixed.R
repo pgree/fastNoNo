@@ -6,17 +6,18 @@
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
-#' \deqn{\beta_2 ~ normal(0, \sigma_{beta_2})}
-#' \deqn{\sigma_beta_1 ~ normal+(0, 1)}
+#' \deqn{\beta_2 ~ normal(0, ss*I)}
+#' \deqn{\sigma_1 ~ normal+(0, 1)}
 #' \deqn{\sigma_y ~ normal+(0, 1)}
 #'
-#' using numerical linear algebra and low dimensional Gaussian quadrature.
+#' where ss is a vector of positive numbers. The algorithm for computing the fit
+#' uses numerical linear algebra and low dimensional Gaussian quadrature.
 #'
 #' @export
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
-#' @param sigma_beta_2 Data vector of scale parameter priors corresponding to group 2.
+#' @param ss Data vector of scale parameter priors corresponding to group 2.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 #'   for details.
 #'
@@ -27,8 +28,8 @@
 #' the vector \eqn{\beta_2}, the coefficients on `X2`.
 #' * `sigma`: A data frame with posterior means and standard deviations for
 #' \eqn{\sigma_y} and \eqn{\sigma_beta_1}.
-#' * `cov`: The posterior covariance matrix of `beta_1` and `beta_2`.
-#' * `errors_means`: A data frame with approximate accuracy of the posterior
+#' * `cov`: The posterior covariance matrix of all coefficients `[beta_1, beta_2]`.
+#' * `errors`: A data frame with approximate accuracy of the posterior
 #' mean and standard deviation estimates
 #'
 #' @examples
