@@ -1,17 +1,18 @@
 #' Fast two-group normal-normal model
 #'
 #' @description
-#' This function fits a fast approximation to the
-#' Bayesian two-group hierarchical linear regression model
+#' This function fits a fast approximation to the Bayesian two-group
+#' hierarchical linear regression model
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
-#' \deqn{\beta_2 ~ normal(0, ss*I)}
+#' \deqn{\beta_2 ~ normal(0, ss * I)}
 #' \deqn{\sigma_1 ~ normal+(0, 1)}
 #' \deqn{\sigma_y ~ normal+(0, 1)}
 #'
-#' where ss is a vector of positive numbers. The algorithm for computing the fit
-#' uses numerical linear algebra and low dimensional Gaussian quadrature.
+#' where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
+#' matrix. The algorithm for computing the fit uses numerical linear algebra and
+#' low dimensional Gaussian quadrature.
 #'
 #' @export
 #' @param y Outcome vector.
@@ -27,10 +28,10 @@
 #' * `beta_2`: A data frame of posterior means and standard deviations for
 #' the vector \eqn{\beta_2}, the coefficients on `X2`.
 #' * `sigma`: A data frame with posterior means and standard deviations for
-#' \eqn{\sigma_y} and \eqn{\sigma_beta_1}.
+#' \eqn{\sigma_y} and \eqn{\sigma_1}.
 #' * `cov`: The posterior covariance matrix of coefficients `[beta_1, beta_2]`.
 #' * `errors`: A data frame with approximate accuracy of the posterior
-#' mean and standard deviation estimates
+#' mean and standard deviation estimates.
 #'
 #' @examples
 #' \dontrun{
@@ -41,36 +42,35 @@
 #' k_2 <- 60
 #'
 #' sigma_y <- 1
-#' sigma_beta_1 <- 0.5
-#' beta_1 <- rnorm(k_1, 0, sigma_beta_1)
+#' sigma_1 <- 0.5
+#' beta_1 <- rnorm(k_1, 0, sigma_1)
 #' beta_2 <- rnorm(k_2, 0, 1)
-#' sigma_beta_2 <- rep(1.0, k_2)
 #'
 #' X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
 #' X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 #' y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_two_group_mixed(y, X_1, X_2, sigma_beta_2, nnt=20)
+#' fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), nnt = 20)
 #' str(fit)
 #'
-#' # Plot estimates vs truth
-#' plot(fit$beta_1$mean, beta_1)
-#' plot(fit$beta_2$mean, beta_2)
-#' plot(fit$sigma$mean, c(sigma_y, sigma_beta_1))
+#' # Plot estimates of the betas vs "truth"
+#' plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
+#' plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 #' }
 #'
 #' @useDynLib fastNoNo dense_eval
-fit_two_group_mixed <- function(y, X1, X2, ss, nnt = 10) {
+fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
-            length(nnt) == 1)
+            length(ss) == ncol(X2), all(ss > 0),
+            length(nnt) == 1, nnt >= 1)
 
   out1 <- run_two_group_mixed(y, X1, X2, ss, nnt)
   out2 <- run_two_group_mixed(y, X1, X2, ss, nnt = 2*nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
-  k <- k1+k2
+  k <- k1 + k2
 
   # compute errors
   error_means <- out1$means - out2$means
@@ -85,17 +85,17 @@ fit_two_group_mixed <- function(y, X1, X2, ss, nnt = 10) {
   colnames(beta_1) <- c("mean", "sd")
 
   # means for second group
-  beta_2 <- data.frame(out2$means[(k1+1):k], out2$sds[(k1+1):k])
+  beta_2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
   rownames(beta_2) <- paste0("beta_2_", 1:k2)
   colnames(beta_2) <- c("mean", "sd")
 
   # scale parameters
-  sigma <- data.frame(out2$means[(k+1):(k+2)], out2$sds[(k+1):(k+2)])
+  sigma <- data.frame(out2$means[(k + 1):(k + 2)], out2$sds[(k + 1):(k + 2)])
   rownames(sigma) <- c("sigma_y", "sigma_beta_1")
   colnames(sigma) <- c("mean", "sd")
 
   # posterior covariance of beta_1 and beta_2
-  cov <- matrix(data=out2$cov, nrow=k, ncol=k)
+  cov <- matrix(data = out2$cov, nrow = k, ncol = k)
 
   list(
     beta_1 = beta_1,
@@ -119,7 +119,7 @@ run_two_group_mixed <- function(y, X1, X2, ss, nnt) {
     "mixed_2group",
     nnt = as.integer(nnt),  # number of quadrature in theta direction
     nn = as.integer(80),    # number of quadrature nodes in other directions
-    n = n,
+    n = as.integer(n),
     k1 = as.integer(k1),
     k2 = as.integer(k2),
     k = as.integer(k1+k2),
@@ -127,11 +127,11 @@ run_two_group_mixed <- function(y, X1, X2, ss, nnt) {
     y = y,
     # these are dummy objects for fortran to use for the results
     ss = as.double(ss),
-    means = as.double(rep(-99, k1+k2+2)),
+    means = as.double(rep(-99, k1 + k2 + 2)),
     dsum = 0.0,
-    sds = as.double(rep(-99, k1+k2+2)),
-    cov = as.double(rep(-99, (k1+k2)**2))
+    sds = as.double(rep(-99, k1 + k2 + 2)),
+    cov = as.double(rep(-99, (k1 + k2)^2))
   )
 
-  list(means=fit$means, sds=fit$sds, cov=fit$cov)
+  list(means = fit$means, sds = fit$sds, cov = fit$cov)
 }

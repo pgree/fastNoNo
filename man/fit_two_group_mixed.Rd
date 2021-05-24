@@ -4,7 +4,7 @@
 \alias{fit_two_group_mixed}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group_mixed(y, X1, X2, ss, nnt = 10)
+fit_two_group_mixed(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10)
 }
 \arguments{
 \item{y}{Outcome vector.}
@@ -13,10 +13,10 @@ fit_two_group_mixed(y, X1, X2, ss, nnt = 10)
 
 \item{X2}{Data matrix corresponding to group 2.}
 
+\item{ss}{Data vector of scale parameter priors corresponding to group 2.}
+
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 for details.}
-
-\item{sigma_beta_2}{Data vector of scale parameter priors corresponding to group 2.}
 }
 \value{
 A named list with the following components:
@@ -26,23 +26,25 @@ the vector \eqn{\beta_1}, the coefficients on \code{X1}.
 \item \code{beta_2}: A data frame of posterior means and standard deviations for
 the vector \eqn{\beta_2}, the coefficients on \code{X2}.
 \item \code{sigma}: A data frame with posterior means and standard deviations for
-\eqn{\sigma_y} and \eqn{\sigma_beta_1}.
-\item \code{cov}: The posterior covariance matrix of \code{beta_1} and \code{beta_2}.
+\eqn{\sigma_y} and \eqn{\sigma_1}.
+\item \code{cov}: The posterior covariance matrix of coefficients \verb{[beta_1, beta_2]}.
 \item \code{errors}: A data frame with approximate accuracy of the posterior
-mean and standard deviation estimates
+mean and standard deviation estimates.
 }
 }
 \description{
-This function fits a fast approximation to the
-Bayesian two-group hierarchical linear regression model
+This function fits a fast approximation to the Bayesian two-group
+hierarchical linear regression model
 
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
-\deqn{\beta_2 ~ normal(0, \sigma_{beta_2})}
-\deqn{\sigma_beta_1 ~ normal+(0, 1)}
+\deqn{\beta_2 ~ normal(0, ss * I)}
+\deqn{\sigma_1 ~ normal+(0, 1)}
 \deqn{\sigma_y ~ normal+(0, 1)}
 
-using numerical linear algebra and low dimensional Gaussian quadrature.
+where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
+matrix. The algorithm for computing the fit uses numerical linear algebra and
+low dimensional Gaussian quadrature.
 }
 \examples{
 \dontrun{
@@ -53,23 +55,21 @@ k_1 <- 50
 k_2 <- 60
 
 sigma_y <- 1
-sigma_beta_1 <- 0.5
-beta_1 <- rnorm(k_1, 0, sigma_beta_1)
+sigma_1 <- 0.5
+beta_1 <- rnorm(k_1, 0, sigma_1)
 beta_2 <- rnorm(k_2, 0, 1)
-sigma_beta_2 <- rep(1.0, k_2)
 
 X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
 X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
 
 # Fit model
-fit <- fit_two_group_mixed(y, X_1, X_2, sigma_beta_2, nnt=20)
+fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), nnt = 20)
 str(fit)
 
-# Plot estimates vs truth
-plot(fit$beta_1$mean, beta_1)
-plot(fit$beta_2$mean, beta_2)
-plot(fit$sigma$mean, c(sigma_y, sigma_beta_1))
+# Plot estimates of the betas vs "truth"
+plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
+plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 }
 
 }

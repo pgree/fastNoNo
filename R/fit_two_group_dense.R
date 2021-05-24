@@ -1,8 +1,8 @@
 #' Fast two-group normal-normal model
 #'
 #' @description
-#' This function fits a fast approximation to the
-#' Bayesian two-group hierarchical linear regression model
+#' This function fits a fast approximation to the Bayesian two-group
+#' hierarchical linear regression model
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
@@ -11,7 +11,8 @@
 #' \deqn{\sigma_2 ~ normal+(0, 1)}
 #' \deqn{\sigma_y ~ normal+(0, 1)}
 #'
-#' using numerical linear algebra and low dimensional Gaussian quadrature.
+#' The algorithm for computing the fit uses numerical linear algebra and
+#' low dimensional Gaussian quadrature.
 #'
 #' @export
 #' @param y Outcome vector.
@@ -51,23 +52,22 @@
 #' fit <- fit_two_group_dense(y, X_1, X_2)
 #' str(fit)
 #'
-#' # Plot estimates vs truth
-#' plot(fit$beta_1$mean, beta_1)
-#' plot(fit$beta_2$mean, beta_2)
-#' plot(fit$sigma$mean, c(sigma_y, sigma_1, sigma_2))
+#' # Plot estimates of the betas vs "truth"
+#' plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
+#' plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 #' }
 #'
 #' @useDynLib fastNoNo dense_eval
 fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
-            length(nnt) == 1)
+            length(nnt) == 1, nnt >= 1)
 
   out1 <- run_two_group_dense(y, X1, X2, nnt)
-  out2 <- run_two_group_dense(y, X1, X2, nnt = 2*nnt)
+  out2 <- run_two_group_dense(y, X1, X2, nnt = 2 * nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
-  k <- k1+k2
+  k <- k1 + k2
 
   # compute errors
   error_means <- out1$means - out2$means
@@ -82,12 +82,12 @@ fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
   colnames(beta_1) <- c("mean", "sd")
 
   # means for second group
-  beta_2 <- data.frame(out2$means[(k1+1):k], out2$sds[(k1+1):k])
+  beta_2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
   rownames(beta_2) <- paste0("beta_2_", 1:k2)
   colnames(beta_2) <- c("mean", "sd")
 
   # scale parameters
-  sigma <- data.frame(out2$means[(k+1):(k+3)], out2$sds[(k+1):(k+3)])
+  sigma <- data.frame(out2$means[(k + 1):(k + 3)], out2$sds[(k + 1):(k + 3)])
   rownames(sigma) <- c("sigma_y", "sigma_1", "sigma_2")
   colnames(sigma) <- c("mean", "sd")
 
@@ -112,16 +112,16 @@ run_two_group_dense <- function(y, X1, X2, nnt) {
     "dense_eval",
     nnt = as.integer(nnt),  # number of quadrature in theta direction
     nn = as.integer(80),    # number of quadrature nodes in other directions
-    n = n,
+    n = as.integer(n),
     k1 = as.integer(k1),
     k2 = as.integer(k2),
     X = cbind(X1, X2),
     y = y,
     # these are dummy objects for fortran to use for the results
-    means = as.double(rep(-99, k1+k2+3)),
+    means = as.double(rep(-99, k1 + k2 + 3)),
     dsum = 0.0,
-    sds = as.double(rep(-99, k1+k2+3))
+    sds = as.double(rep(-99, k1 + k2 + 3))
   )
 
-  list(means=fit$means, sds=fit$sds)
+  list(means = fit$means, sds = fit$sds)
 }
