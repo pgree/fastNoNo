@@ -28,7 +28,7 @@
 #' the vector \eqn{\beta_2}, the coefficients on `X2`.
 #' * `sigma`: A data frame with posterior means and standard deviations for
 #' \eqn{\sigma_y} and \eqn{\sigma_beta_1}.
-#' * `cov`: The posterior covariance matrix of all coefficients `[beta_1, beta_2]`.
+#' * `cov`: The posterior covariance matrix of coefficients `[beta_1, beta_2]`.
 #' * `errors`: A data frame with approximate accuracy of the posterior
 #' mean and standard deviation estimates
 #'
