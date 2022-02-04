@@ -30,8 +30,8 @@ mean and standard deviation estimates.
 }
 }
 \description{
-This function fits a fast approximation to the
-Bayesian two-group hierarchical linear regression model
+This function fits a fast approximation to the Bayesian two-group
+hierarchical linear regression model
 
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
@@ -40,7 +40,8 @@ Bayesian two-group hierarchical linear regression model
 \deqn{\sigma_2 ~ normal+(0, 1)}
 \deqn{\sigma_y ~ normal+(0, 1)}
 
-using numerical linear algebra and low dimensional Gaussian quadrature.
+The algorithm for computing the fit uses numerical linear algebra and
+low dimensional Gaussian quadrature.
 }
 \examples{
 \dontrun{
@@ -63,10 +64,9 @@ y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
 fit <- fit_two_group_dense(y, X_1, X_2)
 str(fit)
 
-# Plot estimates vs truth
-plot(fit$beta_1$mean, beta_1)
-plot(fit$beta_2$mean, beta_2)
-plot(fit$sigma$mean, c(sigma_y, sigma_1, sigma_2))
+# Plot estimates of the betas vs "truth"
+plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
+plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 }
 
 }
