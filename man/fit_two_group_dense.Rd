@@ -14,7 +14,7 @@ fit_two_group_dense(y, X1, X2, nnt = 10)
 \item{X2}{Data matrix corresponding to group 2.}
 
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
-for details.}
+(2021) for details.}
 }
 \value{
 A named list with the following components:
@@ -41,7 +41,7 @@ hierarchical linear regression model
 \deqn{\sigma_y ~ normal+(0, 1)}
 
 The algorithm for computing the fit uses numerical linear algebra and
-low dimensional Gaussian quadrature.
+low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
 }
 \examples{
 \dontrun{
@@ -69,4 +69,9 @@ plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
 plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 }
 
+}
+\references{
+Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Andrew Gelman, and Aki Vehtari.
+(2021). Fast methods for posterior inference of two-group normal-normal models.
+\href{https://arxiv.org/abs/2110.03055}{preprint arXiv:2110.03055}
 }

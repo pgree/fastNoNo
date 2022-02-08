@@ -16,7 +16,7 @@ fit_two_group_mixed(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10)
 \item{ss}{Data vector of scale parameter priors corresponding to group 2.}
 
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
-for details.}
+(2021) for details.}
 }
 \value{
 A named list with the following components:
@@ -44,7 +44,7 @@ hierarchical linear regression model
 
 where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
 matrix. The algorithm for computing the fit uses numerical linear algebra and
-low dimensional Gaussian quadrature.
+low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
 }
 \examples{
 \dontrun{
@@ -72,4 +72,9 @@ plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
 plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 }
 
+}
+\references{
+Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Andrew Gelman, and Aki Vehtari.
+(2021). Fast methods for posterior inference of two-group normal-normal models.
+\href{https://arxiv.org/abs/2110.03055}{preprint arXiv:2110.03055}
 }

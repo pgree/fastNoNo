@@ -12,14 +12,14 @@
 #' \deqn{\sigma_y ~ normal+(0, 1)}
 #'
 #' The algorithm for computing the fit uses numerical linear algebra and
-#' low dimensional Gaussian quadrature.
+#' low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
 #'
 #' @export
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
-#'   for details.
+#'   (2021) for details.
 #'
 #' @return A named list with the following components:
 #' * `beta_1`: A data frame of posterior means and standard deviations for
@@ -56,6 +56,11 @@
 #' plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
 #' plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 #' }
+#'
+#' @references
+#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Andrew Gelman, and Aki Vehtari.
+#' (2021). Fast methods for posterior inference of two-group normal-normal models.
+#' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
 #' @useDynLib fastNoNo dense_eval
 fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
