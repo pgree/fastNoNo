@@ -236,7 +236,7 @@ c
 c
 c
         subroutine dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums,
-     1     dsum, stds)
+     1     stds)
         implicit real *8 (a-h,o-z)
         real*8 a(*), y(*), dsums(*), stds(*),
      1     thetas(nn_theta),rhos(nn),phis(nn), s(k1+k2),s2(k1+k2),

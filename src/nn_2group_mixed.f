@@ -111,7 +111,7 @@ c
 c
 c
         subroutine mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, 
-     1     dsums, dsum, stds, dsums_cov)
+     1     dsums, stds, dsums_cov)
         implicit real *8 (a-h,o-z)
         real*8 a(n,*), y(*), dsums(*), stds(*),
      1     ts(nnt),rhos(nn),phis(nn), s(k),s2(k), ss(k2),

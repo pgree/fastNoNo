@@ -133,7 +133,6 @@ run_two_group_mixed <- function(y, X1, X2, ss, nnt) {
     # these are dummy objects for fortran to use for the results
     ss = as.double(ss),
     means = as.double(rep(-99, k1 + k2 + 2)),
-    dsum = 0.0,
     sds = as.double(rep(-99, k1 + k2 + 2)),
     cov = as.double(rep(-99, (k1 + k2)^2))
   )

@@ -49,7 +49,7 @@
 #' y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_two_group_dense(y, X_1, X_2)
+#' fit <- fit_two_group(y, X_1, X_2)
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
@@ -63,12 +63,12 @@
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
 #' @useDynLib fastNoNo dense_eval
-fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
+fit_two_group <- function(y, X1, X2, nnt = 10) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
             length(nnt) == 1, nnt >= 1)
 
-  out1 <- run_two_group_dense(y, X1, X2, nnt)
-  out2 <- run_two_group_dense(y, X1, X2, nnt = 2 * nnt)
+  out1 <- run_two_group(y, X1, X2, nnt)
+  out2 <- run_two_group(y, X1, X2, nnt = 2 * nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -107,7 +107,7 @@ fit_two_group_dense <- function(y, X1, X2, nnt = 10) {
 
 # internal ----------------------------------------------------------------
 
-run_two_group_dense <- function(y, X1, X2, nnt) {
+run_two_group <- function(y, X1, X2, nnt) {
   # extract parameters from inputs
   n <- length(y)
   k1 <- ncol(X1)
@@ -124,7 +124,6 @@ run_two_group_dense <- function(y, X1, X2, nnt) {
     y = y,
     # these are dummy objects for fortran to use for the results
     means = as.double(rep(-99, k1 + k2 + 3)),
-    dsum = 0.0,
     sds = as.double(rep(-99, k1 + k2 + 3))
   )
 
