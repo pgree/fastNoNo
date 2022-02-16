@@ -64,7 +64,7 @@
 #' (2021). Fast methods for posterior inference of two-group normal-normal models.
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
-#' @useDynLib fastNoNo dense_eval
+#' @useDynLib fastNoNo mixed_2group
 fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
             length(ss) == ncol(X2), all(ss > 0),

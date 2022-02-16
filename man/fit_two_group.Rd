@@ -4,7 +4,7 @@
 \alias{fit_two_group}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group(y, X1, X2, stdy, std1, std2, nnt = 10)
+fit_two_group(y, X1, X2, sd_y, sd_1, sd_2, nnt = 10)
 }
 \arguments{
 \item{y}{Outcome vector.}
@@ -13,14 +13,14 @@ fit_two_group(y, X1, X2, stdy, std1, std2, nnt = 10)
 
 \item{X2}{Data matrix corresponding to group 2.}
 
+\item{sd_y}{Prior on residual standard deviation.}
+
+\item{sd_1}{Hyperprior on standard deviation of group 1.}
+
+\item{sd_2}{Hyperprior on standard deviation of group 2.}
+
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 (2021) for details.}
-
-\item{std_y}{prior on residual standard deviation.}
-
-\item{std_1}{hyperprior on standard deviation of group 1.}
-
-\item{std_2}{hyperprior on standard deviation of group 2.}
 }
 \value{
 A named list with the following components:
@@ -42,9 +42,9 @@ hierarchical linear regression model
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
 \deqn{\beta_2 ~ normal(0, \sigma_2)}
-\deqn{\sigma_y ~ normal+(0, std_y)}
-\deqn{\sigma_1 ~ normal+(0, std_1)}
-\deqn{\sigma_2 ~ normal+(0, std_2)}
+\deqn{\sigma_y ~ normal+(0, sd_y)}
+\deqn{\sigma_1 ~ normal+(0, sd_1)}
+\deqn{\sigma_2 ~ normal+(0, sd_2)}
 
 The algorithm for computing the fit uses numerical linear algebra and
 low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
@@ -67,12 +67,12 @@ X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
 
 # hyperpriors on scale parameters
-std_1 <- 1
-std_2 <- 2
-std_y <- 2
+sd_1 <- 1
+sd_2 <- 2
+sd_y <- 2
 
 # Fit model
-fit <- fit_two_group(y, X_1, X_2, std_y, std_1, std_2)
+fit <- fit_two_group(y, X_1, X_2, sd_y, sd_1, sd_2)
 str(fit)
 
 # Plot estimates of the betas vs "truth"

@@ -7,9 +7,9 @@
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
 #' \deqn{\beta_2 ~ normal(0, \sigma_2)}
-#' \deqn{\sigma_y ~ normal+(0, std_y)}
-#' \deqn{\sigma_1 ~ normal+(0, std_1)}
-#' \deqn{\sigma_2 ~ normal+(0, std_2)}
+#' \deqn{\sigma_y ~ normal+(0, sd_y)}
+#' \deqn{\sigma_1 ~ normal+(0, sd_1)}
+#' \deqn{\sigma_2 ~ normal+(0, sd_2)}
 #'
 #' The algorithm for computing the fit uses numerical linear algebra and
 #' low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
@@ -18,9 +18,9 @@
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
-#' @param std_y prior on residual standard deviation.
-#' @param std_1 hyperprior on standard deviation of group 1.
-#' @param std_2 hyperprior on standard deviation of group 2.
+#' @param sd_y Prior on residual standard deviation.
+#' @param sd_1 Hyperprior on standard deviation of group 1.
+#' @param sd_2 Hyperprior on standard deviation of group 2.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 #'   (2021) for details.
 #'
@@ -52,12 +52,12 @@
 #' y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
 #'
 #' # hyperpriors on scale parameters
-#' std_1 <- 1
-#' std_2 <- 2
-#' std_y <- 2
+#' sd_1 <- 1
+#' sd_2 <- 2
+#' sd_y <- 2
 #'
 #' # Fit model
-#' fit <- fit_two_group(y, X_1, X_2, std_y, std_1, std_2)
+#' fit <- fit_two_group(y, X_1, X_2, sd_y, sd_1, sd_2)
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
@@ -71,12 +71,12 @@
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
 #' @useDynLib fastNoNo dense_eval
-fit_two_group <- function(y, X1, X2, stdy, std1, std2, nnt = 10) {
-  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1), stdy > 0,
-            std1 > 0, std2 > 0, length(nnt) == 1, nnt >= 1)
+fit_two_group <- function(y, X1, X2, sd_y, sd_1, sd_2, nnt = 10) {
+  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1), sd_y > 0,
+            sd_1 > 0, sd_2 > 0, length(nnt) == 1, nnt >= 1)
 
-  out1 <- run_two_group(y, X1, X2, stdy, std1, std2, nnt)
-  out2 <- run_two_group(y, X1, X2, stdy, std1, std2, nnt = 2 * nnt)
+  out1 <- run_two_group(y, X1, X2, sd_y, sd_1, sd_2, nnt)
+  out2 <- run_two_group(y, X1, X2, sd_y, sd_1, sd_2, nnt = 2 * nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -115,7 +115,7 @@ fit_two_group <- function(y, X1, X2, stdy, std1, std2, nnt = 10) {
 
 # internal ----------------------------------------------------------------
 
-run_two_group <- function(y, X1, X2, stdy, std1, std2, nnt) {
+run_two_group <- function(y, X1, X2, sd_y, sd_1, sd_2, nnt) {
   # extract parameters from inputs
   n <- length(y)
   k1 <- ncol(X1)
@@ -130,7 +130,7 @@ run_two_group <- function(y, X1, X2, stdy, std1, std2, nnt) {
     k2 = as.integer(k2),
     X = cbind(X1, X2),
     y = y,
-    sigs = as.double(c(stdy, std1, std2)),
+    sigs = as.double(c(sd_y, sd_1, sd_2)),
     # these are dummy objects for fortran to use for the results
     means = as.double(rep(-99, k1 + k2 + 3)),
     sds = as.double(rep(-99, k1 + k2 + 3))

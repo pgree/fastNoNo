@@ -3,3 +3,4 @@
 export(fit_two_group)
 export(fit_two_group_mixed)
 useDynLib(fastNoNo,dense_eval)
+useDynLib(fastNoNo,mixed_2group)
