@@ -19,7 +19,7 @@ c
 c
         subroutine test_integration()
         implicit real *8 (a-h,o-z)
-        real*8 a(20 000 000), y(500 000)
+        real*8 a(20 000 000), y(500 000), sigs(3)
         real *8, allocatable :: dsums(:), dexps(:),
      1     dsums2(:), dds(:), stds(:), stds2(:)
         character(100) csv_file, filename
@@ -27,10 +27,8 @@ c
 c
 c        parameters
 c
-        csv_file = 'test_dense_params.dat'
-        csv_file = 'abort_params.dat'
         csv_file = 'params.dat'
-        call read_params(csv_file, n, k1, k2, a, y)
+        call read_params(csv_file, n, k1, k2, a, y, sigs)
 ccc        call prin2('a = *',a,n*k)
 ccc        call prin2('y = *',y,n)
         k = k1+k2
@@ -50,18 +48,17 @@ c
 c        integrate
 c
         nn = 60
-        nn_theta = 20
-        nn_theta = 4
-        call dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums, dsum,
+        nn_theta = 40
+        call dense_eval(nn_theta, nn, n, k1, k2, a, y, sigs, dsums, 
      1     stds)
-ccc        call prin2('dsums*', dsums, k+3)
-ccc        call prin2('stds*', stds, k+3)
+        call prin2('dsums*', dsums, k+3)
+        call prin2('stds*', stds, k+3)
 c
 c        double nodes in all directions
 c
         nn2 = 2*nn
         nn_theta2 = 2*nn_theta
-        call dense_eval(nn_theta2, nn2, n, k1, k2, a, y, dsums2, dsum2,
+        call dense_eval(nn_theta2, nn2, n, k1, k2, a, y, sigs, dsums2, 
      1     stds2)
 
 c
@@ -73,9 +70,30 @@ c
         call dd_abs_max(stds2, stds, k+3, dd_max)
         call prin2('max posterior std error*', dd_max, 1)
 
+c
+c        write posterior means and stds to file
+c
         filename = 'exps.dat'
         call write_exps_stds(filename, k, dsums, stds)
 ccc        call prin2('dsums*', dsums,k+3)
+
+c
+c        write to file all dds
+c
+        do i=1,k+3
+        dds(i) = dsums(i) - dsums2(i)
+        enddo
+
+        filename = 'dds_exps.dat'
+        call write_dds(filename, k+3, dds)
+
+        do i=1,k+3
+        dds(i) = stds(i) - stds2(i)
+        enddo
+
+        filename = 'dds_stds.dat'
+        call write_dds(filename, k+3, dds)
+
 
 c
 c        stan comparison
@@ -84,170 +102,54 @@ c
         csv_file = 'test_means_dense_stan.dat'
         csv_file = 'means.dat'
         call read_means(csv_file, k, dexps)
-ccc        call prin2('stan expectations*', dexps, k+3)
+        call prin2('stan expectations*', dexps, k+3)
 
         call dd_abs_max(dexps, dsums, k, dd_max)
         call prin2('stan max error*', dd_max, 1)
-
+        
         return
         end
-c
-c
-c
-c
-c
-        subroutine utest2()
-        implicit real *8 (a-h,o-z)
-        real*8 a(10 000 000), x(100 000), y(1000 000), dexps(10 000),
-     1     dsums2(10 000), dsums(100 000), dds(10 000), stds(10 000),
-     1     stds2(10 000)
-        character(100) csv_file, filename
-
-c
-c        compare the results of the algorithm of this file with
-c        the hardcoded results from a high accuracy run from this
-c        same algorithm
-c
-
-c
-c        read in unit test parameters
-c
-        csv_file = 'test_dense_params2.dat'
-        call read_params(csv_file, n, k1, k2, a, y)
-        k = k1+k2
-        call prinf('n*', n, 1)
-        call prinf('k1*', k1, 1)
-        call prinf('k2*', k2, 1)
-
-c
-c        integrate
-c
-        nn = 80
-        nn_theta = 60
-        call dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums, dsum,
-     1     stds)
-
-c
-c        compare the result computed here with hardcoded results
-c
-        filename = 'test_means_dense_fast2.dat'
-        call read_exps_stds(filename, k, dsums2, stds2)
-
-        call dd_abs_max(dsums2, dsums, k+3, dd_max)
-        call prin2('max posterior mean error*', dd_max, 1)
-
-        call dd_abs_max(stds2, stds, k+3, dd_max)
-        call prin2('max posterior std error*', dd_max, 1)
-
-c
-c        stan comparison
-c
-        filename = 'test_means_dense_stan2.dat'
-        call read_means(filename, k, dexps)
-ccc        call prin2('stan expectations*', dexps, k+3)
-
-        call dd_abs_max(dexps, dsums, k, dd_max)
-        call prin2('stan max error*', dd_max, 1)
-
-        return
-        end
-c
-c
-c
-c
-c
-        subroutine utest()
-        implicit real *8 (a-h,o-z)
-        real*8 a(10 000 000), x(100 000), y(1000 000), dexps(10 000),
-     1     dsums2(10 000), dsums(100 000), dds(10 000), stds(10 000),
-     1     stds2(10 000)
-        character(100) csv_file, filename
-
-c
-c        compare the results of the algorithm of this file with
-c        the hardcoded results from a high accuracy run from this
-c        same algorithm
-c
-
-c
-c        read in parameters from unit test
-c
-        csv_file = 'test_dense_params.dat'
-        call read_params(csv_file, n, k1, k2, a, y)
-        k = k1+k2
-        call prinf('n*', n, 1)
-        call prinf('k1*', k1, 1)
-        call prinf('k2*', k2, 1)
-
-c
-c        integrate
-c
-        nn = 80
-        nn_theta = 60
-        call dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums, dsum,
-     1     stds)
-
-c
-c        compare to hardcoded results
-c
-        filename = 'test_means_dense_fast.dat'
-        call read_exps_stds(filename, k, dsums2, stds2)
-
-        call dd_abs_max(dsums2, dsums, k+3, dd_max)
-        call prin2('max posterior mean error*', dd_max, 1)
-
-        call dd_abs_max(stds2, stds, k+3, dd_max)
-        call prin2('max posterior std error*', dd_max, 1)
-
-c
-c        and compare to stan
-c
-        filename = 'test_means_dense_stan.dat'
-        call read_means(filename, k, dexps)
-ccc        call prin2('stan expectations*', dexps, k+3)
-
-        call dd_abs_max(dexps, dsums, k, dd_max)
-        call prin2('stan max error*', dd_max, 1)
-
-        return
-        end
-c
-c
-c
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
+c 
+c 
+c 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c 
 c       this is the end of the debugging code and the beginning of the
-c       least squares subroutines proper
-c
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c
-c
+c       two-group regression subroutines
+c 
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c 
+c 
 c         This file contains 8 user-callable subroutines: nrleastsq,
 c         nrleastsq2, nrleamatlr, rleamatr, nrleamatrr, nrleamatll,
-c         nrleamatrl, nrleas_proj. Following is a brief description
+c         nrleamatrl, nrleas_proj. Following is a brief description 
 c         of these subroutines.
 c
-c   dense_eval - evaluates two-group normal normal model with
-c         normal+(0, 1) hyperpriors on the scale parameters
+c   dense_eval - evaluates two-group normal normal model with 
+c         normal+(0, 1) hyperpriors on the scale parameters 
+c 
 c
 c
 c
 c
 c
 c
-        subroutine dense_eval(nn_theta, nn, n, k1, k2, a, y, dsums,
-     1     stds)
+        subroutine dense_eval(nn_theta, nn, n, k1, k2, a, y, sigs,
+     1     dsums, stds)
         implicit real *8 (a-h,o-z)
-        real*8 a(*), y(*), dsums(*), stds(*),
-     1     thetas(nn_theta),rhos(nn),phis(nn), s(k1+k2),s2(k1+k2),
+        real*8 a(n,k1+k2), y(n), dsums(k1+k2+3), sigs(3),stds(k1+k2+3),
+     1     thetas(nn_theta),rhos(nn),phis(nn), s(k1+k2),s2(k1+k2), 
      1     xs(k1+k2),
      1     ysmall(k1+k2),ys2(k1+k2),vmoms(100 000), dsumsi(k1+k2+3+10),
      1     whts_thetas(nn_theta+10),whts_phis(nn+10),whts_rhos(nn+10),
      1     dsum_xsi(k1+k2+10), dsum_vars(k1+k2+10)
-        real *8, allocatable :: u(:,:),vt(:,:),asca(:,:),ut(:,:),
-     1     b(:,:),ynew(:),v(:,:),bb(:,:), fmaxs(:), fs(:,:),
-     1     dsums_cov(:,:), dsums_covi(:,:), wwti(:,:), xxti(:,:),
-     1     gs(:,:), c(:,:), ct(:,:), tmp_mat(:,:)
+        real *8 u(n,k1+k2),vt(k1+k2,k1+k2),asca(n,k1+k2),ut(k1+k2,n),
+     1     b(k1+k2,k1+k2),ynew(k1+k2),v(k1+k2,k1+k2),bb(k1+k2,k1+k2), 
+     1     fmaxs(nn), fs(nn_theta,nn),
+     1     dsums_cov(k1+k2,k1+k2), dsums_covi(k1+k2,k1+k2), 
+     1     wwti(k1+k2,k1+k2), xxti(k1+k2,k1+k2),
+     1     gs(nn_theta,nn), c(k1+k2,k1+k2), ct(k1+k2,k1+k2), 
+     1     tmp_mat(k1+k2,k1+k2)
 
 c
 c        this subroutine computes posterior expectations of the two
@@ -256,15 +158,33 @@ c
 c          y ~ normal(A1*x1 + A2*x2, sig1)
 c          x1 ~ normal(0, sig2)
 c          x2 ~ normal(0, sig3)
-c          sig{1,2,3} ~ normal+(0, 1)
+c          sig{1,2,3} ~ normal+(0, stds(1, 2 3))
 c
-c        this subroutine computes E[x_i], var(x_i), E[sig{1,2,3}].
-c        after a change of variables, from sig1, sig2, sig3 to
-c        spherical coordinates, we integrate over a 3-dimensional
-c        grid using a tensor product of gaussian nodes.
+c        this subroutine computes E[x_i], var(x_i), E[sig{1,2,3}]. 
+c        after a change of variables, from sig1, sig2, sig3 to 
+c        spherical coordinates, we integrate over a 3-dimensional 
+c        grid using a tensor product of gaussian nodes. 
 c        for each value of the outer integral
-c        we do a diagonalization where the conditional density is
+c        we do a diagonalization where the conditional density is 
 c        a gaussian with a diagonal covariance.
+c
+c       inputs - 
+c          nn_theta - number of gaussian nodes in the theta direction,
+c            generally this can be small (~ 10-40)
+c          nn - nodes in the other two directions
+c          n - number of data points (observations)
+c          k1 - number of predictors in first group
+c          k2 - number of predictors in second group
+c          a - data, an n x (k1 + k2) matrix
+c          y - observations
+c          sigs - array of length three with priors on the standard
+c            deviations of sig1, sig2, sig3
+c
+c       outputs - 
+c          dsums - posterior means, the first k1 entries correspond
+c            to the first group, the next k2 correspond to the second
+c            group, and the final three correspond to the scale parameters
+c          stds - posterior standard deviations, in the same order as dsums
 c
 
         done = 1.0d0
@@ -272,24 +192,12 @@ c
 
         k = k1+k2
 
-        allocate (u(n,k))
-        allocate (ut(k,n))
-        allocate (vt(k,k))
-        allocate (v(k,k))
-        allocate (asca(n,k))
-        allocate (b(k,k))
-        allocate (bb(k,k))
-        allocate (ynew(k))
-        allocate (fmaxs(nn))
-        allocate (fs(nn_theta,nn))
-        allocate (gs(nn_theta,nn))
-        allocate (dsums_cov(k,k))
-        allocate (dsums_covi(k,k))
-        allocate (wwti(k,k))
-        allocate (xxti(k,k))
-        allocate (c(k,k))
-        allocate (ct(k,k))
-        allocate (tmp_mat(k,k))
+c
+c       hyperpriors -- variances, not stds 
+c
+        d1 = sigs(1)**2
+        d2 = sigs(2)**2
+        d3 = sigs(3)**2
 
 c
 c        before computing integral find least squares solution to
@@ -307,7 +215,7 @@ c        construct grid for outer parameter of integration, theta
 c
         theta0 = 0.0
         theta1 = pi/2.0d0
-        call theta_lege_nodes_whts(nn_theta, theta0, theta1, thetas,
+        call theta_lege_nodes_whts(nn_theta, theta0, theta1, thetas, 
      1     whts_thetas)
 
 c
@@ -330,14 +238,14 @@ c
 
 c
 c        theta integral
-c
+c       
         do 130 i=1,nn_theta
         t = thetas(i)
         wht_theta = whts_thetas(i)
 c
 c        compute the diagonal form of a^t*a for each theta which
-c        will be used to convert the integrand to a diagonal
-c        gaussian for each (theta, phi, rho)
+c        will be used to convert the integrand to a diagonal 
+c        gaussian for each (theta, phi, rho) 
 c
         call rescale_a(t,b,asca,k,k,k1,k2)
         call dsvd(k,k, asca, u, s, vt)
@@ -347,7 +255,7 @@ c
 
 c
 c        initialize sums taken in inner loop
-c          wwti is E[w*w^t] where w is in the coordinate
+c          wwti is E[w*w^t] where w is in the coordinate 
 c          system that depends on theta
 c
         dsumi = 0
@@ -365,20 +273,20 @@ c
 c        for each theta, get upper integration bound for phi
 c
         call get_phi1_fmax(nn, n, k, t, ysmall, ys2, s, s2, resid,
-     1     phi1i, fmax_theta)
+     1     d1, d2, d3, phi1i, fmax_theta)
         fmaxs(i) = fmax_theta
 ccc        call prin2('phi1i*', phi1i, 1)
 ccc        call prin2('fmax*', fmax, 1)
 
 c
-c        ... and lay down nodes
+c        ... and lay down nodes 
 c
         phi0 = 0.0
         call lege_nodes_whts(nn, phi0, phi1i, phis, whts_phis)
 ccc        call prin2('phis new*', phis, nn)
 
 c
-c          phi integral
+c          phi integral 
 c
         do 120 j=1,nn
         phi = phis(j)
@@ -391,14 +299,19 @@ c
 c
 c          rho integral
 c
-        call eval_rho_int(nn, n, k, exp_fact,
-     1     dsum_rho, dsum_rho1, dsum_rho2, fmax)
+        a1 = cos(phi)**2/d1
+        a1 = a1 + sin(phi)**2*cos(t)**2/d2
+        a1 = a1 + sin(phi)**2*sin(t)**2/d3
+        call  eval_rho_int(nn, n, a1, exp_fact, fmax, dsum_rho, 
+     1     dsum_rho1, dsum_rho2)
+
+
 c
-c        for fixed theta, compute integral over phi by a sum of
+c        for fixed theta, compute integral over phi by a sum of 
 c        the form \sum_i exp(fi)*gi so that
-c        we have an expression exp(fmi)*dsum, the reason we do
+c        we have an expression exp(fmi)*dsum, the reason we do 
 c        this is that exp(fi) is often smaller than 10^{-250}
-c
+c       
         fi = prefact + fmax - fmaxs(1)
         gi = dsum_rho
         gi1 = dsum_rho1
@@ -410,8 +323,8 @@ c
           dsumi = dsumi * exp(fmi-fi) + gi*wt
 
           do ijk=1,k
-          dsumsi(ijk) = dsumsi(ijk) * exp(fmi - fi) + gi*wt*vmoms(ijk)
-          enddo
+          dsumsi(ijk) = dsumsi(ijk) * exp(fmi - fi) + gi*wt*vmoms(ijk) 
+          enddo        
 
           dsumsi(k+1) = dsumsi(k+1)*exp(fmi-fi) + gi1*cos(phi)*wt
           dsumsi(k+2) = dsumsi(k+2)*exp(fmi-fi) + gi1*sin(phi)*cos(t)*wt
@@ -424,7 +337,7 @@ c
           do ijk=1,k
           coef = 1/(s2(ijk)/cos(phi)**2 + 1/sin(phi)**2)
           dsum_vars(ijk) = dsum_vars(ijk) * exp(fmi-fi) + coef*gi2*wt
-          enddo
+          enddo        
 
           do i1=1,k
           do i2=1,k
@@ -437,8 +350,8 @@ c
           dsumi = dsumi + exp(fi-fmi) * gi*wt
 
           do ijk=1,k
-          dsumsi(ijk) = dsumsi(ijk) + exp(fi - fmi) * gi*wt*vmoms(ijk)
-          enddo
+          dsumsi(ijk) = dsumsi(ijk) + exp(fi - fmi) * gi*wt*vmoms(ijk) 
+          enddo        
 
           dsumsi(k+1) = dsumsi(k+1) + exp(fi-fmi)*gi1*cos(phi)*wt
           dsumsi(k+2) = dsumsi(k+2) + exp(fi-fmi)*gi1*sin(phi)*cos(t)*wt
@@ -451,7 +364,7 @@ c
           do ijk=1,k
           coef = 1/(s2(ijk)/cos(phi)**2 + 1/sin(phi)**2)
           dsum_vars(ijk) = dsum_vars(ijk) + exp(fi-fmi)*coef*gi2*wt
-          enddo
+          enddo        
 
           do i1=1,k
           do i2=1,k
@@ -463,7 +376,7 @@ c
 
  120    continue
 
-c
+c        
 c        for covariance we need to convert back to original coordinate
 c        system. we have a different change of variables for each value
 c        of theta, so do this for each theta
@@ -487,9 +400,9 @@ ccc        call prin2('xs 2*', dsums_xsi, k)
 ccc        call prin2('dsumi*', dsumi, 1)
 
 c
-c        due to underflow issues, integrate over theta by computing
+c        due to underflow issues, integrate over theta by computing 
 c        sum of the form \sum_i exp(fi)*gi such that at the end
-c        we have an expression exp(fm)*dsum
+c        we have an expression exp(fm)*dsum 
 c
         fi = fmi
         wt = wht_theta
@@ -514,7 +427,7 @@ c
           dsums_cov(i1,i2)=dsums_cov(i1,i2)*exp(fm-fi) + tmp*wt
           enddo
           enddo
-
+  
           fm = fi
         else
           dsum = dsum + exp(fi-fm) * dsumi*wt
@@ -537,7 +450,7 @@ c
           dsums_cov(i1,i2)=dsums_cov(i1,i2) + exp(fi-fm)*tmp*wt
           enddo
           enddo
-
+  
         endif
 
  130    continue
@@ -562,7 +475,7 @@ c
         enddo
 
 c
-c        dsums_cov now contains E[xx^t], adjust to get covariance
+c        dsums_cov now contains E[xx^t], adjust to get covariance 
 c
         do i=1,k
         do j=1,k
@@ -589,7 +502,7 @@ c
 
 c
 c        plot
-c
+c        
 ccc        call prin2('fs*', fs, nn_theta*nn)
 ccc        call plot_heatmap(nn_theta, nn, fs)
 
@@ -609,12 +522,12 @@ c
      1     ut(100 000), tmp_mat(100 000)
 
 c
-c        this subroutine is not finished! it is in the middle of
+c        this subroutine is not finished! it is in the middle of 
 c        development
 c
 
         call max_vec(nnt*nn, fs, fmax, ind)
-
+        
         do i=1,nnt
         do j=1,nn
         hs(i, j) = fs(i, j) - fmax + log10(gs(i, j))
@@ -645,7 +558,7 @@ ccc        call prin2('coefs*', coefs, nnt*nn)
         do j=1,nn
         coefs_log(i, j) = log10(abs(coefs(i,j)))
         tot_coef = tot_coef + abs(coefs(i,j))
-
+        
         if ((i .gt. nnt-3) .or. (j .gt. nn-5)) then
           dsum = dsum + abs(coefs(i,j))
           ndsum = ndsum + 1
@@ -670,7 +583,7 @@ c
 ccc        call prinf('ndsum*', ndsum, 1)
         avg_tail_coef = dsum / (nn*3 + nnt*5 - 3*5)
         call prin2('avg_tail_coef*', avg_tail_coef, 1)
-        err = avg_tail_coef / tot_coef
+        err = avg_tail_coef / tot_coef 
 
         call prin2('err*', err, 1)
 
@@ -705,7 +618,7 @@ c
         do i=1,k1
         s1(i) = cos(t)
         enddo
-
+        
         do i=1,k2
         s1(i+k1) = sin(t)
         enddo
@@ -721,18 +634,18 @@ c
 c
 c
         subroutine get_phi1_fmax(nn, n, k, t, ysmall, ys2, s, s2, resid,
-     1     phi1i, fmax)
+     1     d1, d2, d3, phi1i, fmax)
         implicit real *8 (a-h,o-z)
         real*8 rhos(nn+10),whts_rhos(nn+10),phis(nn+10),
      1     whts_phis(nn+10), ysmall(*),ys2(*),s(*),s2(*),
      1     fmaxs(nn+10)
 
 c
-c        find the upper integration bound of the integral with
-c        respect to phi. do this by evaluating the integral on
+c        find the upper integration bound of the integral with 
+c        respect to phi. do this by evaluating the integral on  
 c        a sparse grid and checking when the value decreases below
-c        10^{-18} of its maximum. also return the maximum value of
-c        the integrand
+c        10^{-18} of its maximum. also return the maximum value of 
+c        the integrand 
 c
 
         done = 1.0d0
@@ -753,21 +666,25 @@ c
         phi = phis(j)
         call compute_beta_alpha_prefact(phi,ysmall,ys2,s,s2,
      1      n,k,resid,alpha,beta,prefact,exp_fact)
+        a1 = cos(phi)**2/d1
+        a1 = a1 + sin(phi)**2*cos(t)**2/d2
+        a1 = a1 + sin(phi)**2*sin(t)**2/d3
 
 c
-c        get maximum of integrand and use that maximum for the
+c        get maximum of integrand and use that maximum for the 
 c        first value of phi for scaling
 c
         dn = n - 2
         rho_max = sqrt(1.0d0/2.0d0*(sqrt(4.0d0*exp_fact + dn*dn) - dn))
-        call eval_logdens_rho(rho_max,n,exp_fact,fmaxmax)
+        call eval_logdens_rho(n, rho_max, a1, exp_fact, fmaxmax)
         fmaxs(j) = fmaxmax
 
 c
 c        compute integral in rho
 c
-        call eval_rho_int(nn, n, k, exp_fact,
-     1     dsum_rho, dsum_rho1, dsum_rho2, fmaxi)
+        call  eval_rho_int(nn, n, a1, exp_fact, fmaxi, dsum_rho, 
+     1     dsum_rho1, dsum_rho2)
+
         fi = log(dsum_rho) + prefact + fmaxi - fmaxs(1)
 
         if (fi .gt. fmax) fmax = fi
@@ -780,7 +697,7 @@ c
  119    continue
 
 c
-c        must use full interval
+c        must use full interval 
 c
         phi1i = pi/2.0d0
 
@@ -799,51 +716,165 @@ c
 c
 c
 c
-        subroutine eval_rho_int(nn, n, k, exp_fact,
-     1     dsum_rho, dsum_rho1, dsum_rho2, fmax)
+        subroutine eval_rho_int(nn, n, a1, c1, fmax, dsum_rho, 
+     1     dsum_rho1, dsum_rho2)
         implicit real *8 (a-h,o-z)
-        real*8 whts_rhos(nn),rhos(nn)
+        real*8 rhos(nn), whts_rhos(nn)
 
 c
-c        compute the integral from 0 to infinity of
-c         f(rho), rho*f(rho), and rho**2*f(rho)
+c        evaluate the integral from 0 to infinity of 
 c
-c        where
-c
-c         f(rho) = exp(-rho**2/2 - exp_fact/(2*rho**2))/rho**(n-2)
+c          f(t) = rho**(-n+2) * exp(-a1*rho**2/2 - c1/(2*rho**2))
 c
 
-c
-c        first find integration bounds
-c
-        call get_rho0(exp_fact, n, rho0)
-        call get_rho1(exp_fact, n, rho1)
+        call get_rho0(a1, c1, n, rho0)
+        call get_rho1(a1, c1, n, rho1)
         call lege_nodes_whts(nn, rho0, rho1, rhos, whts_rhos)
 
-c
-c        get maximum of integrand
-c
-        dn = n - 2
-        rho_max = sqrt(1.0d0/2.0d0*(sqrt(4.0d0*exp_fact + dn*dn) - dn))
-        call eval_logdens_rho(rho_max,n,exp_fact,fmax)
+        call get_rho_max_fmax(n, a1, c1, rho_max, fmax)
 
 c
-c        compute integral
+c        integrate
 c
-        dsum_rho = 0
-        dsum_rho1 = 0
-        dsum_rho2 = 0
-        do 110 i=1,nn
-        rho = rhos(i)
-        call eval_logdens_rho(rho,n,exp_fact,f)
-        wht_rho = whts_rhos(i)
+        dsum_rho = 0.0d0
+        dsum_rho1 = 0.0d0
+        dsum_rho2 = 0.0d0
+        do 100 i_rho=1,nn
+        rho = rhos(i_rho)
 
-        dsum_rho = dsum_rho + exp(f-fmax)*wht_rho
-        dsum_rho1 = dsum_rho1 + rho*exp(f-fmax)*wht_rho
-        dsum_rho2 = dsum_rho2 + rho**2*exp(f-fmax)*wht_rho
+        call eval_logdens_rho(n, rho, a1, c1, f)
+        fci = fc + f
+ccc        call prin2('a1*', a1, 1)
+ccc        call prin2('c1*', c1, 1)
 
- 110    continue
+        dsum_rho = dsum_rho + exp(f-fmax)*whts_rhos(i_rho)
+        dsum_rho1 = dsum_rho1 + rho*exp(f-fmax)*whts_rhos(i_rho)
+        dsum_rho2 = dsum_rho2 + rho**2*exp(f-fmax)*whts_rhos(i_rho)
 
+ 100    continue
+
+c
+c        check: compare maximum of integrand to value at endpoints
+c
+        nmax = 3
+        do i=1,nmax
+
+        call eval_logdens_rho(n, rho0, a1, c1, f0)
+        call eval_logdens_rho(n, rho1, a1, c1, f1)
+        dd1 = exp(f0 - fmax)
+        dd2 = exp(f1 - fmax)
+
+        if ((dd1 .gt. 1.0d-14) .or. (dd2 .gt. 1.0d-14)) then
+          rho0 = rho0/2.0d0
+          rho1 = rho1*2.0d0
+        else
+          goto 900
+        endif
+        enddo
+
+ 900    continue
+
+        if ((dd1 .gt. 1.0d-14) .or. (dd2 .gt. 1.0d-14)) then
+          call prinf('i*', i, 1)
+          call prin2('uh oh, endpt 1*', dd1, 1)
+          call prin2('uh oh, endpt 2*', dd2, 1)
+        endif
+
+        return
+        end
+c
+c
+c
+c
+c
+        subroutine get_rho_max_fmax(n, a1, c1, rho_max, fmax)
+        implicit real *8 (a-h,o-z)
+
+        dn = n-2
+        rho_max = sqrt(1.0d0/(2*a1)*(sqrt(4.0d0*c1*a1 + dn*dn) - dn))
+ccc        call prin2('rho_max*', rho_max, 1)
+
+        call eval_logdens_rho(n, rho_max, a1, c1, fmax)
+
+        return
+        end
+c
+c
+c
+c
+c
+        subroutine get_rho0(a1, ci, n, rho0)
+        implicit real *8 (a-h,o-z)
+
+        dn = n-2
+        rho_max = sqrt(1/(2.0d0*a1)*(sqrt(4*ci*a1 + dn**2) - dn))
+
+        call eval_logdens_rho(n, rho_max, a1, ci, fmax)
+        fmax_log10 = fmax / log(10.0d0)
+
+        dder2 = -a1-3*ci/rho_max**4 + (n-2)/rho_max**2
+        sd = 1/sqrt(-dder2)
+
+c
+c        find right endpoint
+c        
+        xmin = 1.0d-16
+        xmax = rho_max
+        do 120 i=1,10
+        rho0 = (xmin + xmax)/2.0d0
+        call eval_logdens_rho(n, rho0, a1, ci, f)
+        f_log10 = f / log(10.0d0)
+
+        if (f_log10 .lt. fmax_log10-18) xmin = rho0
+        if (f_log10 .ge. fmax_log10-18) xmax = rho0
+ 120    continue
+
+c
+c        check difference btwn endpoint and max
+c
+ccc        call prin2('fmax*', exp(fmax), 1)
+ccc        call prin2('f at right endpoint*', exp(f), 1)
+ccc        dd = exp(f-fmax)
+ccc        call prin2('endpoint over max*', dd, 1)
+
+        return
+        end
+c
+c
+c
+c
+c
+        subroutine get_rho1(a1, ci, n, rho1)
+        implicit real *8 (a-h,o-z)
+
+        dn = n-2
+        rho_max = sqrt(1/(2.0d0*a1)*(sqrt(4*ci*a1 + dn**2) - dn))
+        if (ci .eq. 0) rho_max = 1.0d-15
+        call eval_logdens_rho(n, rho_max, a1, ci, fmax)
+        fmax_log10 = fmax / log(10.0d0)
+
+        dder2 = -a1-3*ci/rho_max**4 + (n-2)/rho_max**2
+        sd = 1/sqrt(-dder2)
+
+c
+c        find right endpoint
+c        
+        xmin = rho_max
+        xmax = rho_max + 40*sd
+        if (ci .eq. 0) then 
+          xmin = 1.0d-15
+          xmax = sqrt(1000.0d0/a1)
+        endif
+
+        do 120 i=1,10
+        rho1 = (xmin + xmax)/2.0d0
+        call eval_logdens_rho(n, rho1, a1, ci, f)
+
+        f_log10 = f / log(10.0d0)
+
+        if (f_log10 .lt. fmax_log10-18) xmax = rho1
+        if (f_log10 .ge. fmax_log10-18) xmin = rho1
+ 120    continue
 
         return
         end
@@ -876,16 +907,11 @@ c
 c
 c
 c
-        subroutine eval_logdens_rho(rho,n,exp_fact,val)
+        subroutine eval_logdens_rho(n, rho, a1, c1, f)
         implicit real *8 (a-h,o-z)
 
-c
-c        evaluate the log of the integrand of the inner integral
-c
-
-        val = -exp_fact/2.0d0/(rho*rho)
-        val = val -rho*rho/2.0d0
-        val = val - (n-2)*log(rho)
+        f = - (n-2)*log(rho) - rho**2/2.0d0*a1 - c1/(2*rho**2)
+ccc        f = f + 2*log(rho)
 
         return
         end
@@ -900,7 +926,7 @@ c
         dimension ys(*),ys2(*),s(*),s2(*)
 
 c
-c        for convenience, compute quantities that appear in
+c        for convenience, compute quantities that appear in 
 c        several locations in the integrand. prefact is the
 c        part of the integrand that doesn't depend on rho
 c
@@ -963,7 +989,7 @@ c
         do i=1,k1
         xs(i) = xs(i)*cos(t)
         enddo
-
+        
         do i=1,k2
         xs(i+k1) = xs(i+k1)*sin(t)
         enddo
@@ -1055,132 +1081,6 @@ c
 c
 c
 c
-        subroutine get_rho0(ci, n, rho0)
-        implicit real *8 (a-h,o-z)
-c
-c        find the lower bound of integration of the inner integral
-c        using bisection and the formula for the maximum of the
-c        integrand
-c
-
-c
-c        compute maximum of integrand
-c
-        dn = n - 2
-        rho_max = sqrt(1/2.0*(sqrt(4*ci + dn**2) - dn))
-        call eval_logdens_rho(rho_max,n,ci,fmax)
-        fmax_log10 = fmax / log(10.0d0)
-
-c
-c        bisection
-c
-        xmin = 1.0d-16
-        xmax = rho_max
-        do 110 i=1,10
-        rho0 = (xmin + xmax)/2.0d0
-        call eval_logdens_rho(rho0,n,ci,f)
-        f_log10 = f / log(10.0d0)
-        if (f_log10 .lt. fmax_log10-18) xmin = rho0
-        if (f_log10 .ge. fmax_log10-18) xmax = rho0
- 110    continue
-
-ccc        call eval_logdens_rho(rho0, n, ci, f)
-ccc        call prin2('f at left endpoint*', exp(f), 1)
-
-        return
-        end
-c
-c
-c
-c
-c
-        subroutine get_rho1(ci, n, rho1)
-        implicit real *8 (a-h,o-z)
-
-c
-c        find the upper bound of integration of the inner integral
-c        using bisection and the formula for the maximum of the
-c        integrand and the second derivative at the maximum
-c
-
-c
-c        compute maximum of integrand and second derivative at maximum
-c
-
-        dn = n - 2
-        rho_max = sqrt(1/2.0*(sqrt(4*ci + dn**2) - dn))
-        call eval_logdens_rho(rho_max,n,ci,fmax)
-        fmax_log10 = fmax / log(10.0d0)
-
-        dder2 = -1-3*ci/rho_max**4 + (n-2)/rho_max**2
-        sd = 1/sqrt(-dder2)
-
-c
-c        bisection
-c
-        xmin = rho_max
-        xmax = rho_max + 40*sd
-        do 120 i=1,10
-        rho1 = (xmin + xmax)/2.0d0
-        call eval_logdens_rho(rho1,n,ci,f)
-
-        f_log10 = f / log(10.0d0)
-        if (f_log10 .lt. fmax_log10-18) xmax = rho1
-        if (f_log10 .ge. fmax_log10-18) xmin = rho1
- 120    continue
-
-ccc        call prin2('rho1*', rho1, 1)
-ccc        call eval_logdens_rho(rho1, n, ci, f)
-ccc        if (f .gt. -20) then
-ccc          call prin2('bad!*', 1.0d0, 1)
-ccc          call prin2('f*', f, 1)
-ccc        endif
-
-        return
-        end
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
-c
         subroutine plot_heatmap(nn1, nn2, fs)
         implicit real *8 (a-h,o-z)
         real*8 fs(1)
@@ -1202,7 +1102,7 @@ c        if this function gets called twice, nothing gets
 c        plotted, so change iw
 c
         iw = in
-        call pyimage(iw,nn1,nn2,fs,'title* ')
+ccc        call pyimage(iw,nn1,nn2,fs,'title* ')
 
         in = in + 1
 
@@ -1212,16 +1112,16 @@ c
 c
 c
 c
-c
+c       
         subroutine cc_arr(n, x, y)
         implicit real*8 (a-h,o-z)
         real*8 x(1),y(1)
-
+        
         do 100 i=1,n
         y(i) = x(i)
  100    continue
 
-        return
+        return 
         end
 c
 c
@@ -1240,7 +1140,7 @@ c
  425    continue
  450    continue
 
-
+        
         return
         end
 c
@@ -1260,7 +1160,7 @@ c
  1025   continue
  1050   continue
  1075   continue
-
+        
         return
         end
 c
@@ -1390,7 +1290,7 @@ c
         do i=1,nn
         do j=1,m
         c(i,j) = 0
-        enddo
+        enddo 
         enddo
 
         do i=1,n
@@ -1398,7 +1298,7 @@ c
         c(i,j) = b(i,j)
         enddo
         enddo
-
+        
         return
         end
 c
@@ -1406,9 +1306,9 @@ c
 c
 c
 c
-        subroutine read_params(csv_file, n, k1, k2, a, y)
+        subroutine read_params(csv_file, n, k1, k2, a, y, sigs)
         implicit real *8 (a-h,o-z)
-        real*8 a(*), y(*)
+        real*8 a(*), y(*), sigs(*)
         character(*) csv_file
 c
 c        read the csv file written in rstudio by test43.R
@@ -1420,24 +1320,17 @@ c        read matrix size
 c
  100    format(i12)
         read(2, 100) n
-ccc        call prinf('n*', n, 1)
         read(2, 100) k1
-ccc        call prinf('k*', k, 1)
         read(2, 100) k2
-ccc        call prinf('k*', k, 1)
 c
 c        read a
 c
         k = k1+k2
-ccc        call prinf('nk*', n*k, 1)
  200    format(f12.6)
         do 250 i=1,n*k
         read(2, 200) a(i)
-ccc        call prinf('i*', i, 1)
-ccc        call prin2('a(i)*', a(i), 1)
  250    continue
 
-ccc        call prin2('a*', a, n*k)
 c
 c        read y
 c
@@ -1446,6 +1339,13 @@ c
  350    continue
 
 ccc        call prin2('y*', y, n)
+c
+c        read sigs
+c
+        do i=1,3
+        read(2, 200) sigs(i)
+        enddo
+
         return
         end
 c
@@ -1482,7 +1382,7 @@ c
         c(i,j) = s(j)*a(i,j)
  1050   continue
  1075   continue
-
+        
         return
         end
 c
@@ -1499,7 +1399,7 @@ c
         c(i,j) = s(i)*a(i,j)
  1050   continue
  1075   continue
-
+        
         return
         end
 c
@@ -1572,7 +1472,7 @@ c
         character(100) csv_file
 
 c
-c        read the posterior means computed by stan from
+c        read the posterior means computed by stan from 
 c        text file
 c
 
@@ -1620,25 +1520,6 @@ c
         do i=1,n
         dd = abs((v1(i) - v2(i))/v1(i))
         if (dd .gt. dd_max) dd_max = dd
-        enddo
-
-        return
-        end
-c
-c
-c
-c
-c
-        subroutine write_exps_stds(file_out, k, dsums, stds)
-        implicit real*8 (a-h,o-z)
-        real*8 dsums(*), stds(*)
-        character(*) file_out
-
-        open (2, file=file_out)
-
- 210    format(f22.16,','f22.16)
-        do i=1,k+3
-        write(2, 210) dsums(i), stds(i)
         enddo
 
         return
@@ -1697,20 +1578,35 @@ c
 c
 c
 c
-        subroutine write_dd_exps_stds(file_out, k, dd, dsums, stds)
+        subroutine write_exps_stds(file_out, k, dsums, stds)
         implicit real*8 (a-h,o-z)
         real*8 dsums(*), stds(*)
         character(*) file_out
 
-ccc        csv_file = 'expectations.dat'
         open (2, file=file_out)
 
  210    format(f22.16,','f22.16)
-
-        write(2, 210) dd
-
         do i=1,k+3
         write(2, 210) dsums(i), stds(i)
+        enddo
+
+        return
+        end
+c
+c
+c
+c
+c
+        subroutine write_dds(file_out, k, dds)
+        implicit real*8 (a-h,o-z)
+        real*8 dds(*)
+        character(*) file_out
+
+        open (2, file=file_out)
+ 210    format(f22.16)
+
+        do i=1,k
+        write(2, 210) dds(i)
         enddo
 
         return

@@ -4,7 +4,7 @@
 \alias{fit_two_group}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group(y, X1, X2, nnt = 10)
+fit_two_group(y, X1, X2, stdy, std1, std2, nnt = 10)
 }
 \arguments{
 \item{y}{Outcome vector.}
@@ -15,6 +15,12 @@ fit_two_group(y, X1, X2, nnt = 10)
 
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 (2021) for details.}
+
+\item{std_1}{hyperprior on standard deviation of group 1.}
+
+\item{std_2}{hyperprior on standard deviation of group 2.}
+
+\item{std_y}{prior on residual standard deviation.}
 }
 \value{
 A named list with the following components:
@@ -36,9 +42,9 @@ hierarchical linear regression model
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
 \deqn{\beta_2 ~ normal(0, \sigma_2)}
-\deqn{\sigma_1 ~ normal+(0, 1)}
-\deqn{\sigma_2 ~ normal+(0, 1)}
-\deqn{\sigma_y ~ normal+(0, 1)}
+\deqn{\sigma_1 ~ normal+(0, std_1)}
+\deqn{\sigma_2 ~ normal+(0, std_2)}
+\deqn{\sigma_y ~ normal+(0, std_y)}
 
 The algorithm for computing the fit uses numerical linear algebra and
 low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
@@ -60,8 +66,13 @@ X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
 X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
 
+# hyperpriors on scale parameters
+std_1 <- 1
+std_2 <- 2
+std_y <- 2
+
 # Fit model
-fit <- fit_two_group(y, X_1, X_2)
+fit <- fit_two_group(y, X_1, X_2, std_1, std_2, std_y)
 str(fit)
 
 # Plot estimates of the betas vs "truth"
