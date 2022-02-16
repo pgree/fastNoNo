@@ -26,12 +26,12 @@ std_2 <- 10
 sigs <- c(std_y, std_1, std_2)
 
 # run the stan model
-model1 <- cmdstan_model("~/fastNoNo/R/nn_2group.stan")
-niters <- 1e4
+model1 <- cmdstan_model("~/fastNoNo/tests/nn_2group.stan")
+niters <- 1e3
 
 # parameters
 set.seed(1)
-data_list <- list(n=n, k1=k1, k2=k2, y=y, sigs=sigs, X1=X_1, X2=X_2)
+data_list <- list(n=n, k1=k_1, k2=k_2, y=y, sigs=sigs, X1=X_1, X2=X_2)
 
 # sample
 fit_stan <- model1$sample(
