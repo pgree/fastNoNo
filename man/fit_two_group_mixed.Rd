@@ -4,7 +4,15 @@
 \alias{fit_two_group_mixed}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group_mixed(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10)
+fit_two_group_mixed(
+  y,
+  X1,
+  X2,
+  ss = rep(1, ncol(X2)),
+  sd_y = 1,
+  sd_1 = 1,
+  nnt = 10
+)
 }
 \arguments{
 \item{y}{Outcome vector.}
@@ -14,6 +22,10 @@ fit_two_group_mixed(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10)
 \item{X2}{Data matrix corresponding to group 2.}
 
 \item{ss}{Data vector of scale parameter priors corresponding to group 2.}
+
+\item{sd_y}{Hyperprior on residual standard deviation.}
+
+\item{sd_1}{Hyperprior on standard deviation of group 1.}
 
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 (2021) for details.}
@@ -39,8 +51,8 @@ hierarchical linear regression model
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
 \deqn{\beta_2 ~ normal(0, ss * I)}
-\deqn{\sigma_1 ~ normal+(0, 1)}
-\deqn{\sigma_y ~ normal+(0, 1)}
+\deqn{\sigma_y ~ normal+(0, sd_y)}
+\deqn{\sigma_1 ~ normal+(0, sd_1)}
 
 where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
 matrix. The algorithm for computing the fit uses numerical linear algebra and
@@ -64,7 +76,7 @@ X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
 
 # Fit model
-fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), nnt = 20)
+fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd_1 = 1, nnt = 20)
 str(fit)
 
 # Plot estimates of the betas vs "truth"

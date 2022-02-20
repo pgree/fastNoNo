@@ -3,7 +3,7 @@ c
 c
 c
 c
-        subroutine mixed_test_integration()
+        subroutine test_mixed_effects()
         implicit real *8 (a-h,o-z)
         real*8 a(150 000 000), y(500 000), ss(100 000)
         real *8, allocatable :: dsums(:), dexps(:),
@@ -14,7 +14,8 @@ c
 c        parameters
 c
         filename = 'params.dat'
-        call mixed_read_params(filename, n, k1, k2, a, y, ss)
+        call mixed_read_params(filename, n, k1, k2, a, y, ss, sigy, 
+     1     sig1)
 ccc        call prin2('a = *',a,n*k)
 ccc        call prin2('y = *',y,n)
         k = k1+k2
@@ -23,7 +24,7 @@ ccc        call prin2('y = *',y,n)
         call prinf('k2*', k2, 1)
 
 
-        k3 = k+3
+        k3 = k + 3
         allocate(dsums(k3))
         allocate(dsums2(k3))
         allocate(dexps(k3))
@@ -38,7 +39,7 @@ c
         nn = 80
         nnt = 40
         call cpu_time(t1)
-        call mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, 
+        call mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1,
      1     dsums, dsum, stds, cov)
         call cpu_time(t2)
         call prin2('dsums*', dsums, k+2)
@@ -50,7 +51,7 @@ c        double nodes in all directions
 c
         nn2 = 2*nn
         nnt2 = 2*nnt
-        call mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss,
+        call mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1,
      1     dsums2, dsum2, stds2, cov)
 ccc        call prin2('dsums*', dsums2, k+2)
 ccc        call prin2('stds*', stds2, k+2)
@@ -91,13 +92,11 @@ c
         filename = 'dds_stds.dat'
         call mixed_write_dds(filename, k+2, dds)
 
-        stop
-
 c
 c        stan comparison
 c
         csv_file = 'means.dat'
-        call mixed_read_means(csv_file, k, dexps)
+        call mixed_read_means(csv_file, k+2, dexps)
         call prin2('stan expectations*', dexps, k+2)
 
         call mixed_dd_abs_max(dexps, dsums, k+2, dd_max)
@@ -111,7 +110,7 @@ c
 c
 c
         subroutine mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, 
-     1     dsums, stds, dsums_cov)
+     1     sigy, sig1, dsums, stds, dsums_cov)
         implicit real *8 (a-h,o-z)
         real*8 a(n,*), y(*), dsums(*), stds(*),
      1     ts(nnt),rhos(nn),phis(nn), s(k),s2(k), ss(k2),
@@ -126,12 +125,12 @@ c
 c        this subroutine computes posterior expectations of the two
 c        group bayesian linear regression model
 c
-c          y ~ normal(A1*x1 + A2*x2, sig1)
-c          x1 ~ normal(0, sig2)
+c          y ~ normal(A1*x1 + A2*x2, sigy)
+c          x1 ~ normal(0, sig1)
 c          x2 ~ normal(0, [ss(1), ss(2), ...,ss(k2)])
-c          sig{1,2} ~ normal+(0, [d1, d2])
+c          sig{y,1} ~ normal+(0, [sigy, sig1])
 c
-c        this subroutine computes E[x_i], var(x_i), E[sig{1,2}]. 
+c        this subroutine computes E[x_i], var(x_i), E[sig{y,1}]. 
 c
 
         done = 1.0d0
@@ -165,8 +164,8 @@ c
 c
 c       hyperpriors -- variances, not standard deviations
 c
-        d1 = 1.0d0**2
-        d2 = 1.0d0**2
+        d1 = sigy**2
+        d2 = sig1**2
 
 c
 c        before computing integral find least squares solution to
@@ -185,7 +184,11 @@ c
         do i=1,k
         s_inv(i) = 1/s(i)
         s0(i) = sqrt(s(i))
+cccccccccccccccccc
+        s0(i) = sqrt(abs(s(i)))
+cccccccccccccccccc
         enddo
+ccc        call prin2('s*', s, k)
 
 c
 c        solve linear system 
@@ -211,7 +214,6 @@ c
         do i=1,n
         resid = resid + (ax(i) - y(i))**2
         enddo
-
 
 c
 c        construct grid for outer parameter of integration, theta
@@ -403,6 +405,7 @@ c
         call mixed_y_proj(ynew,u,s,k,k,ysmall,res2)
         call mixed_entry_sqr(ysmall,ys2,k)
         call mixed_entry_sqr(s,s2,k)
+
 
 c
 c        initialize sums taken in inner loop
@@ -1097,7 +1100,8 @@ c
 c
 c
 c
-        subroutine mixed_read_params(csv_file, n, k1, k2, a, y, ss)
+        subroutine mixed_read_params(csv_file, n, k1, k2, a, y, ss,
+     1     sigy, sig1)
         implicit real *8 (a-h,o-z)
         real*8 a(*), y(*), ss(*)
         character(*) csv_file
@@ -1138,8 +1142,8 @@ c
 c
 c        scale hyperpriors
 c
-ccc        read(2, 200) sigy
-ccc        read(2, 200) sig2
+        read(2, 200) sigy
+        read(2, 200) sig1
 
 
         return
@@ -1221,7 +1225,7 @@ c
 
  200    format(f12.6)
 
-        do 250 i=1,m+2
+        do 250 i=1,m
         read(2, 200) dexps(i)
  250    continue
 

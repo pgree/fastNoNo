@@ -5,7 +5,7 @@ library(rstan)
 library(fastNoNo)
 
 # generate random data
-n <- 10
+n <- 200
 k_1 <- 3
 k_2 <- 3
 
@@ -21,7 +21,7 @@ y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
 
 # hyperpriors on scale parameters
 std_y <- 2
-std_1 <- 1
+std_1 <- 3
 std_2 <- 10
 sigs <- c(std_y, std_1, std_2)
 

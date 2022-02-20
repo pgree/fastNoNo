@@ -4,7 +4,7 @@
 \alias{fit_two_group}
 \title{Fast two-group normal-normal model}
 \usage{
-fit_two_group(y, X1, X2, sd_y, sd_1, sd_2, nnt = 10)
+fit_two_group(y, X1, X2, sd_y, sd_1 = 1, sd_2 = 1, nnt = 10)
 }
 \arguments{
 \item{y}{Outcome vector.}

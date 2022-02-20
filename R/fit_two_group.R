@@ -71,7 +71,7 @@
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
 #' @useDynLib fastNoNo dense_eval
-fit_two_group <- function(y, X1, X2, sd_y, sd_1, sd_2, nnt = 10) {
+fit_two_group <- function(y, X1, X2, sd_y, sd_1 = 1, sd_2 = 1, nnt = 10) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1), sd_y > 0,
             sd_1 > 0, sd_2 > 0, length(nnt) == 1, nnt >= 1)
 

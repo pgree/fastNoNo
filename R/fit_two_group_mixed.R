@@ -7,8 +7,8 @@
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
 #' \deqn{\beta_2 ~ normal(0, ss * I)}
-#' \deqn{\sigma_1 ~ normal+(0, 1)}
-#' \deqn{\sigma_y ~ normal+(0, 1)}
+#' \deqn{\sigma_y ~ normal+(0, sd_y)}
+#' \deqn{\sigma_1 ~ normal+(0, sd_1)}
 #'
 #' where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
 #' matrix. The algorithm for computing the fit uses numerical linear algebra and
@@ -19,6 +19,8 @@
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
 #' @param ss Data vector of scale parameter priors corresponding to group 2.
+#' @param sd_y Hyperprior on residual standard deviation.
+#' @param sd_1 Hyperprior on standard deviation of group 1.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 #'   (2021) for details.
 #'
@@ -51,7 +53,7 @@
 #' y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), nnt = 20)
+#' fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd_1 = 1, nnt = 20)
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
@@ -65,13 +67,13 @@
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
 #' @useDynLib fastNoNo mixed_2group
-fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10) {
+fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1 = 1, nnt = 10) {
   stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
-            length(ss) == ncol(X2), all(ss > 0),
+            length(ss) == ncol(X2), all(ss > 0), sd_y > 0, sd_1 > 0,
             length(nnt) == 1, nnt >= 1)
 
-  out1 <- run_two_group_mixed(y, X1, X2, ss, nnt)
-  out2 <- run_two_group_mixed(y, X1, X2, ss, nnt = 2*nnt)
+  out1 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt)
+  out2 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt = 2*nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -114,12 +116,11 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), nnt = 10) {
 
 # internal ----------------------------------------------------------------
 
-run_two_group_mixed <- function(y, X1, X2, ss, nnt) {
+run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
   # extract parameters from inputs
   n <- length(y)
   k1 <- ncol(X1)
   k2 <- ncol(X2)
-
   fit <- .Fortran(
     "mixed_2group",
     nnt = as.integer(nnt),  # number of quadrature in theta direction
@@ -130,8 +131,10 @@ run_two_group_mixed <- function(y, X1, X2, ss, nnt) {
     k = as.integer(k1+k2),
     X = cbind(X1, X2),
     y = y,
-    # these are dummy objects for fortran to use for the results
     ss = as.double(ss),
+    sd_y = as.double(sd_y),
+    sd_1 = as.double(sd_1),
+    # these are dummy objects for fortran to use for the results
     means = as.double(rep(-99, k1 + k2 + 2)),
     sds = as.double(rep(-99, k1 + k2 + 2)),
     cov = as.double(rep(-99, (k1 + k2)^2))
