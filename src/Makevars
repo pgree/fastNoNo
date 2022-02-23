@@ -1,4 +1,5 @@
 FLIBS = -L`gfortran -print-file-name=libgfortran.dylib | xargs dirname`
+PKG_CXXLIBS = -L`gfortran -print-file-name=libgfortran.dylib | xargs dirname`
 PKG_FFLAGS=-std=legacy -w -framework Accelerate
 VER=-11
 CC=gcc$(VER)
