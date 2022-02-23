@@ -1,3 +1,7 @@
 PKG_FLIBS = -L`gfortran -print-file-name=libgfortran.dylib | xargs dirname`
 PKG_FFLAGS=-std=legacy -w -framework Accelerate
 CC=gcc
+CXX=g++
+CXX11=g++
+CXX14=g++
+CXX17=g++
