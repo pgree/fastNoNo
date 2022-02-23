@@ -16,3 +16,4 @@ RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: yes
 BugReports: https://github.com/pgree/fastNoNo/issues/
+SystemRequirements: gfortran
