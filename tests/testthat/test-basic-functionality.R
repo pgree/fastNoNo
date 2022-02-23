@@ -23,7 +23,6 @@ test_that("fit_two_group runs", {
   # Fit model
   fit <- fit_two_group(y, X_1, X_2, sd_y, sd_1, sd_2)
   expect_named(fit, c("beta_1", "beta_2", "sigma", "errors"))
-  expect_equal(fit$beta_1$mean[1], -.15, tolerance = 0.05)
 })
 
 test_that("fit_two_group_mixed runs", {
