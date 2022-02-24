@@ -1,114 +1,3 @@
-c
-c
-c
-c
-c
-        subroutine testit(n)
-        implicit real*8 (a-h,o-z)
-
-        call test_integration()
-ccc        call utest()
-ccc        call utest2()
-
-        return
-        end
-c
-c
-c
-c
-c
-        subroutine test_integration()
-        implicit real *8 (a-h,o-z)
-        real*8 a(20 000 000), y(500 000), sigs(3)
-        real *8, allocatable :: dsums(:), dexps(:),
-     1     dsums2(:), dds(:), stds(:), stds2(:)
-        character(100) csv_file, filename
-
-c
-c        parameters
-c
-        csv_file = 'params.dat'
-        call read_params(csv_file, n, k1, k2, a, y, sigs)
-ccc        call prin2('a = *',a,n*k)
-ccc        call prin2('y = *',y,n)
-        k = k1+k2
-        call prinf('n*', n, 1)
-        call prinf('k1*', k1, 1)
-        call prinf('k2*', k2, 1)
-
-        k3 = k+3
-        allocate(dsums(k3))
-        allocate(dsums2(k3))
-        allocate(dexps(k3))
-        allocate(dds(k3))
-        allocate(stds(k3))
-        allocate(stds2(k3))
-
-c
-c        integrate
-c
-        nn = 60
-        nn_theta = 40
-        call dense_eval(nn_theta, nn, n, k1, k2, a, y, sigs, dsums, 
-     1     stds)
-        call prin2('dsums*', dsums, k+3)
-        call prin2('stds*', stds, k+3)
-c
-c        double nodes in all directions
-c
-        nn2 = 2*nn
-        nn_theta2 = 2*nn_theta
-        call dense_eval(nn_theta2, nn2, n, k1, k2, a, y, sigs, dsums2, 
-     1     stds2)
-
-c
-c        check error
-c
-        call dd_abs_max(dsums2, dsums, k+3, dd_max)
-        call prin2('max posterior mean error*', dd_max, 1)
-
-        call dd_abs_max(stds2, stds, k+3, dd_max)
-        call prin2('max posterior std error*', dd_max, 1)
-
-c
-c        write posterior means and stds to file
-c
-        filename = 'exps.dat'
-        call write_exps_stds(filename, k, dsums, stds)
-ccc        call prin2('dsums*', dsums,k+3)
-
-c
-c        write to file all dds
-c
-        do i=1,k+3
-        dds(i) = dsums(i) - dsums2(i)
-        enddo
-
-        filename = 'dds_exps.dat'
-        call write_dds(filename, k+3, dds)
-
-        do i=1,k+3
-        dds(i) = stds(i) - stds2(i)
-        enddo
-
-        filename = 'dds_stds.dat'
-        call write_dds(filename, k+3, dds)
-
-
-c
-c        stan comparison
-c
-        csv_file = 'test_means_dense_stan2.dat'
-        csv_file = 'test_means_dense_stan.dat'
-        csv_file = 'means.dat'
-        call read_means(csv_file, k, dexps)
-        call prin2('stan expectations*', dexps, k+3)
-
-        call dd_abs_max(dexps, dsums, k, dd_max)
-        call prin2('stan max error*', dd_max, 1)
-        
-        return
-        end
 c 
 c 
 c 
@@ -567,13 +456,13 @@ ccc        call prin2('coefs*', coefs, nnt*nn)
         enddo
 
         if (i .eq. nnt) then
-          call prin2('coefs(i, j)*', coefs(i, j), 1)
+ccc          call prin2('coefs(i, j)*', coefs(i, j), 1)
         endif
 
         enddo
 
 ccc        call prin2('coefs_log*', coefs_log, nnt*nn)
-        call prin2('coefs*', coefs, nnt*nn)
+ccc        call prin2('coefs*', coefs, nnt*nn)
         call plot_heatmap(nnt, nn, coefs_log)
 
 
@@ -582,10 +471,10 @@ c        error estimate
 c
 ccc        call prinf('ndsum*', ndsum, 1)
         avg_tail_coef = dsum / (nn*3 + nnt*5 - 3*5)
-        call prin2('avg_tail_coef*', avg_tail_coef, 1)
+ccc        call prin2('avg_tail_coef*', avg_tail_coef, 1)
         err = avg_tail_coef / tot_coef 
 
-        call prin2('err*', err, 1)
+ccc        call prin2('err*', err, 1)
 
         fmax = -1.0d250
         do i=1,nn
@@ -775,9 +664,9 @@ c
  900    continue
 
         if ((dd1 .gt. 1.0d-14) .or. (dd2 .gt. 1.0d-14)) then
-          call prinf('i*', i, 1)
-          call prin2('uh oh, endpt 1*', dd1, 1)
-          call prin2('uh oh, endpt 2*', dd2, 1)
+c          call prinf('i*', i, 1)
+c          call prin2('uh oh, endpt 1*', dd1, 1)
+c          call prin2('uh oh, endpt 2*', dd2, 1)
         endif
 
         return

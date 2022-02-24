@@ -3,112 +3,6 @@ c
 c
 c
 c
-        subroutine test_mixed_effects()
-        implicit real *8 (a-h,o-z)
-        real*8 a(150 000 000), y(500 000), ss(100 000)
-        real *8, allocatable :: dsums(:), dexps(:),
-     1     dsums2(:), dds(:), stds(:), stds2(:), cov(:, :)
-        character(100) csv_file, filename
-
-c
-c        parameters
-c
-        filename = 'params.dat'
-        call mixed_read_params(filename, n, k1, k2, a, y, ss, sigy, 
-     1     sig1)
-ccc        call prin2('a = *',a,n*k)
-ccc        call prin2('y = *',y,n)
-        k = k1+k2
-        call prinf('n*', n, 1)
-        call prinf('k1*', k1, 1)
-        call prinf('k2*', k2, 1)
-
-
-        k3 = k + 3
-        allocate(dsums(k3))
-        allocate(dsums2(k3))
-        allocate(dexps(k3))
-        allocate(dds(k3))
-        allocate(stds(k3))
-        allocate(stds2(k3))
-        allocate(cov(k, k))
-
-c
-c        integrate
-c
-        nn = 80
-        nnt = 40
-        call cpu_time(t1)
-        call mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1,
-     1     dsums, dsum, stds, cov)
-        call cpu_time(t2)
-        call prin2('dsums*', dsums, k+2)
-        call prin2('stds*', stds, k+2)
-        call prin2('total time*', t2-t1, 1)
-
-c
-c        double nodes in all directions
-c
-        nn2 = 2*nn
-        nnt2 = 2*nnt
-        call mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1,
-     1     dsums2, dsum2, stds2, cov)
-ccc        call prin2('dsums*', dsums2, k+2)
-ccc        call prin2('stds*', stds2, k+2)
-
-c
-c        check error
-c
-        call mixed_dd_abs_max(dsums2, dsums, k+2, dd_max)
-        call prin2('max posterior mean error*', dd_max, 1)
-
-        call mixed_dd_abs_max(stds2, stds, k+2, dd_max)
-        call prin2('max posterior std error*', dd_max, 1)
-
-        filename = 'exps.dat'
-        call mixed_write_exps_stds(filename, k, dsums, stds)
-ccc        call prin2('dsums*', dsums,k+3)
-
-c
-c        print last k2 cols of covariance matrix
-c
-        filename = 'cov_cols.dat'
-        call mixed_write_cov_cols(filename, k, k2, cov(1,k1+1))
-
-c
-c        print all dds
-c
-        do i=1,k+2
-        dds(i) = dsums(i) - dsums2(i)
-        enddo
-
-        filename = 'dds_exps.dat'
-        call mixed_write_dds(filename, k+2, dds)
-
-        do i=1,k+2
-        dds(i) = stds(i) - stds2(i)
-        enddo
-
-        filename = 'dds_stds.dat'
-        call mixed_write_dds(filename, k+2, dds)
-
-c
-c        stan comparison
-c
-        csv_file = 'means.dat'
-        call mixed_read_means(csv_file, k+2, dexps)
-        call prin2('stan expectations*', dexps, k+2)
-
-        call mixed_dd_abs_max(dexps, dsums, k+2, dd_max)
-        call prin2('stan max error*', dd_max, 1)
-        
-        return
-        end
-c
-c
-c
-c
-c
         subroutine mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, 
      1     sigy, sig1, dsums, stds, dsums_cov)
         implicit real *8 (a-h,o-z)
@@ -919,7 +813,7 @@ c        if this function gets called twice, nothing gets
 c        plotted, so change iw
 c
         iw = in
-        call pyimage(iw,nn1,nn2,fs,'title* ')
+ccc        call pyimage(iw,nn1,nn2,fs,'title* ')
 
         in = in + 1
 

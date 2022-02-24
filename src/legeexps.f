@@ -1131,7 +1131,7 @@ c
         sss=-sss
  2200 continue
 c 
-        call prin2('dd=*',dd,1)
+ccc        call prin2('dd=*',dd,1)
         polout(1)=-dd
 c 
         return
