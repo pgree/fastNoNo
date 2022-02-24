@@ -9,3 +9,5 @@
 ^pkgdown$
 src/.*\.o$
 src/.*\.so$
+^tests/stan-comparison$
+.github
