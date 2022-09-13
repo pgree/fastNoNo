@@ -62,7 +62,8 @@
 #' }
 #'
 #' @references
-#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Andrew Gelman, and Aki Vehtari.
+#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry,
+#' Andrew Gelman, and Aki Vehtari.
 #' (2021). Fast methods for posterior inference of two-group normal-normal models.
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
@@ -120,25 +121,24 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
   n <- length(y)
   k1 <- ncol(X1)
   k2 <- ncol(X2)
-  # fit <- rcppeigen_mixed2group(...)
-  # fit <- .Fortran(
-  #   "mixed_2group",
-  #   nnt = as.integer(nnt),  # number of quadrature in theta direction
-  #   nn = as.integer(80),    # number of quadrature nodes in other directions
-  #   n = as.integer(n),
-  #   k1 = as.integer(k1),
-  #   k2 = as.integer(k2),
-  #   k = as.integer(k1+k2),
-  #   X = cbind(X1, X2),
-  #   y = y,
-  #   ss = as.double(ss),
-  #   sd_y = as.double(sd_y),
-  #   sd_1 = as.double(sd_1),
-  #   # these are dummy objects for fortran to use for the results
-  #   means = as.double(rep(-99, k1 + k2 + 2)),
-  #   sds = as.double(rep(-99, k1 + k2 + 2)),
-  #   cov = as.double(rep(-99, (k1 + k2)^2))
-  # )
+  fit <- mixed_2group(
+     nnt = as.integer(nnt),  # number of quadrature in theta direction
+     nn = as.integer(80),    # number of quadrature nodes in other directions
+     n = as.integer(n),
+     k1 = as.integer(k1),
+     k2 = as.integer(k2),
+     k = as.integer(k1+k2),
+     X = cbind(X1, X2),
+     y = y,
+     ss = as.double(ss),
+     sd_y = as.double(sd_y),
+     sd_1 = as.double(sd_1),
+     # these are dummy objects for fortran to use for the results
+     means = as.double(rep(-99, k1 + k2 + 2)),
+     dsum - as.double(0),
+     sds = as.double(rep(-99, k1 + k2 + 2)),
+     cov = as.double(rep(-99, (k1 + k2)^2))
+  )
 
   list(means = fit$means, sds = fit$sds, cov = fit$cov)
 }
