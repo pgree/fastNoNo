@@ -4,8 +4,24 @@
 \name{fastNoNo-package}
 \alias{fastNoNo}
 \alias{fastNoNo-package}
-\title{fastNoNo: What the package does (short line)}
+\title{fastNoNo: Fast hierarchial Bayesian Normal-Normal models}
 \description{
-More about what it does (maybe more than one line)
+Fits Bayesian hierarchial linear regression models using numerical linear algebra and low dimensional Gaussian quadrature.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/pgree/fastNoNo/issues/}
+}
+
+}
+\author{
+\strong{Maintainer}: Philip Greengard \email{philip.greengard@gmail.com}
+
+Authors:
+\itemize{
+  \item Jonah Gabry \email{jsg2201@columbia.edu}
+}
+
 }
 \keyword{internal}

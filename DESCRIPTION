@@ -1,12 +1,24 @@
 Package: fastNoNo
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
-Date: 2022-09-13
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Title: Fast hierarchial Bayesian Normal-Normal models
+Version: 0.2.0
+Authors@R: 
+    c(person(given = "Philip", family = "Greengard", role = c("aut", "cre"), 
+           email = "philip.greengard@gmail.com"),
+      person(given = "Jonah", family = "Gabry", role = "aut",
+           email = "jsg2201@columbia.edu"))
+Description: Fits Bayesian hierarchial linear regression models using numerical 
+  linear algebra and low dimensional Gaussian quadrature.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Roxygen: list(markdown = TRUE)
+NeedsCompilation: yes
+BugReports: https://github.com/pgree/fastNoNo/issues/
 Imports: Rcpp (>= 1.0.8.3), RcppEigen
 LinkingTo: Rcpp, RcppEigen
-RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+
