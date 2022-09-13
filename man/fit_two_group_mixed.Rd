@@ -32,17 +32,15 @@ fit_two_group_mixed(
 }
 \value{
 A named list with the following components:
-\itemize{
-\item \code{beta_1}: A data frame of posterior means and standard deviations for
-the vector \eqn{\beta_1}, the coefficients on \code{X1}.
-\item \code{beta_2}: A data frame of posterior means and standard deviations for
-the vector \eqn{\beta_2}, the coefficients on \code{X2}.
-\item \code{sigma}: A data frame with posterior means and standard deviations for
+* `beta_1`: A data frame of posterior means and standard deviations for
+the vector \eqn{\beta_1}, the coefficients on `X1`.
+* `beta_2`: A data frame of posterior means and standard deviations for
+the vector \eqn{\beta_2}, the coefficients on `X2`.
+* `sigma`: A data frame with posterior means and standard deviations for
 \eqn{\sigma_y} and \eqn{\sigma_1}.
-\item \code{cov}: The posterior covariance matrix of coefficients \verb{[beta_1, beta_2]}.
-\item \code{errors}: A data frame with approximate accuracy of the posterior
+* `cov`: The posterior covariance matrix of coefficients `[beta_1, beta_2]`.
+* `errors`: A data frame with approximate accuracy of the posterior
 mean and standard deviation estimates.
-}
 }
 \description{
 This function fits a fast approximation to the Bayesian two-group
@@ -88,5 +86,5 @@ plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
 \references{
 Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Andrew Gelman, and Aki Vehtari.
 (2021). Fast methods for posterior inference of two-group normal-normal models.
-\href{https://arxiv.org/abs/2110.03055}{preprint arXiv:2110.03055}
+[preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 }
