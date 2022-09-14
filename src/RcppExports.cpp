@@ -55,9 +55,10 @@ BEGIN_RCPP
 END_RCPP
 }
 // mixed_2group
-void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss, double sigy, double sig1, Eigen::VectorXd& dsums, double& dsum, Eigen::VectorXd& stds, Eigen::MatrixXd& dsums_cov);
-RcppExport SEXP _fastNoNo_mixed_2group(SEXP nntSEXP, SEXP nnSEXP, SEXP nSEXP, SEXP k1SEXP, SEXP k2SEXP, SEXP kSEXP, SEXP aSEXP, SEXP ySEXP, SEXP ssSEXP, SEXP sigySEXP, SEXP sig1SEXP, SEXP dsumsSEXP, SEXP dsumSEXP, SEXP stdsSEXP, SEXP dsums_covSEXP) {
+Rcpp::List mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss, double sigy, double sig1);
+RcppExport SEXP _fastNoNo_mixed_2group(SEXP nntSEXP, SEXP nnSEXP, SEXP nSEXP, SEXP k1SEXP, SEXP k2SEXP, SEXP kSEXP, SEXP aSEXP, SEXP ySEXP, SEXP ssSEXP, SEXP sigySEXP, SEXP sig1SEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type nnt(nntSEXP);
     Rcpp::traits::input_parameter< int >::type nn(nnSEXP);
@@ -70,12 +71,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type ss(ssSEXP);
     Rcpp::traits::input_parameter< double >::type sigy(sigySEXP);
     Rcpp::traits::input_parameter< double >::type sig1(sig1SEXP);
-    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type dsums(dsumsSEXP);
-    Rcpp::traits::input_parameter< double& >::type dsum(dsumSEXP);
-    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type stds(stdsSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type dsums_cov(dsums_covSEXP);
-    mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1, dsums, dsum, stds, dsums_cov);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1));
+    return rcpp_result_gen;
 END_RCPP
 }
 
@@ -84,7 +81,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastNoNo_rcppeigen_outerproduct", (DL_FUNC) &_fastNoNo_rcppeigen_outerproduct, 1},
     {"_fastNoNo_rcppeigen_innerproduct", (DL_FUNC) &_fastNoNo_rcppeigen_innerproduct, 1},
     {"_fastNoNo_rcppeigen_bothproducts", (DL_FUNC) &_fastNoNo_rcppeigen_bothproducts, 1},
-    {"_fastNoNo_mixed_2group", (DL_FUNC) &_fastNoNo_mixed_2group, 15},
+    {"_fastNoNo_mixed_2group", (DL_FUNC) &_fastNoNo_mixed_2group, 11},
     {NULL, NULL, 0}
 };
 

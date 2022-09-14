@@ -118,6 +118,7 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1
 
 run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
   # extract parameters from inputs
+
   n <- length(y)
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -128,16 +129,11 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
      k1 = as.integer(k1),
      k2 = as.integer(k2),
      k = as.integer(k1+k2),
-     X = cbind(X1, X2),
+     a = cbind(X1, X2),
      y = y,
      ss = as.double(ss),
-     sd_y = as.double(sd_y),
-     sd_1 = as.double(sd_1),
-     # these are dummy objects for fortran to use for the results
-     means = as.double(rep(-99, k1 + k2 + 2)),
-     dsum - as.double(0),
-     sds = as.double(rep(-99, k1 + k2 + 2)),
-     cov = as.double(rep(-99, (k1 + k2)^2))
+     sigy = as.double(sd_y),
+     sig1 = as.double(sd_1)
   )
 
   list(means = fit$means, sds = fit$sds, cov = fit$cov)

@@ -5,22 +5,15 @@
 #include <vector>
 #include <string>
 #include <eigen3/Eigen/Dense>
-using namespace Eigen;
+// using namespace Eigen;
 extern "C" {
 #include "dont_compile/legeexps.c"
 }
 #include <chrono>
 using namespace std::chrono;
 #include <RcppEigen.h>
+
 // [[Rcpp::depends(RcppEigen)]]
-
-// [[Rcpp::export]]
-struct return_struct {
-  Eigen::VectorXd means;
-  Eigen::VectorXd sds;
-  Eigen::MatrixXd cov;
-};
-
 
 void lege_nodes_whts(int nn, double t0, double t1,
                      Eigen::VectorXd &ts, Eigen::VectorXd &whts);
@@ -56,20 +49,19 @@ void get_int_bds(int n, Eigen::VectorXd phis, Eigen::VectorXd fs, int &i0, int &
 
 void get_mjs(int k, Eigen::VectorXd s2, Eigen::VectorXd ys, double phi, Eigen::VectorXd &vmoms);
 
-return_struct mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
-                           Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss,
-                           double sigy, double sig1);
-
 void get_xs_to_ws_matrix(int k, int k1, int k2, Eigen::MatrixXd v, double t,
                          Eigen::MatrixXd &a);
 
 void get_xs_from_ws(Eigen::VectorXd ws, int k, int k1, int k2, Eigen::MatrixXd vt,
                     double t, Eigen::VectorXd &xs);
 
+Rcpp::List mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
+                        Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss,
+                        double sigy, double sig1);
 
 ////////////////////////////////////////////////////////////////////
 
-
+/*
 void test_mixed_effects() {
   std::string filename = "params.dat";
   //std::cout << "filename: " << filename << std::endl;
@@ -94,7 +86,7 @@ void test_mixed_effects() {
   t1 = high_resolution_clock::now();
   nn = 80;
   nnt = 40;
-  return_struct fit1 = mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1);
+  Rcpp::List fit1 = mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1);
   dsums = fit1.means;
   stds = fit1.sds;
   cov = fit1.cov;
@@ -108,7 +100,7 @@ void test_mixed_effects() {
   // double number of nodes
   nn2 = 2 * nn;
   nnt2 = 2 * nnt;
-  return_struct fit2 = mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1);
+  Rcpp::List fit2 = mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1);
   dsums2 = fit2.means;
   stds2 = fit2.sds;
   cov2 = fit2.cov;
@@ -120,15 +112,15 @@ void test_mixed_effects() {
   std::cout << "max posterior mean merror: " << dds.cwiseAbs().maxCoeff() << std::endl;
 
 }
+*/
 
 // [[Rcpp::export]]
-return_struct mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
+Rcpp::List mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
                            Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss,
                            double sigy, double sig1) {
   Eigen::VectorXd dsums(k+2), stds(k+2);
   Eigen::MatrixXd dsums_cov(k, k);
   double d1, d2, t, wht_t, fi, wt, fm, ss1, ss2, tmp, dsum;
-  return_struct fit;
 
   // adjust for fixed priors on coefficients k1+1 to k1+k2
   Eigen::MatrixXd a2 = a;
@@ -275,10 +267,9 @@ return_struct mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
     stds(k1 + j) *= pow(ss[j], 2);
   }
 
-  fit.means = dsums;
-  fit.sds = stds;
-  fit.cov = dsums_cov;
-  return fit;
+  return Rcpp::List::create(Rcpp::Named("means") = dsums,
+                            Rcpp::Named("sds") = stds,
+                            Rcpp::Named("cov") = dsums_cov);
 }
 
 

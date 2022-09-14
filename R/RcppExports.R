@@ -17,7 +17,7 @@ rcppeigen_bothproducts <- function(x) {
     .Call('_fastNoNo_rcppeigen_bothproducts', PACKAGE = 'fastNoNo', x)
 }
 
-mixed_2group <- function(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1, dsums, dsum, stds, dsums_cov) {
-    invisible(.Call('_fastNoNo_mixed_2group', PACKAGE = 'fastNoNo', nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1, dsums, dsum, stds, dsums_cov))
+mixed_2group <- function(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1) {
+    .Call('_fastNoNo_mixed_2group', PACKAGE = 'fastNoNo', nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1)
 }
 
