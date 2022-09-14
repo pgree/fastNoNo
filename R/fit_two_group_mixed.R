@@ -18,7 +18,7 @@
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
-#' @param ss Data vector of scale parameter priors corresponding to group 2.
+#' @param ss Vector of scale parameter priors corresponding to group 2.
 #' @param sd_y Hyperprior on residual standard deviation.
 #' @param sd_1 Hyperprior on standard deviation of group 1.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.

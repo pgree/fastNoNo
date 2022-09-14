@@ -21,7 +21,7 @@ fit_two_group_mixed(
 
 \item{X2}{Data matrix corresponding to group 2.}
 
-\item{ss}{Data vector of scale parameter priors corresponding to group 2.}
+\item{ss}{Vector of scale parameter priors corresponding to group 2.}
 
 \item{sd_y}{Hyperprior on residual standard deviation.}
 
