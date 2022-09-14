@@ -14,28 +14,39 @@ using namespace std::chrono;
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
 
+// [[Rcpp::export]]
+struct return_struct {
+  Eigen::VectorXd means;
+  Eigen::VectorXd sds;
+  Eigen::MatrixXd cov;
+};
+
 
 void lege_nodes_whts(int nn, double t0, double t1,
-		     Eigen::VectorXd &ts, Eigen::VectorXd &whts);
+                     Eigen::VectorXd &ts, Eigen::VectorXd &whts);
+
+void mixed_read_params(std::string filename, int &n, int &k1, int &k2, Eigen::MatrixXd &a,
+                       Eigen::VectorXd &y, Eigen::VectorXd &ss, double &sigy,
+                       double &sig1);
 
 void rescale_a(double t, Eigen::MatrixXd &a, Eigen::MatrixXd &asca, int n, int k,
-	       int k1, int k2);
+               int k1, int k2);
 
 void eval_inner(int nn, int n, int k1, int k2, int k, double d1,
-		double d2, Eigen::MatrixXd b, double t, double resid,
-		Eigen::VectorXd ynew, Eigen::VectorXd &dsumsi, double &dsumi,
-		double &ss1i, double &ss2i, Eigen::MatrixXd &dsums_covi,
-		Eigen::VectorXd &dsum_xsi, Eigen::MatrixXd &xxti, double &fmi);
+                double d2, Eigen::MatrixXd b, double t, double resid,
+                Eigen::VectorXd ynew, Eigen::VectorXd &dsumsi, double &dsumi,
+                double &ss1i, double &ss2i, Eigen::MatrixXd &dsums_covi,
+                Eigen::VectorXd &dsum_xsi, Eigen::MatrixXd &xxti, double &fmi);
 
 void get_beta_alpha_prefact(double phi, Eigen::VectorXd ys, Eigen::VectorXd ys2,
-			    Eigen::VectorXd s, Eigen::VectorXd s2, int n, int k,
-			    double resid, double &alpha, double &beta,
-			    double &prefact, double &exp_fact);
+                            Eigen::VectorXd s, Eigen::VectorXd s2, int n, int k,
+                            double resid, double &alpha, double &beta,
+                            double &prefact, double &exp_fact);
 
 void get_phi(int nn, int n, int k, double t, Eigen::VectorXd ysmall,
-	     Eigen::VectorXd ys2, Eigen::VectorXd s, Eigen::VectorXd s2, double resid,
-	     double d1, double d2, double &phi0i, double &phi1i,
-	     double &fmax);
+             Eigen::VectorXd ys2, Eigen::VectorXd s, Eigen::VectorXd s2, double resid,
+             double d1, double d2, double &phi0i, double &phi1i,
+             double &fmax);
 
 void eval_jac_det(double rho, double phi, double t, double &f);
 
@@ -45,27 +56,79 @@ void get_int_bds(int n, Eigen::VectorXd phis, Eigen::VectorXd fs, int &i0, int &
 
 void get_mjs(int k, Eigen::VectorXd s2, Eigen::VectorXd ys, double phi, Eigen::VectorXd &vmoms);
 
-void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
-		  Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss,
-		  double sigy, double sig1,
-		  Eigen::VectorXd &dsums, double &dsum, Eigen::VectorXd &stds,
-		  Eigen::MatrixXd &cov);
+return_struct mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
+                           Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss,
+                           double sigy, double sig1);
 
 void get_xs_to_ws_matrix(int k, int k1, int k2, Eigen::MatrixXd v, double t,
-			 Eigen::MatrixXd &a);
+                         Eigen::MatrixXd &a);
 
 void get_xs_from_ws(Eigen::VectorXd ws, int k, int k1, int k2, Eigen::MatrixXd vt,
-		    double t, Eigen::VectorXd &xs);
+                    double t, Eigen::VectorXd &xs);
 
 
 ////////////////////////////////////////////////////////////////////
 
 
+void test_mixed_effects() {
+  std::string filename = "params.dat";
+  //std::cout << "filename: " << filename << std::endl;
+  int n, k1, k2, k3, k, nn, nnt, nn2, nnt2;
+  Eigen::MatrixXd a;
+  double sigy, sig1, dsum;
+  Eigen::VectorXd y, ss;
+
+  // dimensions of problem
+  mixed_read_params(filename, n, k1, k2, a, y, ss, sigy, sig1);
+  k = k1 + k2;
+  //std::cout << "n: " << n << std::endl;
+  //std::cout << "k1: " << k1 << std::endl;
+  //std::cout << "k: " << k << std::endl;
+
+  // allocate memory accordingly
+  Eigen::VectorXd dsums(k+2), dsums2(k+2), stds(k+2), stds2(k+2), dds(k+2);
+  Eigen::MatrixXd cov(k, k), cov2(k, k);
+
+  // run algorithm
+  high_resolution_clock::time_point t1, t2;
+  t1 = high_resolution_clock::now();
+  nn = 80;
+  nnt = 40;
+  return_struct fit1 = mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1);
+  dsums = fit1.means;
+  stds = fit1.sds;
+  cov = fit1.cov;
+
+  t2 = high_resolution_clock::now();
+  std::chrono::duration<double, std::milli> duration = t2 - t1;
+  std::cout << "total time: " << duration.count()/1e6 << std::endl;
+  //std::cout << "dsums: " << dsums << std::endl;
+  //std::cout << "stds: " << stds << std::endl;
+
+  // double number of nodes
+  nn2 = 2 * nn;
+  nnt2 = 2 * nnt;
+  return_struct fit2 = mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1);
+  dsums2 = fit2.means;
+  stds2 = fit2.sds;
+  cov2 = fit2.cov;
+
+  // difference
+  dds = dsums - dsums2;
+  std::cout << "max posterior mean merror: " << dds.cwiseAbs().maxCoeff() << std::endl;
+  dds = stds - stds2;
+  std::cout << "max posterior mean merror: " << dds.cwiseAbs().maxCoeff() << std::endl;
+
+}
 
 // [[Rcpp::export]]
-void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss, double sigy, double sig1,		  Eigen::VectorXd &dsums, double &dsum, Eigen::VectorXd &stds,
-		  Eigen::MatrixXd &dsums_cov) {
-  double d1, d2, t, wht_t, fi, wt, fm, ss1, ss2, tmp;
+return_struct mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
+                           Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss,
+                           double sigy, double sig1) {
+  Eigen::VectorXd dsums(k+2), stds(k+2);
+  Eigen::MatrixXd dsums_cov(k, k);
+  double d1, d2, t, wht_t, fi, wt, fm, ss1, ss2, tmp, dsum;
+  return_struct fit;
 
   // adjust for fixed priors on coefficients k1+1 to k1+k2
   Eigen::MatrixXd a2 = a;
@@ -140,7 +203,7 @@ void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd
 
     // compute phi integral
     eval_inner(nn, n, k1, k2, k, d1, d2, b, t, resid, ynew, dsumsi,
-	       dsumi, ss1i, ss2i, dsums_covi, dsum_xsi, xxti, fi);
+               dsumi, ss1i, ss2i, dsums_covi, dsum_xsi, xxti, fi);
 
     // due to underflow issues, integrate over theta by computing
     // a sum of the form \sum_i exp(fi)*gi such that at the end
@@ -149,7 +212,7 @@ void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd
       dsum = dsum * exp(fm-fi) + dsumi*wt;
 
       for (int ijk=0; ijk<k; ijk++) {
-	dsums(ijk) = dsums(ijk) * exp(fm-fi) + dsum_xsi(ijk)*wt;
+        dsums(ijk) = dsums(ijk) * exp(fm-fi) + dsum_xsi(ijk)*wt;
       }
 
       dsums(k) = dsums(k) * exp(fm-fi) + dsumsi(k)*wt;
@@ -159,19 +222,19 @@ void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd
       ss2 = ss2 * exp(fm-fi) + ss2i*wt;
 
       for (int i1=0; i1<k; i1++) {
-	for (int i2=0; i2<k; i2++) {
+        for (int i2=0; i2<k; i2++) {
           tmp = dsums_covi(i1,i2) + xxti(i1,i2);
           dsums_cov(i1,i2) = dsums_cov(i1,i2)*exp(fm-fi) + tmp*wt;
-	}
+        }
       }
 
       fm = fi;
-     } else {
+    } else {
 
       dsum = dsum + exp(fi-fm) * dsumi*wt;
 
       for (int ijk=0; ijk<k; ijk++) {
-	dsums(ijk) = dsums(ijk) + exp(fi-fm)*dsum_xsi(ijk)*wt;
+        dsums(ijk) = dsums(ijk) + exp(fi-fm)*dsum_xsi(ijk)*wt;
       }
 
       dsums(k) = dsums(k) + exp(fi-fm)*dsumsi(k)*wt;
@@ -181,10 +244,10 @@ void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd
       ss2 = ss2 + exp(fi-fm)*ss2i*wt;
 
       for (int i1=0; i1<k; i1++) {
-	for (int i2=0; i2<k; i2++) {
+        for (int i2=0; i2<k; i2++) {
           tmp = dsums_covi(i1,i2)+xxti(i1,i2);
           dsums_cov(i1,i2)=dsums_cov(i1,i2) + exp(fi-fm)*tmp*wt;
-	}
+        }
       }
     }
     // if we've gotten to the point that the function is small, break
@@ -212,7 +275,10 @@ void mixed_2group(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd
     stds(k1 + j) *= pow(ss[j], 2);
   }
 
-
+  fit.means = dsums;
+  fit.sds = stds;
+  fit.cov = dsums_cov;
+  return fit;
 }
 
 
