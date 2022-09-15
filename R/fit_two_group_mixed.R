@@ -109,7 +109,8 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1
     beta_2 = beta_2,
     sigma = sigma,
     cov = cov,
-    errors = errors
+    errors = errors,
+    time = out1$time
   )
 }
 
@@ -135,6 +136,6 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
      sigy = as.double(sd_y),
      sig1 = as.double(sd_1)
   )
-
-  list(means = fit$means, sds = fit$sds, cov = fit$cov)
+  list(means = fit$means, sds = fit$sds, cov = fit$cov, time = fit$time)
 }
+
