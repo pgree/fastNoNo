@@ -1,8 +1,8 @@
 #' Fast two-group normal-normal model
 #'
 #' @description
-#' This function fits a fast approximation to the Bayesian two-group
-#' hierarchical linear regression model
+#' Fits a fast and accurate approximation to the Bayesian two-group hierarchical
+#' linear regression model
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
@@ -18,22 +18,26 @@
 #' @param y Outcome vector.
 #' @param X1 Data matrix corresponding to group 1.
 #' @param X2 Data matrix corresponding to group 2.
-#' @param ss Data vector of scale parameter priors corresponding to group 2.
+#' @param ss Vector of scale parameter priors corresponding to group 2.
 #' @param sd_y Hyperprior on residual standard deviation.
 #' @param sd_1 Hyperprior on standard deviation of group 1.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 #'   (2021) for details.
 #'
 #' @return A named list with the following components:
-#' * `beta_1`: A data frame of posterior means and standard deviations for
-#' the vector \eqn{\beta_1}, the coefficients on `X1`.
-#' * `beta_2`: A data frame of posterior means and standard deviations for
-#' the vector \eqn{\beta_2}, the coefficients on `X2`.
-#' * `sigma`: A data frame with posterior means and standard deviations for
-#' \eqn{\sigma_y} and \eqn{\sigma_1}.
-#' * `cov`: The posterior covariance matrix of coefficients `[beta_1, beta_2]`.
-#' * `errors`: A data frame with approximate accuracy of the posterior
-#' mean and standard deviation estimates.
+#' * `beta_1`: A data frame with two columns (`mean`, `sd`) containing the
+#' posterior means and standard deviations for the vector \eqn{\beta_1} (the
+#' coefficients on `X1`).
+#' * `beta_2`: A data frame with two columns (`mean`, `sd`)  containing the
+#' posterior means and standard deviations for the vector \eqn{\beta_2} (the
+#' coefficients on `X2`).
+#' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
+#' posterior means and standard deviations for \eqn{\sigma_y} and
+#' \eqn{\sigma_1}.
+#' * `cov`: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
+#' * `errors`: A data frame with two columns (`error_means`, `error_sds`)
+#' containing the approximate accuracy of the posterior mean and standard
+#' deviation estimates.
 #'
 #' @examples
 #' \dontrun{
@@ -68,12 +72,19 @@
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
 fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1 = 1, nnt = 10) {
-  stopifnot(nrow(X1) == nrow(X2), length(y) == nrow(X1),
-            length(ss) == ncol(X2), all(ss > 0), sd_y > 0, sd_1 > 0,
-            length(nnt) == 1, nnt >= 1)
+  stopifnot(
+    nrow(X1) == nrow(X2),
+    length(y) == nrow(X1),
+    length(ss) == ncol(X2),
+    all(ss > 0),
+    sd_y > 0,
+    sd_1 > 0,
+    length(nnt) == 1,
+    nnt >= 1
+  )
 
   out1 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt)
-  out2 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt = 2*nnt)
+  out2 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt = 2 * nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -83,8 +94,10 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1
   error_means <- out1$means - out2$means
   error_sds <- out1$sds - out2$sds
   errors <- data.frame(error_means, error_sds)
-  rownames(errors) <- c(paste0("beta_1_", 1:k1), paste0("beta_2_", 1:k2),
-                        "sigma_y", "sigma_beta_1")
+  rownames(errors) <- c(paste0("beta_1_", 1:k1),
+                        paste0("beta_2_", 1:k2),
+                        "sigma_y",
+                        "sigma_beta_1")
 
   # means for first group
   beta_1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])

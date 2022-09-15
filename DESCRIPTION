@@ -18,7 +18,4 @@ NeedsCompilation: yes
 BugReports: https://github.com/pgree/fastNoNo/issues/
 Imports: Rcpp (>= 1.0.8.3), RcppEigen
 LinkingTo: Rcpp, RcppEigen
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
-
+Suggests: tinytest
