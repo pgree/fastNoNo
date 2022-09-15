@@ -4,8 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <string>
-#include <Eigen/Dense>
-// #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 // using namespace Eigen;
 extern "C" {
 #include "dont_compile/legeexps.c"
