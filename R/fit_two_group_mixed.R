@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Fits a fast and accurate approximation to the Bayesian two-group hierarchical
-#' linear regression model.
+#' linear regression model
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
