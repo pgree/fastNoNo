@@ -42,8 +42,7 @@ coefficients on \code{X2}).
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
 posterior means and standard deviations for \eqn{\sigma_y} and
 \eqn{\sigma_1}.
-\item \code{cov}: The posterior covariance matrix of coefficients \eqn{\beta_1} and
-\eqn{\beta_2}.
+\item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
 \item \code{errors}: A data frame with two columns (\code{error_means}, \code{error_sds})
 containing the approximate accuracy of the posterior mean and standard
 deviation estimates.

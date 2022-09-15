@@ -34,8 +34,7 @@
 #' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
 #' posterior means and standard deviations for \eqn{\sigma_y} and
 #' \eqn{\sigma_1}.
-#' * `cov`: The posterior covariance matrix of coefficients \eqn{\beta_1} and
-#' \eqn{\beta_2}.
+#' * `cov`: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
 #' * `errors`: A data frame with two columns (`error_means`, `error_sds`)
 #' containing the approximate accuracy of the posterior mean and standard
 #' deviation estimates.
