@@ -20,7 +20,7 @@
 #' @param X2 Data matrix corresponding to group 2.
 #' @param ss Vector of scale parameter priors corresponding to group 2.
 #' @param sd_y Hyperprior on residual standard deviation.
-#' @param sd_1 Hyperprior on standard deviation of group 1.
+#' @param sd1 Hyperprior on standard deviation of group 1.
 #' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 #'   (2021) for details.
 #'
@@ -44,25 +44,25 @@
 #' # Simulate data
 #' set.seed(1)
 #' n <- 1000
-#' k_1 <- 50
-#' k_2 <- 60
+#' k1 <- 50
+#' k2 <- 60
 #'
 #' sigma_y <- 1
-#' sigma_1 <- 0.5
-#' beta_1 <- rnorm(k_1, 0, sigma_1)
-#' beta_2 <- rnorm(k_2, 0, 1)
+#' sigma1 <- 0.5
+#' beta1 <- rnorm(k1, 0, sigma1)
+#' beta2 <- rnorm(k2, 0, 1)
 #'
-#' X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
-#' X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
-#' y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
+#' X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
+#' X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
+#' y <- rnorm(n, X1 %*% beta1 + X2 %*% beta2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd_1 = 1, nnt = 20)
+#' fit <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_y = 1, sd1 = 1, nnt = 20)
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
-#' plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
-#' plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
+#' plot(fit$beta1$mean, beta1); abline(0, 1, col = "red")
+#' plot(fit$beta2$mean, beta2); abline(0, 1, col = "red")
 #' }
 #'
 #' @references
@@ -71,20 +71,20 @@
 #' (2021). Fast methods for posterior inference of two-group normal-normal models.
 #' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
 #'
-fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1 = 1, nnt = 10) {
+fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 = 1, nnt = 10) {
   stopifnot(
     nrow(X1) == nrow(X2),
     length(y) == nrow(X1),
     length(ss) == ncol(X2),
     all(ss > 0),
     sd_y > 0,
-    sd_1 > 0,
+    sd1 > 0,
     length(nnt) == 1,
     nnt >= 1
   )
 
-  out1 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt)
-  out2 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd_1, nnt = 2 * nnt)
+  out1 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd1, nnt)
+  out2 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd1, nnt = 2 * nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -130,7 +130,7 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd_1
 
 # internal ----------------------------------------------------------------
 
-run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
+run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd1, nnt) {
   # extract parameters from inputs
 
   n <- length(y)
@@ -147,7 +147,7 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd_1, nnt) {
      y = y,
      ss = as.double(ss),
      sigy = as.double(sd_y),
-     sig1 = as.double(sd_1)
+     sig1 = as.double(sd1)
   )
   list(means = fit$means, sds = fit$sds, cov = fit$cov, time = fit$time)
 }
