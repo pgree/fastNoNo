@@ -6,7 +6,8 @@
 \alias{fastNoNo-package}
 \title{fastNoNo: Fast hierarchial Bayesian Normal-Normal models}
 \description{
-Fits Bayesian hierarchial linear regression models using numerical linear algebra and low dimensional Gaussian quadrature.
+Fits Bayesian hierarchial linear regression models using numerical 
+  linear algebra and low dimensional Gaussian quadrature.
 }
 \seealso{
 Useful links:
