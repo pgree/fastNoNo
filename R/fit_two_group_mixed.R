@@ -136,7 +136,7 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd1, nnt) {
   n <- length(y)
   k1 <- ncol(X1)
   k2 <- ncol(X2)
-  fit <- mixed_2group(
+  fit <- fastNoNo:::mixed_2group0(
      nnt = as.integer(nnt),  # number of quadrature in theta direction
      nn = as.integer(80),    # number of quadrature nodes in other directions
      n = as.integer(n),
