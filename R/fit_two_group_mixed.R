@@ -25,10 +25,10 @@
 #'   (2021) for details.
 #'
 #' @return A named list with the following components:
-#' * `beta_1`: A data frame with two columns (`mean`, `sd`) containing the
+#' * `beta1`: A data frame with two columns (`mean`, `sd`) containing the
 #' posterior means and standard deviations for the vector \eqn{\beta_1} (the
 #' coefficients on `X1`).
-#' * `beta_2`: A data frame with two columns (`mean`, `sd`)  containing the
+#' * `beta2`: A data frame with two columns (`mean`, `sd`)  containing the
 #' posterior means and standard deviations for the vector \eqn{\beta_2} (the
 #' coefficients on `X2`).
 #' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
@@ -94,32 +94,32 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
   error_means <- out1$means - out2$means
   error_sds <- out1$sds - out2$sds
   errors <- data.frame(error_means, error_sds)
-  rownames(errors) <- c(paste0("beta_1_", 1:k1),
-                        paste0("beta_2_", 1:k2),
+  rownames(errors) <- c(paste0("beta1_", 1:k1),
+                        paste0("beta2_", 1:k2),
                         "sigma_y",
-                        "sigma_beta_1")
+                        "sigma_beta1")
 
   # means for first group
-  beta_1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
-  rownames(beta_1) <- paste0("beta_1_", 1:k1)
-  colnames(beta_1) <- c("mean", "sd")
+  beta1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
+  rownames(beta1) <- paste0("beta1_", 1:k1)
+  colnames(beta1) <- c("mean", "sd")
 
   # means for second group
-  beta_2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
-  rownames(beta_2) <- paste0("beta_2_", 1:k2)
-  colnames(beta_2) <- c("mean", "sd")
+  beta2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
+  rownames(beta2) <- paste0("beta2_", 1:k2)
+  colnames(beta2) <- c("mean", "sd")
 
   # scale parameters
   sigma <- data.frame(out2$means[(k + 1):(k + 2)], out2$sds[(k + 1):(k + 2)])
-  rownames(sigma) <- c("sigma_y", "sigma_beta_1")
+  rownames(sigma) <- c("sigma_y", "sigma_beta1")
   colnames(sigma) <- c("mean", "sd")
 
-  # posterior covariance of beta_1 and beta_2
+  # posterior covariance of beta1 and beta2
   cov <- matrix(data = out2$cov, nrow = k, ncol = k)
 
   list(
-    beta_1 = beta_1,
-    beta_2 = beta_2,
+    beta1 = beta1,
+    beta2 = beta2,
     sigma = sigma,
     cov = cov,
     errors = errors,

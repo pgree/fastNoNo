@@ -33,10 +33,10 @@ fit_two_group_mixed(
 \value{
 A named list with the following components:
 \itemize{
-\item \code{beta_1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
+\item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
 posterior means and standard deviations for the vector \eqn{\beta_1} (the
 coefficients on \code{X1}).
-\item \code{beta_2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
+\item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
 posterior means and standard deviations for the vector \eqn{\beta_2} (the
 coefficients on \code{X2}).
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
