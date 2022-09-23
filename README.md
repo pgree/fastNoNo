@@ -36,5 +36,5 @@ Then install the `fastNoNo` package from GitHub using the `remotes` package.
 
 ```r
 # install.packages("remotes")
-remotes::install_github("pgree/fastNoNo", ref = "cpp")
+remotes::install_github("pgree/fastNoNo")
 ```
