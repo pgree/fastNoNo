@@ -735,12 +735,12 @@ void mixed_read_params(std::string filename, int &n, int &k1, int &k2, Eigen::Ma
 }
 
 
-int main() {
-
-  test_mixed_effects();
-
-  return 0;
-}
+// int main() {
+//
+//   test_mixed_effects();
+//
+//   return 0;
+// }
 
 
 
