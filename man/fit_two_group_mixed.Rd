@@ -15,20 +15,22 @@ fit_two_group_mixed(
 )
 }
 \arguments{
-\item{y}{Outcome vector.}
+\item{y}{(vector) The outcome variable.}
 
-\item{X1}{Data matrix corresponding to group 1.}
+\item{X1}{(matrix) The data corresponding to group 1. Must have \code{length(y)} rows.}
 
-\item{X2}{Data matrix corresponding to group 2.}
+\item{X2}{(matrix) The data corresponding to group 2. Must have \code{length(y)} rows.}
 
-\item{ss}{Vector of scale parameter priors corresponding to group 2.}
+\item{ss}{(vector) Scale parameter values for the prior on \eqn{\beta_2}.
+Must have either one element or \code{ncol(X2)} elements. In the former case the
+value is recycled.}
 
-\item{sd_y}{Hyperprior on residual standard deviation.}
+\item{sd_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
 
-\item{sd1}{Hyperprior on standard deviation of group 1.}
+\item{sd1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
 
-\item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
-(2021) for details.}
+\item{nnt}{(positive integer) Number of quadrature nodes in \eqn{\theta}
+direction as described in Greengard et al. (2022).}
 }
 \value{
 A named list with the following components:

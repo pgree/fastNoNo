@@ -11,6 +11,7 @@ Fits Bayesian hierarchial linear regression models using numerical linear algebr
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://github.com/pgree/fastNoNo}
   \item Report bugs at \url{https://github.com/pgree/fastNoNo/issues/}
 }
 
