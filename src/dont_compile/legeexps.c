@@ -1,3 +1,5 @@
+/* Copyright (C) 2019-2020 The Simons Foundation, Inc., Zydrunas Gimbutas, 
+and Vladimir Rokhlin - All Rights Reserved. */
 /* legeexps.f -- translated by f2c (version 20190311).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
