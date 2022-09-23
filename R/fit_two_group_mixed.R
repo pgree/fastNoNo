@@ -68,10 +68,10 @@
 #' }
 #'
 #' @references
-#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry,
-#' Andrew Gelman, and Aki Vehtari.
-#' (2021). Fast methods for posterior inference of two-group normal-normal models.
-#' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
+#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
+#' Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
+#' two-group normal-normal models. To appear,
+#' [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 #'
 fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 = 1, nnt = 10) {
   stopifnot(
