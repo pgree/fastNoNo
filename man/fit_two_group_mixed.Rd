@@ -40,12 +40,14 @@ coefficients on \code{X1}).
 posterior means and standard deviations for the vector \eqn{\beta_2} (the
 coefficients on \code{X2}).
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
-posterior means and standard deviations for \eqn{\sigma_y} and
-\eqn{\sigma_1}.
+posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
 \item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
 \item \code{errors}: A data frame with two columns (\code{error_means}, \code{error_sds})
 containing the approximate accuracy of the posterior mean and standard
 deviation estimates.
+\item \code{time}: The execution time of the algorithm in seconds. This only includes
+the time taken to run the internal C++ code. To include the full time elapsed
+when running the \R function use \code{\link[=system.time]{system.time()}}.
 }
 }
 \description{

@@ -32,12 +32,14 @@
 #' posterior means and standard deviations for the vector \eqn{\beta_2} (the
 #' coefficients on `X2`).
 #' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
-#' posterior means and standard deviations for \eqn{\sigma_y} and
-#' \eqn{\sigma_1}.
+#' posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
 #' * `cov`: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
 #' * `errors`: A data frame with two columns (`error_means`, `error_sds`)
 #' containing the approximate accuracy of the posterior mean and standard
 #' deviation estimates.
+#' * `time`: The execution time of the algorithm in seconds. This only includes
+#' the time taken to run the internal C++ code. To include the full time elapsed
+#' when running the \R function use [system.time()].
 #'
 #' @examples
 #' \dontrun{
