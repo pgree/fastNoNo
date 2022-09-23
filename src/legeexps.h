@@ -1,3 +1,6 @@
+#ifndef __FASTNONO_LEGEEXPS_H__
+#define __FASTNONO_LEGEEXPS_H__
+
 /* legeexps.f -- translated by f2c (version 20190311).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
@@ -140,14 +143,14 @@ static long int c__2 = 2;
 /*        the order $O(n)$; it has been tested for n \leq 100 000. */
 
 
-/* Subroutine */ int legeexps_(long int *itype, long int *n, double *x, 
+/* Subroutine */ int legeexps_(long int *itype, long int *n, double *x,
 	double *u, double *v, double *whts)
 {
     /* System generated locals */
     long int u_dim1, u_offset, v_dim1, v_offset, i__1, i__2;
 
     /* Local variables */
-    extern /* Subroutine */ int legerts2_(long int *, long int *, double *, 
+    extern /* Subroutine */ int legerts2_(long int *, long int *, double *,
 	    double *), legepols_(double *, long int *, double *);
     static double d__;
     static long int i__, j, itype_rts__;
@@ -264,7 +267,7 @@ static long int c__2 = 2;
 
 
 
-/* Subroutine */ int legerts2_(long int *itype, long int *n, double *ts, 
+/* Subroutine */ int legerts2_(long int *itype, long int *n, double *ts,
 	double *whts)
 {
     /* System generated locals */
@@ -276,8 +279,8 @@ static long int c__2 = 2;
 
     /* Local variables */
     static double d__;
-    extern /* Subroutine */ int legetayl2_(double *, double *, 
-	    double *, double *, long int *, long int *, double *, 
+    extern /* Subroutine */ int legetayl2_(double *, double *,
+	    double *, double *, long int *, long int *, double *,
 	    double *);
     static double h__;
     static long int i__, k;
@@ -498,7 +501,7 @@ L2000:
 
 
 /* Subroutine */ int legetayl2_(double *pol, double *der, double *
-	x, double *h__, long int *n, long int *k, double *sum, 
+	x, double *h__, long int *n, long int *k, double *sum,
 	double *sumder)
 {
     /* Initialized data */
@@ -512,7 +515,7 @@ L2000:
     /* Local variables */
     static double d__;
     static long int i__;
-    static double d7, q0, q1, q2, dn, qi, ddd, two, qip1, dddd, half, 
+    static double d7, q0, q1, q2, dn, qi, ddd, two, qip1, dddd, half,
 	    done, hinv, prods[100], rnums[100], prodinv[100], squares[100];
 
 
@@ -592,7 +595,7 @@ L2000:
 
 
 
-/* Subroutine */ int legepol_(double *x, long int *n, double *pol, 
+/* Subroutine */ int legepol_(double *x, long int *n, double *pol,
 	double *der)
 {
     /* System generated locals */
@@ -714,11 +717,11 @@ L1200:
 
 
 
-/* Subroutine */ int matmul_0_(int n__, double *a, double *b, 
+/* Subroutine */ int matmul_0_(int n__, double *a, double *b,
 	double *c__, long int *n)
 {
     /* System generated locals */
-    long int a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, i__1, i__2, 
+    long int a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, i__1, i__2,
 	    i__3;
 
     /* Local variables */
@@ -785,15 +788,17 @@ L_matmua:
     return 0;
 } /* matmul_ */
 
-/* Subroutine */ int matmul_(double *a, double *b, double *c__, 
+/* Subroutine */ int matmul_(double *a, double *b, double *c__,
 	long int *n)
 {
     return matmul_0_(0, a, b, c__, n);
     }
 
-/* Subroutine */ int matmua_(double *a, double *b, double *c__, 
+/* Subroutine */ int matmua_(double *a, double *b, double *c__,
 	long int *n)
 {
     return matmul_0_(1, a, b, c__, n);
     }
 
+
+# endif

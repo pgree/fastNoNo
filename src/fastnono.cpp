@@ -1,7 +1,6 @@
-#include "dont_compile/fastnono.cpp"
-#include <RcppEigen.h>
-// [[Rcpp::depends(RcppEigen)]]
+#include "fastnono.h"
 
+// [[Rcpp::depends(RcppEigen)]]
 
 // [[Rcpp::export]]
 Rcpp::List mixed_2group0(int nnt, int nn, int n, int k1, int k2, int k,

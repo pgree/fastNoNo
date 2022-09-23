@@ -1,15 +1,18 @@
+#ifndef __FASTNONO_H__
+#define __FASTNONO_H__
+
+#include <RcppEigen.h>
+#include <Eigen/Dense>
 #include <stdlib.h>
 #include <iostream>
-#include <fstream>
 #include <cmath>
 #include <vector>
-#include <string>
-#include <Eigen/Dense>
-extern "C" {
-#include "legeexps.c"
-}
 #include <chrono>
 using namespace std::chrono;
+
+extern "C" {
+#include "legeexps.h"
+}
 
 struct fit_out {
   Eigen::VectorXd means;
@@ -742,5 +745,4 @@ void mixed_read_params(std::string filename, int &n, int &k1, int &k2, Eigen::Ma
 //   return 0;
 // }
 
-
-
+# endif
