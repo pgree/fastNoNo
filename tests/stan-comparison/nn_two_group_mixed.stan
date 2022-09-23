@@ -18,9 +18,7 @@ parameters {
 model {
   y ~ normal(X1*beta1 + X2*beta2, sigma_y);
   beta1 ~ normal(0, sigma_beta1);
-  for (i in 1:k2) {
-    beta2[i] ~ normal(0, ss[i]);
-  }
+  beta2 ~ normal(0, ss);
   sigma_y ~ normal(0, sdy);
   sigma_beta1 ~ normal(0, sd1);
 }

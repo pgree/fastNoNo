@@ -12,6 +12,101 @@ X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
 fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20)
 
+
+# test input checking -----------------------------------------------------
+
+# certain values not allowed
+y_NA <- y
+X_1_NA <- X_1
+X_2_NA <- X_2
+y_NA[1] <- NA
+X_1_NA[1,1] <- NA
+X_2_NA[1,1] <- NA
+expect_error(
+  fit_two_group_mixed(y_NA, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
+  "!anyNA(y) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1_NA, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
+  "!anyNA(X1) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2_NA, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
+  "!anyNA(X2) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = -1, sd_y = 1, sd1 = 1, nnt = 20),
+  "all(ss > 0) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = -1, sd1 = 1, nnt = 20),
+  "sd_y > 0 is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = -1, nnt = 20),
+  "sd1 > 0 is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1, nnt = -20),
+  "nnt > 0 is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1, nnt = pi),
+  "nnt == as.integer(nnt) is not TRUE",
+  fixed = TRUE
+)
+
+
+
+# incorrect sizes
+expect_error(
+  fit_two_group_mixed(y[-1], X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
+  "length(y) == nrow(X1) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1[-1, ], X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
+  "nrow(X1) == nrow(X2) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2[-1, ], ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
+  "nrow(X1) == nrow(X2) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_1), sd_y = 1, sd1 = 1, nnt = 20),
+  "length(ss) == 1 || length(ss) == ncol(X2) is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1:2, sd1 = 1, nnt = 20),
+  "length(sd_y) == 1 is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1:2, nnt = 20),
+  "length(sd1) == 1 is not TRUE",
+  fixed = TRUE
+)
+expect_error(
+  fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1, nnt = 1:2),
+  "length(nnt) == 1 is not TRUE",
+  fixed = TRUE
+)
+
+
+
+
+
+# test contents of fit object ---------------------------------------------
 expect_equal(names(fit), c("beta1", "beta2", "sigma", "cov", "errors", "time"))
 
 expect_inherits(fit$beta1, "data.frame")

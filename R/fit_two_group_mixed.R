@@ -75,14 +75,20 @@
 #'
 fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 = 1, nnt = 10) {
   stopifnot(
+    !anyNA(y),
+    !anyNA(X1),
+    !anyNA(X2),
     nrow(X1) == nrow(X2),
     length(y) == nrow(X1),
-    length(ss) == ncol(X2),
+    length(ss) == 1 || length(ss) == ncol(X2),
+    length(sd_y) == 1,
+    length(sd1) == 1,
+    length(nnt) == 1,
     all(ss > 0),
     sd_y > 0,
     sd1 > 0,
-    length(nnt) == 1,
-    nnt >= 1
+    nnt > 0,
+    nnt == as.integer(nnt)
   )
 
   out1 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd1, nnt)
