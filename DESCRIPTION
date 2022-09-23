@@ -1,7 +1,7 @@
 Package: fastNoNo
 Type: Package
 Title: Fast hierarchial Bayesian Normal-Normal models
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     c(person(given = "Philip", family = "Greengard", role = c("aut", "cre"), 
            email = "philip.greengard@gmail.com"),
@@ -9,14 +9,14 @@ Authors@R:
            email = "jsg2201@columbia.edu"))
 Description: Fits Bayesian hierarchial linear regression models using numerical 
   linear algebra and low dimensional Gaussian quadrature.
+URL: https://github.com/pgree/fastNoNo
+BugReports: https://github.com/pgree/fastNoNo/issues/
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: yes
-BugReports: https://github.com/pgree/fastNoNo/issues/
-SystemRequirements: gfortran
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+Imports: Rcpp (>= 1.0.8.3), RcppEigen
+LinkingTo: Rcpp, RcppEigen
+Suggests: tinytest

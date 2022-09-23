@@ -10,7 +10,7 @@ fit_two_group_mixed(
   X2,
   ss = rep(1, ncol(X2)),
   sd_y = 1,
-  sd_1 = 1,
+  sd1 = 1,
   nnt = 10
 )
 }
@@ -21,11 +21,11 @@ fit_two_group_mixed(
 
 \item{X2}{Data matrix corresponding to group 2.}
 
-\item{ss}{Data vector of scale parameter priors corresponding to group 2.}
+\item{ss}{Vector of scale parameter priors corresponding to group 2.}
 
 \item{sd_y}{Hyperprior on residual standard deviation.}
 
-\item{sd_1}{Hyperprior on standard deviation of group 1.}
+\item{sd1}{Hyperprior on standard deviation of group 1.}
 
 \item{nnt}{Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
 (2021) for details.}
@@ -33,20 +33,26 @@ fit_two_group_mixed(
 \value{
 A named list with the following components:
 \itemize{
-\item \code{beta_1}: A data frame of posterior means and standard deviations for
-the vector \eqn{\beta_1}, the coefficients on \code{X1}.
-\item \code{beta_2}: A data frame of posterior means and standard deviations for
-the vector \eqn{\beta_2}, the coefficients on \code{X2}.
-\item \code{sigma}: A data frame with posterior means and standard deviations for
-\eqn{\sigma_y} and \eqn{\sigma_1}.
-\item \code{cov}: The posterior covariance matrix of coefficients \verb{[beta_1, beta_2]}.
-\item \code{errors}: A data frame with approximate accuracy of the posterior
-mean and standard deviation estimates.
+\item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
+posterior means and standard deviations for the vector \eqn{\beta_1} (the
+coefficients on \code{X1}).
+\item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
+posterior means and standard deviations for the vector \eqn{\beta_2} (the
+coefficients on \code{X2}).
+\item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
+posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
+\item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
+\item \code{errors}: A data frame with two columns (\code{error_means}, \code{error_sds})
+containing the approximate accuracy of the posterior mean and standard
+deviation estimates.
+\item \code{time}: The execution time of the algorithm in seconds. This only includes
+the time taken to run the internal C++ code. To include the full time elapsed
+when running the \R function use \code{\link[=system.time]{system.time()}}.
 }
 }
 \description{
-This function fits a fast approximation to the Bayesian two-group
-hierarchical linear regression model
+Fits a fast and accurate approximation to the Bayesian two-group hierarchical
+linear regression model
 
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
@@ -63,30 +69,31 @@ low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
 # Simulate data
 set.seed(1)
 n <- 1000
-k_1 <- 50
-k_2 <- 60
+k1 <- 50
+k2 <- 60
 
 sigma_y <- 1
-sigma_1 <- 0.5
-beta_1 <- rnorm(k_1, 0, sigma_1)
-beta_2 <- rnorm(k_2, 0, 1)
+sigma1 <- 0.5
+beta1 <- rnorm(k1, 0, sigma1)
+beta2 <- rnorm(k2, 0, 1)
 
-X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
-X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
-y <- rnorm(n, X_1 \%*\% beta_1 + X_2 \%*\% beta_2, sigma_y)
+X1 <- matrix(rnorm(n * k1, 2, 3), ncol = k1)
+X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
+y <- rnorm(n, X1 \%*\% beta1 + X2 \%*\% beta2, sigma_y)
 
 # Fit model
-fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd_1 = 1, nnt = 20)
+fit <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_y = 1, sd1 = 1, nnt = 20)
 str(fit)
 
 # Plot estimates of the betas vs "truth"
-plot(fit$beta_1$mean, beta_1); abline(0, 1, col = "red")
-plot(fit$beta_2$mean, beta_2); abline(0, 1, col = "red")
+plot(fit$beta1$mean, beta1); abline(0, 1, col = "red")
+plot(fit$beta2$mean, beta2); abline(0, 1, col = "red")
 }
 
 }
 \references{
-Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Andrew Gelman, and Aki Vehtari.
-(2021). Fast methods for posterior inference of two-group normal-normal models.
-\href{https://arxiv.org/abs/2110.03055}{preprint arXiv:2110.03055}
+Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
+Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
+two-group normal-normal models. To appear,
+\href{http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf}{Bayesian Analysis}
 }

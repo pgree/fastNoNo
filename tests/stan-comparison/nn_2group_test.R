@@ -1,7 +1,5 @@
 library(tidyverse)
 library(cmdstanr)
-library(rstanarm)
-library(rstan)
 library(fastNoNo)
 
 # generate random data
@@ -26,7 +24,7 @@ std_2 <- 10
 sigs <- c(std_y, std_1, std_2)
 
 # run the stan model
-model1 <- cmdstan_model("~/fastNoNo/tests/nn_2group.stan")
+model1 <- cmdstan_model("tests/stan-comparison/nn_2group.stan")
 niters <- 1e3
 
 # parameters

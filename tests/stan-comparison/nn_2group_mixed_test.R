@@ -1,11 +1,6 @@
 library(tidyverse)
 library(cmdstanr)
-library(rstanarm)
-library(rstan)
 library(fastNoNo)
-
-# cd to script location
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 # generate data
 # parameters
@@ -23,8 +18,7 @@ ss <- sample.int(3, k2, replace=TRUE)
 sdy <- 1.0
 sd1 <- 2.0
 
-file1 <- "nn_2group_mixed.stan"
-mod1 <- cmdstan_model(file1)
+mod1 <- cmdstan_model("tests/stan-comparison/nn_2group_mixed.stan")
 niters <- 1e3
 
 # parameters
