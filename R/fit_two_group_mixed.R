@@ -15,14 +15,16 @@
 #' low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
 #'
 #' @export
-#' @param y Outcome vector.
-#' @param X1 Data matrix corresponding to group 1.
-#' @param X2 Data matrix corresponding to group 2.
-#' @param ss Vector of scale parameter priors corresponding to group 2.
-#' @param sd_y Hyperprior on residual standard deviation.
-#' @param sd1 Hyperprior on standard deviation of group 1.
-#' @param nnt Number of quadrature nodes in \eqn{\theta}. See Greengard et al.
-#'   (2021) for details.
+#' @param y (vector) The outcome variable.
+#' @param X1 (matrix) The data corresponding to group 1. Must have `length(y)` rows.
+#' @param X2 (matrix) The data corresponding to group 2. Must have `length(y)` rows.
+#' @param ss (vector) Scale parameter values for the prior on \eqn{\beta_2}.
+#'   Must have either one element or `ncol(X2)` elements. In the former case the
+#'   value is recycled.
+#' @param sd_y (positive real) Scale parameter value for the prior on \eqn{\sigma_y}.
+#' @param sd1 (positive real) Scale parameter value for the prior on \eqn{\sigma_1}.
+#' @param nnt (positive integer) Number of quadrature nodes in \eqn{\theta}
+#'   direction as described in Greengard et al. (2022).
 #'
 #' @return A named list with the following components:
 #' * `beta1`: A data frame with two columns (`mean`, `sd`) containing the
@@ -90,6 +92,9 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
     nnt > 0,
     nnt == as.integer(nnt)
   )
+  if (length(ss) == 1) {
+    ss <- rep(ss, ncol(X2))
+  }
 
   out1 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd1, nnt)
   out2 <- run_two_group_mixed(y, X1, X2, ss, sd_y, sd1, nnt = 2 * nnt)
