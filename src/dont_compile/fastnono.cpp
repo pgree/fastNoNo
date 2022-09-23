@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <Eigen/Dense>
 extern "C" {
 #include "legeexps.c"
 }
