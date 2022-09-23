@@ -69,7 +69,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
                      Eigen::VectorXd ss, double sigy, double sig1) {
   Eigen::VectorXd dsums(k+2), stds(k+2);
   Eigen::MatrixXd dsums_cov(k, k);
-  double d1, d2, t, fi, wt, fm, ss1, ss2, tmp, dsum;
+  double d1, d2, t, fi, wt, fm, ss1, ss2, dsum;
   fit_out fit;
 
   // time this function run
@@ -153,7 +153,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   ss1 = 0;
   ss2 = 0;
   fm = -1.0e250;
-  double dsumi, ss1i, ss2i, fmi;
+  double dsumi, ss1i, ss2i;
   Eigen::VectorXd dsumsi(k+2), dsum_xsi(k+2);
   Eigen::MatrixXd dsums_covi(k, k), xxti(k, k);
 
@@ -262,7 +262,7 @@ void eval_inner(int nn, int n, int k1, int k2, int k, double d1,
 
   // compute the residual of least squares solution
   Eigen::VectorXd ysmall = ynew.transpose() * u;
-  double res2 = ysmall.norm() - ysmall.norm();
+  // double res2 = ysmall.norm() - ysmall.norm();
 
   // square entries of two vectors
   Eigen::VectorXd ys2 = ysmall.array().square();
@@ -427,8 +427,7 @@ void get_mjs(int k, Eigen::VectorXd s2, Eigen::VectorXd ys, double phi,
 void get_phi(int nn, int n, int k, double t, Eigen::VectorXd ysmall,
              Eigen::VectorXd ys2, Eigen::VectorXd s, Eigen::VectorXd s2, double resid,
              double d1, double d2, double &phi0i, double &phi1i, double &fmax) {
-  double phi, alpha, beta, prefact, exp_fact, a1, sig22, sig12, rho,
-    djac, f, fi;
+  double phi, alpha, beta, prefact, exp_fact, a1, sig22, sig12, rho, djac, f;
   Eigen::VectorXd fs(nn), phis(nn), whts_phis(nn);
 
   /*
@@ -480,9 +479,9 @@ void get_phi(int nn, int n, int k, double t, Eigen::VectorXd ysmall,
   }
 
   // check that bounds are reasonable
-  fmax = fs.maxCoeff();
-  double r_dd = fmax - fs[i0];
-  double l_dd = fmax - fs[i1];
+  // fmax = fs.maxCoeff();
+  // double r_dd = fmax - fs[i0];
+  // double l_dd = fmax - fs[i1];
   //std::cout << "r_dd: " << r_dd << std::endl;
   //std::cout << "l_dd: " << l_dd << std::endl;
 }
@@ -612,7 +611,7 @@ void lege_nodes_whts(int nn, double t0, double t1,
   // convert to appropriate data types of calling sequence
   long int nn0[1] = {nn};
   long int itype[1] = {1};
-  double ts0[nn], whts0[nn], dummy[1], tmp;
+  double ts0[nn], whts0[nn], dummy[1];
   legeexps_(itype, nn0, ts0, dummy, dummy, whts0);
 
   // copy nodes and weights into Eigen::VectorXd and scale to fit interval

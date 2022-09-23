@@ -1,4 +1,5 @@
 #include "fastnono.h"
+#include <RcppEigen.h>
 
 // [[Rcpp::depends(RcppEigen)]]
 
