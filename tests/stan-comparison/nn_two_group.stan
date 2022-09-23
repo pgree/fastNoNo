@@ -11,14 +11,14 @@ parameters {
   real<lower=0> sigma_y;
   real<lower=0> sigma1;
   real<lower=0> sigma2;
-  vector[k1] alpha1;
-  vector[k2] alpha2;
+  vector[k1] beta1;
+  vector[k2] beta2;
 
 }
 model {
-  y ~ normal(X1*alpha1 + X2*alpha2, sigma_y);
-  alpha1 ~ normal(0, sigma1);
-  alpha2 ~ normal(0, sigma2);
+  y ~ normal(X1*beta1 + X2*beta2, sigma_y);
+  beta1 ~ normal(0, sigma1);
+  beta2 ~ normal(0, sigma2);
   sigma_y ~ normal(0, sigs[1]);
   sigma1 ~ normal(0, sigs[2]);
   sigma2 ~ normal(0, sigs[3]);

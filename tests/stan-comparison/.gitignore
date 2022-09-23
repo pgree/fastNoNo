@@ -1,0 +1,3 @@
+# ignore cmdstan executables
+nn_two_group_mixed
+nn_two_group
