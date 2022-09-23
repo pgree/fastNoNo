@@ -2,7 +2,7 @@
 #define __FASTNONO_H__
 
 #include <RcppEigen.h>
-#include <Eigen/Dense>
+// #include <Eigen/Dense>
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
