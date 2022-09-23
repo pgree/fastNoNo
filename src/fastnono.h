@@ -2,13 +2,10 @@
 #define __FASTNONO_H__
 
 #include <RcppEigen.h>
-// #include <Eigen/Dense>
 #include <stdlib.h>
-#include <iostream>
 #include <cmath>
-#include <vector>
 #include <chrono>
-using namespace std::chrono;
+// #include <iostream>
 
 extern "C" {
 #include "legeexps.h"
@@ -73,8 +70,8 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   fit_out fit;
 
   // time this function run
-  high_resolution_clock::time_point tt1, tt2;
-  tt1 = high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point tt1, tt2;
+  tt1 = std::chrono::high_resolution_clock::now();
 
   // adjust for fixed priors on coefficients k1+1 to k1+k2
   Eigen::MatrixXd a2 = a;
@@ -222,7 +219,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   }
 
   // end timing
-  tt2 = high_resolution_clock::now();
+  tt2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double, std::milli> duration = tt2 - tt1;
 
   // fill struct with output
