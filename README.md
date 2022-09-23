@@ -9,7 +9,7 @@ An R package that fits fast approximations to Bayesian hierarchical linear
 regression models using numerical linear algebra and low dimensional Gaussian
 quadrature. For more details see the following paper:
 
-* Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew Gelman, and Aki Vehtari. (2021). Fast methods for posterior inference of two-group normal-normal models. [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
+* Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew Gelman, and Aki Vehtari. (2021). Fast methods for posterior inference of two-group normal-normal models. [To appear, Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 
 ### Installation
 
