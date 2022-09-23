@@ -1,11 +1,10 @@
 /* Copyright (C) 2019-2020 The Simons Foundation, Inc., Zydrunas Gimbutas,
  and Vladimir Rokhlin - All Rights Reserved. */
 
-/* legeexps.f -- translated by f2c (version 20190311). */
-
 #ifndef __FASTNONO_LEGEEXPS_H__
 #define __FASTNONO_LEGEEXPS_H__
 
+/* legeexps.f -- translated by f2c (version 20190311). */
 
 /*        This file contains a set of subroutines for the handling */
 /*        of Legendre expansions. It contains 19 subroutines that are */

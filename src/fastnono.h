@@ -517,7 +517,7 @@ void get_int_bds(int nn, Eigen::VectorXd phis, Eigen::VectorXd fs, int &i0, int 
   i1 = std::min(i1 + 1, nn);
 
   // get minimum bound
-  tmpvec = ((tmpvec1.array() == 1) && (phis.array() <= fmax_phi))\
+  tmpvec = ((tmpvec1.array() == 1) && (phis.array() <= fmax_phi)) \
     .cast<int>();
   for (int i=0; i<nn; i++) {
     if (tmpvec[i] > 0) {
@@ -526,15 +526,12 @@ void get_int_bds(int nn, Eigen::VectorXd phis, Eigen::VectorXd fs, int &i0, int 
     }
   }
   i0 = std::max(i0 - 1, 0);
-
 }
 
 
 
 void eval_logdens_rho(int n, double rho, double a1, double c1, double &f) {
-
   f = -n*log(rho) - pow(rho, 2)/2.0*a1 - c1/(2*pow(rho, 2));
-
 }
 
 
@@ -553,15 +550,14 @@ void eval_jac_det(double rho, double phi, double t, double &f) {
   djac = 1 / (1 + pow(y1, 2));
   djac *= (1/sqrt(alph)-pow(x1, 2)/pow(alph, 1.5))/sqrt(1- pow(x1, 2)/alph);
   f = abs(djac);
-
 }
 
 
 
 void get_beta_alpha_prefact(double phi, Eigen::VectorXd ys, Eigen::VectorXd ys2,
-			    Eigen::VectorXd s, Eigen::VectorXd s2, int n, int k,
-			    double resid, double &alpha, double &beta,
-			    double &prefact, double &exp_fact) {
+                            Eigen::VectorXd s, Eigen::VectorXd s2, int n, int k,
+                            double resid, double &alpha, double &beta,
+                            double &prefact, double &exp_fact) {
 
   // for convenience, compute quantities that appear in
   // several locations in the integrand. prefact is the
@@ -570,14 +566,12 @@ void get_beta_alpha_prefact(double phi, Eigen::VectorXd ys, Eigen::VectorXd ys2,
   double sp = pow(sin(phi), 2);
   double cp = pow(cos(phi), 2);
 
-
   // alpha
   alpha = 0;
   for (int i=0; i<k; i++) {
     alpha = alpha - log(cp+sp*s2(i));
   }
   alpha = alpha/2.0 + k/2.0 * log(2 * M_PI);
-
 
   // beta
   beta = 0;
@@ -588,25 +582,21 @@ void get_beta_alpha_prefact(double phi, Eigen::VectorXd ys, Eigen::VectorXd ys2,
   // prefact
   prefact = -(n-k)/2.0*log(cp)+alpha;
   exp_fact= resid/cp+beta;
-
-
 }
 
 
 
-void rescale_a(double t, Eigen::MatrixXd &a, Eigen::MatrixXd &asca, int n, int k,
-	       int k1, int k2) {
+void rescale_a(double t, Eigen::MatrixXd &a, Eigen::MatrixXd &asca,
+               int n, int k, int k1, int k2) {
 
   // multiply a by a diagonal matrix
   double tc = cos(t);
   double ts = sin(t);
 
   for (int i=0; i<n; i++) {
-
     for (int j=0; j<k1; j++) {
       asca(i, j) = a(i, j) * tc;
     }
-
     for (int j=0; j<k2; j++) {
       asca(i, k1 + j) = a(i, k1 + j) * ts;
     }
@@ -614,9 +604,8 @@ void rescale_a(double t, Eigen::MatrixXd &a, Eigen::MatrixXd &asca, int n, int k
 }
 
 
-
-void lege_nodes_whts(int nn, double t0, double t1, Eigen::VectorXd &ts,
-		     Eigen::VectorXd &whts) {
+void lege_nodes_whts(int nn, double t0, double t1,
+                     Eigen::VectorXd &ts, Eigen::VectorXd &whts) {
   // this function wraps legeexps.c, which was constructed from
   // Vladimir Rokhlin's legeexps.f via a call to f2c
 
@@ -626,13 +615,11 @@ void lege_nodes_whts(int nn, double t0, double t1, Eigen::VectorXd &ts,
   double ts0[nn], whts0[nn], dummy[1], tmp;
   legeexps_(itype, nn0, ts0, dummy, dummy, whts0);
 
-  // copy nodes and weights into Eigen::VectorXd and scale to fit
-  // interval
+  // copy nodes and weights into Eigen::VectorXd and scale to fit interval
   for (int i=0; i<nn; i++) {
     ts(i) = t0 + (t1 - t0) * (ts0[i] + 1)/2.0;
     whts(i) = whts0[i] * (t1 - t0) / 2.0;
   }
-
 }
 
 
