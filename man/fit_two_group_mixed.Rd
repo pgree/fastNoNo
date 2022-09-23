@@ -92,8 +92,8 @@ plot(fit$beta2$mean, beta2); abline(0, 1, col = "red")
 
 }
 \references{
-Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry,
-Andrew Gelman, and Aki Vehtari.
-(2021). Fast methods for posterior inference of two-group normal-normal models.
-\href{https://arxiv.org/abs/2110.03055}{preprint arXiv:2110.03055}
+Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
+Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
+two-group normal-normal models. To appear,
+\href{http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf}{Bayesian Analysis}
 }

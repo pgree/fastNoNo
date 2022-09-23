@@ -68,10 +68,10 @@
 #' }
 #'
 #' @references
-#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry,
-#' Andrew Gelman, and Aki Vehtari.
-#' (2021). Fast methods for posterior inference of two-group normal-normal models.
-#' [preprint arXiv:2110.03055](https://arxiv.org/abs/2110.03055)
+#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
+#' Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
+#' two-group normal-normal models. To appear,
+#' [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 #'
 fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 = 1, nnt = 10) {
   stopifnot(
@@ -116,7 +116,7 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
   rownames(sigma) <- c("sigma_y", "sigma_beta1")
   colnames(sigma) <- c("mean", "sd")
 
-  # posterior covariance of beta1 and beta2
+  # posterior covariance of [beta1, beta2]
   cov <- matrix(data = out2$cov, nrow = k, ncol = k)
 
   list(
@@ -133,12 +133,10 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
 # internal ----------------------------------------------------------------
 
 run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd1, nnt) {
-  # extract parameters from inputs
-
   n <- length(y)
   k1 <- ncol(X1)
   k2 <- ncol(X2)
-  fit <- mixed_2group0(
+  fit <- mixed_2group_cpp(
      nnt = as.integer(nnt),  # number of quadrature in theta direction
      nn = as.integer(80),    # number of quadrature nodes in other directions
      n = as.integer(n),
@@ -151,6 +149,11 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd1, nnt) {
      sigy = as.double(sd_y),
      sig1 = as.double(sd1)
   )
-  list(means = fit$means, sds = fit$sds, cov = fit$cov, time = fit$time)
+  list(
+    means = fit$means,
+    sds = fit$sds,
+    cov = fit$cov,
+    time = fit$time
+  )
 }
 

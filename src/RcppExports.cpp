@@ -11,9 +11,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// mixed_2group0
-Rcpp::List mixed_2group0(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss, double sigy, double sig1);
-RcppExport SEXP _fastNoNo_mixed_2group0(SEXP nntSEXP, SEXP nnSEXP, SEXP nSEXP, SEXP k1SEXP, SEXP k2SEXP, SEXP kSEXP, SEXP aSEXP, SEXP ySEXP, SEXP ssSEXP, SEXP sigySEXP, SEXP sig1SEXP) {
+// mixed_2group_cpp
+Rcpp::List mixed_2group_cpp(int nnt, int nn, int n, int k1, int k2, int k, Eigen::MatrixXd a, Eigen::VectorXd y, Eigen::VectorXd ss, double sigy, double sig1);
+RcppExport SEXP _fastNoNo_mixed_2group_cpp(SEXP nntSEXP, SEXP nnSEXP, SEXP nSEXP, SEXP k1SEXP, SEXP k2SEXP, SEXP kSEXP, SEXP aSEXP, SEXP ySEXP, SEXP ssSEXP, SEXP sigySEXP, SEXP sig1SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -28,13 +28,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type ss(ssSEXP);
     Rcpp::traits::input_parameter< double >::type sigy(sigySEXP);
     Rcpp::traits::input_parameter< double >::type sig1(sig1SEXP);
-    rcpp_result_gen = Rcpp::wrap(mixed_2group0(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1));
+    rcpp_result_gen = Rcpp::wrap(mixed_2group_cpp(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_fastNoNo_mixed_2group0", (DL_FUNC) &_fastNoNo_mixed_2group0, 11},
+    {"_fastNoNo_mixed_2group_cpp", (DL_FUNC) &_fastNoNo_mixed_2group_cpp, 11},
     {NULL, NULL, 0}
 };
 
