@@ -67,53 +67,53 @@ void get_xs_from_ws(Eigen::VectorXd ws, int k, int k1, int k2, Eigen::MatrixXd v
 ////////////////////////////////////////////////////////////////////
 
 
-void test_mixed_effects() {
-  std::string filename = "params.dat";
-  //std::cout << "filename: " << filename << std::endl;
-  int n, k1, k2, k3, k, nn, nnt, nn2, nnt2;
-  Eigen::MatrixXd a;
-  double sigy, sig1, dsum, tt;
-  Eigen::VectorXd y, ss;
-
-  // dimensions of problem
-  mixed_read_params(filename, n, k1, k2, a, y, ss, sigy, sig1);
-  k = k1 + k2;
-  //std::cout << "n: " << n << std::endl;
-  //std::cout << "k1: " << k1 << std::endl;
-  //std::cout << "k: " << k << std::endl;
-
-  // allocate memory accordingly
-  Eigen::VectorXd dsums(k+2), dsums2(k+2), stds(k+2), stds2(k+2), dds(k+2);
-  Eigen::MatrixXd cov(k, k), cov2(k, k);
-
-  // run algorithm
-  nn = 80;
-  nnt = 40;
-  fit_out fit1 = mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1);
-  dsums = fit1.means;
-  stds = fit1.sds;
-  cov = fit1.cov;
-  tt = fit1.time;
-  std::cout << "tt: " << tt << std::endl;
-  std::cout << "dsums: " << dsums << std::endl;
-  //std::cout << "stds: " << stds << std::endl;
-  exit(0);
-
-  // double number of nodes
-  nn2 = 2 * nn;
-  nnt2 = 2 * nnt;
-  fit_out fit2 = mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1);
-  dsums2 = fit2.means;
-  stds2 = fit2.sds;
-  cov2 = fit2.cov;
-
-  // difference
-  dds = dsums - dsums2;
-  std::cout << "max posterior mean error: " << dds.cwiseAbs().maxCoeff() << std::endl;
-  dds = stds - stds2;
-  std::cout << "max posterior std error: " << dds.cwiseAbs().maxCoeff() << std::endl;
-
-}
+// void test_mixed_effects() {
+//   std::string filename = "params.dat";
+//   //std::cout << "filename: " << filename << std::endl;
+//   int n, k1, k2, k3, k, nn, nnt, nn2, nnt2;
+//   Eigen::MatrixXd a;
+//   double sigy, sig1, dsum, tt;
+//   Eigen::VectorXd y, ss;
+//
+//   // dimensions of problem
+//   mixed_read_params(filename, n, k1, k2, a, y, ss, sigy, sig1);
+//   k = k1 + k2;
+//   //std::cout << "n: " << n << std::endl;
+//   //std::cout << "k1: " << k1 << std::endl;
+//   //std::cout << "k: " << k << std::endl;
+//
+//   // allocate memory accordingly
+//   Eigen::VectorXd dsums(k+2), dsums2(k+2), stds(k+2), stds2(k+2), dds(k+2);
+//   Eigen::MatrixXd cov(k, k), cov2(k, k);
+//
+//   // run algorithm
+//   nn = 80;
+//   nnt = 40;
+//   fit_out fit1 = mixed_2group(nnt, nn, n, k1, k2, k, a, y, ss, sigy, sig1);
+//   dsums = fit1.means;
+//   stds = fit1.sds;
+//   cov = fit1.cov;
+//   tt = fit1.time;
+//   std::cout << "tt: " << tt << std::endl;
+//   std::cout << "dsums: " << dsums << std::endl;
+//   //std::cout << "stds: " << stds << std::endl;
+//   exit(0);
+//
+//   // double number of nodes
+//   nn2 = 2 * nn;
+//   nnt2 = 2 * nnt;
+//   fit_out fit2 = mixed_2group(nnt2, nn2, n, k1, k2, k, a, y, ss, sigy, sig1);
+//   dsums2 = fit2.means;
+//   stds2 = fit2.sds;
+//   cov2 = fit2.cov;
+//
+//   // difference
+//   dds = dsums - dsums2;
+//   std::cout << "max posterior mean error: " << dds.cwiseAbs().maxCoeff() << std::endl;
+//   dds = stds - stds2;
+//   std::cout << "max posterior std error: " << dds.cwiseAbs().maxCoeff() << std::endl;
+//
+// }
 
 
 fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
