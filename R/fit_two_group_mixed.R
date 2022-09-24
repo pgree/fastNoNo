@@ -103,7 +103,6 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
   k2 <- ncol(X2)
   k <- k1 + k2
 
-  # compute errors
   error_means <- out1$means - out2$means
   error_sds <- out1$sds - out2$sds
   errors <- data.frame(error_means, error_sds)
@@ -112,22 +111,18 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
                         "sigma_y",
                         "sigma_beta1")
 
-  # means for first group
   beta1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
   rownames(beta1) <- paste0("beta1_", 1:k1)
   colnames(beta1) <- c("mean", "sd")
 
-  # means for second group
   beta2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
   rownames(beta2) <- paste0("beta2_", 1:k2)
   colnames(beta2) <- c("mean", "sd")
 
-  # scale parameters
   sigma <- data.frame(out2$means[(k + 1):(k + 2)], out2$sds[(k + 1):(k + 2)])
   rownames(sigma) <- c("sigma_y", "sigma_beta1")
   colnames(sigma) <- c("mean", "sd")
 
-  # posterior covariance of [beta1, beta2]
   cov <- matrix(data = out2$cov, nrow = k, ncol = k)
 
   list(

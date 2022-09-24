@@ -10,7 +10,6 @@ beta_2 <- rnorm(k_2, 0, 1)
 X_1 <- matrix(rnorm(n * k_1, 2, 3), ncol = k_1)
 X_2 <- matrix(rnorm(n * k_2, -1, 5), ncol = k_2)
 y <- rnorm(n, X_1 %*% beta_1 + X_2 %*% beta_2, sigma_y)
-fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20)
 
 
 # test input checking -----------------------------------------------------
@@ -64,7 +63,6 @@ expect_error(
 )
 
 
-
 # incorrect sizes
 expect_error(
   fit_two_group_mixed(y[-1], X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20),
@@ -103,10 +101,9 @@ expect_error(
 )
 
 
-
-
-
 # test contents of fit object ---------------------------------------------
+fit <- fit_two_group_mixed(y, X_1, X_2, ss = rep(1, k_2), sd_y = 1, sd1 = 1, nnt = 20)
+
 expect_equal(names(fit), c("beta1", "beta2", "sigma", "cov", "errors", "time"))
 
 expect_inherits(fit$beta1, "data.frame")
@@ -134,4 +131,16 @@ expect_equal(dim(fit$cov), c(k_1 + k_2, k_1 + k_2))
 
 expect_inherits(fit$time, "numeric")
 expect_equal(length(fit$time), 1)
+
+
+
+# test algorithm is deterministic -----------------------------------------
+
+# with the same inputs we should get the same answers if we refit
+fit2 <- fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1, nnt = 20)
+
+expect_equal(fit$beta1, fit2$beta1)
+expect_equal(fit$beta2, fit2$beta2)
+expect_equal(fit$sigma, fit2$sigma)
+expect_equal(fit$errors, fit2$errors)
 
