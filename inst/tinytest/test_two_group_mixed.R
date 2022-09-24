@@ -137,10 +137,12 @@ expect_equal(length(fit$time), 1)
 # test algorithm is deterministic -----------------------------------------
 
 # with the same inputs we should get the same answers if we refit
-fit2 <- fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1, nnt = 20)
+fit1 <- fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1)
+fit2 <- fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_y = 1, sd1 = 1)
 
-expect_equal(fit$beta1, fit2$beta1)
-expect_equal(fit$beta2, fit2$beta2)
-expect_equal(fit$sigma, fit2$sigma)
-expect_equal(fit$errors, fit2$errors)
+expect_equal(fit1$beta1, fit2$beta1)
+expect_equal(fit1$beta2, fit2$beta2)
+expect_equal(fit1$sigma, fit2$sigma)
+expect_equal(fit1$errors, fit2$errors)
+expect_equal(fit1$cov, fit2$cov)
 
