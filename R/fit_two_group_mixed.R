@@ -139,27 +139,18 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
 # internal ----------------------------------------------------------------
 
 run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd1, nnt) {
-  n <- length(y)
-  k1 <- ncol(X1)
-  k2 <- ncol(X2)
-  fit <- mixed_2group_cpp(
+  mixed_2group_cpp(
      nnt = as.integer(nnt),  # number of quadrature in theta direction
      nn = as.integer(80),    # number of quadrature nodes in other directions
-     n = as.integer(n),
-     k1 = as.integer(k1),
-     k2 = as.integer(k2),
-     k = as.integer(k1+k2),
+     n = length(y),
+     k1 = ncol(X1),
+     k2 = ncol(X2),
+     k = ncol(X1) + ncol(X2),
      a = cbind(X1, X2),
      y = y,
      ss = as.double(ss),
      sigy = as.double(sd_y),
      sig1 = as.double(sd1)
-  )
-  list(
-    means = fit$means,
-    sds = fit$sds,
-    cov = fit$cov,
-    time = fit$time
   )
 }
 
