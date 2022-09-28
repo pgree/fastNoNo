@@ -49,7 +49,7 @@ containing the approximate accuracy of the posterior mean and standard
 deviation estimates.
 \item \code{time}: The execution time of the algorithm in seconds. This only includes
 the time taken to run the internal C++ code. To include the full time elapsed
-when running the \R function use \code{\link[=system.time]{system.time()}}.
+when running the \R function see \code{\link[=system.time]{system.time()}}.
 }
 }
 \description{
