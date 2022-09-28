@@ -21,9 +21,9 @@ fit_two_group_mixed(
 
 \item{X2}{(matrix) The data corresponding to group 2. Must have \code{length(y)} rows.}
 
-\item{ss}{(vector) Scale parameter values for the prior on \eqn{\beta_2}.
-Must have either one element or \code{ncol(X2)} elements. In the former case the
-value is recycled.}
+\item{ss}{(positive reals) Scale parameter values for the prior on
+\eqn{\beta_2}. Must have either one element or \code{ncol(X2)} elements. In the
+former case the value is recycled.}
 
 \item{sd_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
 
@@ -64,7 +64,7 @@ linear regression model
 
 where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
 matrix. The algorithm for computing the fit uses numerical linear algebra and
-low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
+low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 }
 \examples{
 \dontrun{
@@ -88,8 +88,8 @@ fit <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_y = 1, sd1 = 1, nnt = 
 str(fit)
 
 # Plot estimates of the betas vs "truth"
-plot(fit$beta1$mean, beta1); abline(0, 1, col = "red")
-plot(fit$beta2$mean, beta2); abline(0, 1, col = "red")
+plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
+plot(fit$beta2$mean, beta2, pch = 20); abline(0, 1, col = "red")
 }
 
 }

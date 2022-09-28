@@ -12,15 +12,15 @@
 #'
 #' where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
 #' matrix. The algorithm for computing the fit uses numerical linear algebra and
-#' low dimensional Gaussian quadrature. See Greengard et al. (2021) for details.
+#' low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 #'
 #' @export
 #' @param y (vector) The outcome variable.
 #' @param X1 (matrix) The data corresponding to group 1. Must have `length(y)` rows.
 #' @param X2 (matrix) The data corresponding to group 2. Must have `length(y)` rows.
-#' @param ss (vector) Scale parameter values for the prior on \eqn{\beta_2}.
-#'   Must have either one element or `ncol(X2)` elements. In the former case the
-#'   value is recycled.
+#' @param ss (positive reals) Scale parameter values for the prior on
+#'   \eqn{\beta_2}. Must have either one element or `ncol(X2)` elements. In the
+#'   former case the value is recycled.
 #' @param sd_y (positive real) Scale parameter value for the prior on \eqn{\sigma_y}.
 #' @param sd1 (positive real) Scale parameter value for the prior on \eqn{\sigma_1}.
 #' @param nnt (positive integer) Number of quadrature nodes in \eqn{\theta}
@@ -41,7 +41,7 @@
 #' deviation estimates.
 #' * `time`: The execution time of the algorithm in seconds. This only includes
 #' the time taken to run the internal C++ code. To include the full time elapsed
-#' when running the \R function use [system.time()].
+#' when running the \R function see [system.time()].
 #'
 #' @examples
 #' \dontrun{
@@ -65,8 +65,8 @@
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
-#' plot(fit$beta1$mean, beta1); abline(0, 1, col = "red")
-#' plot(fit$beta2$mean, beta2); abline(0, 1, col = "red")
+#' plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
+#' plot(fit$beta2$mean, beta2, pch = 20); abline(0, 1, col = "red")
 #' }
 #'
 #' @references
