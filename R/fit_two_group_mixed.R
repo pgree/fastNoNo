@@ -121,6 +121,8 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
   colnames(sigma) <- c("mean", "sd")
 
   cov <- matrix(data = out2$cov, nrow = k, ncol = k)
+  rownames(cov) <- c(rownames(beta1), rownames(beta2))
+  colnames(cov) <- rownames(cov)
 
   list(
     beta1 = beta1,
