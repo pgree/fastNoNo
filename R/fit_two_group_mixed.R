@@ -36,7 +36,7 @@
 #' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
 #' posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
 #' * `cov`: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
-#' * `errors`: A data frame with two columns (`error_means`, `error_sds`)
+#' * `errors`: A data frame with two columns (`error_mean`, `error_sd`)
 #' containing the approximate accuracy of the posterior mean and standard
 #' deviation estimates.
 #' * `time`: The execution time of the algorithm in seconds. This only includes
@@ -44,7 +44,6 @@
 #' when running the \R function see [system.time()].
 #'
 #' @examples
-#' \dontrun{
 #' # Simulate data
 #' set.seed(1)
 #' n <- 1000
@@ -67,7 +66,6 @@
 #' # Plot estimates of the betas vs "truth"
 #' plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
 #' plot(fit$beta2$mean, beta2, pch = 20); abline(0, 1, col = "red")
-#' }
 #'
 #' @references
 #' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
@@ -103,13 +101,12 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
   k2 <- ncol(X2)
   k <- k1 + k2
 
-  error_means <- out1$means - out2$means
-  error_sds <- out1$sds - out2$sds
-  errors <- data.frame(error_means, error_sds)
+  errors <- data.frame(out1$means - out2$means, out1$sds - out2$sds)
   rownames(errors) <- c(paste0("beta1_", 1:k1),
                         paste0("beta2_", 1:k2),
                         "sigma_y",
                         "sigma_beta1")
+  colnames(errors) <- c("error_mean", "error_sd")
 
   beta1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
   rownames(beta1) <- paste0("beta1_", 1:k1)

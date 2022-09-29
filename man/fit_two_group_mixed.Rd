@@ -44,7 +44,7 @@ coefficients on \code{X2}).
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
 posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
 \item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
-\item \code{errors}: A data frame with two columns (\code{error_means}, \code{error_sds})
+\item \code{errors}: A data frame with two columns (\code{error_mean}, \code{error_sd})
 containing the approximate accuracy of the posterior mean and standard
 deviation estimates.
 \item \code{time}: The execution time of the algorithm in seconds. This only includes
@@ -67,7 +67,6 @@ matrix. The algorithm for computing the fit uses numerical linear algebra and
 low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 }
 \examples{
-\dontrun{
 # Simulate data
 set.seed(1)
 n <- 1000
@@ -90,7 +89,6 @@ str(fit)
 # Plot estimates of the betas vs "truth"
 plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
 plot(fit$beta2$mean, beta2, pch = 20); abline(0, 1, col = "red")
-}
 
 }
 \references{
