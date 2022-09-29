@@ -149,3 +149,17 @@ expect_equal(fit1$sigma, fit2$sigma)
 expect_equal(fit1$errors, fit2$errors)
 expect_equal(fit1$cov, fit2$cov)
 
+
+
+# test prior arguments behave reasonably ----------------------------------
+
+# these are just sanity checks, nothing precise
+
+fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_y = 10)
+fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_y = .1)
+expect_true(all(fit1$sigma["sigma_y", ] > fit2$sigma["sigma_y", ]))
+
+fit1 <- fit_two_group_mixed(y, X_1, X_2, sd1 = 10)
+fit2 <- fit_two_group_mixed(y, X_1, X_2, sd1 = .1)
+expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
+
