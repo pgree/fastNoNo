@@ -19,7 +19,7 @@ sd1 <- 2.0
 # Stan posterior means and sds --------------------------------------------
 data_list <- list(n=n, k1=k1, k2=k2, y=y, ss=ss, sdy=sdy, sd1=sd1, X1=X1, X2=X2)
 mod <- cmdstan_model("tests/stan-comparison/nn_two_group_mixed.stan")
-fit_stan <- mod$sample(data = data_list, seed = 1, parallel_chains = 4)
+fit_stan <- mod$sample(data = data_list, seed = 1, parallel_chains = 4, iter_sampling = 1e4)
 posterior_summary <- fit_stan$summary()[-1, ] # drop lp__
 stan_estimates <- as.data.frame(posterior_summary[, c("mean", "sd")])
 rownames(stan_estimates) <- posterior_summary$variable

@@ -26,7 +26,7 @@ sigs <- c(std_y, std_1, std_2)
 # Stan posterior means and sds --------------------------------------------
 mod <- cmdstan_model("tests/stan-comparison/nn_two_group.stan")
 data_list <- list(n=n, k1=k_1, k2=k_2, y=y, sigs=sigs, X1=X_1, X2=X_2)
-fit_stan <- mod$sample(data = data_list, seed = 1, parallel_chains = 4)
+fit_stan <- mod$sample(data = data_list, seed = 1, parallel_chains = 4, iter_sampling = 1e4)
 posterior_summary <- fit_stan$summary()[-1, ] # drop lp__
 stan_estimates <- as.data.frame(posterior_summary[, c("mean", "sd")])
 rownames(stan_estimates) <- posterior_summary$variable
