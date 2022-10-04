@@ -151,8 +151,10 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   ss2 = 0;
   fm = -1.0e250;
   double dsumi, ss1i, ss2i;
-  Eigen::VectorXd dsumsi(k+2), dsum_xsi(k+2);
-  Eigen::MatrixXd dsums_covi(k, k), xxti(k, k);
+  Eigen::VectorXd dsumsi = Eigen::VectorXd(k+2);
+  Eigen::VectorXd dsum_xsi = Eigen::VectorXd(k+2);
+  Eigen::MatrixXd dsums_covi = Eigen::MatrixXd::Zero(k, k);
+  Eigen::MatrixXd xxti = Eigen::MatrixXd::Zero(k, k);
 
   // theta integral
   for (int i=0; i<nnt; i++) {
@@ -162,6 +164,15 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
     // compute phi integral
     eval_inner(nn, n, k1, k2, k, d1, d2, b, t, resid, ynew, dsumsi,
 	       dsumi, ss1i, ss2i, dsums_covi, dsum_xsi, xxti, fi);
+    //std::cout << "t: " << t << std::endl;
+    //std::cout << "dsumsi: " << dsumsi << std::endl;
+    //std::cout << "dsumi: " << dsumi << std::endl;
+    //std::cout << "fi: " << fi << std::endl;
+    //std::cout << "dsums_covi: " << dsums_covi << std::endl;
+    //std::cout << "dsum_xsi: " << dsum_xsi << std::endl;
+    //std::cout << "xxti: " << xxti << std::endl;
+    //std::cout << "ss1i: " << ss1i << std::endl;
+    //std::cout << "ss2i: " << ss2i << std::endl;
 
     // due to underflow issues, integrate over theta by computing
     // a sum of the form \sum_i exp(fi)*gi such that at the end
@@ -197,6 +208,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
     // if we've gotten to the point that the function is small, break
     if (fi/log(10.0) < fm/log(10.0) - 20.0) break;
   }
+  //std::cout << "stds: " << stds << std::endl;
 
   // scale first and second moments by normalizing constant
   dsums /= dsum;
@@ -206,6 +218,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   dsums_cov -= (dsums.head(k) * dsums.head(k).transpose());
 
   // get stds
+  //std::cout << "dsums_cov.diagonal: " << dsums_cov.diagonal() << std::endl;
   stds.head(k) = dsums_cov.diagonal().cwiseSqrt();
 
   // get variances of sig1, sig2
@@ -228,6 +241,9 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   fit.cov = dsums_cov;
   fit.time = duration.count()/1e3;
 
+  //std::cout << "stds: " << stds << std::endl;
+  //std::cout << "dsums: " << dsums << std::endl;
+  //std::cout << "dsum: " << dsum << std::endl;
   return fit;
 }
 
@@ -248,7 +264,6 @@ void eval_inner(int nn, int n, int k1, int k2, int k, double d1,
   // gaussian for each (theta, phi, rho)
   rescale_a(t, b, asca, k, k, k1, k2);
   //std::cout << "asca: " << asca(k-1, k-1) << std::endl;
-
   Eigen::BDCSVD<Eigen::MatrixXd> svd(asca, Eigen::ComputeThinU | Eigen::ComputeThinV);
   //std::cout << "Its singular values are:" << std::endl << svd.singularValues() << std::endl;
 
