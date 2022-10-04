@@ -64,8 +64,9 @@ void get_xs_from_ws(Eigen::VectorXd ws, int k, int k1, int k2, Eigen::MatrixXd v
 fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
                      Eigen::MatrixXd a, Eigen::VectorXd y,
                      Eigen::VectorXd ss, double sigy, double sig1) {
-  Eigen::VectorXd dsums(k+2), stds(k+2);
-  Eigen::MatrixXd dsums_cov(k, k);
+  Eigen::VectorXd dsums = Eigen::VectorXd::Zero(k+2);
+  Eigen::VectorXd stds = Eigen::VectorXd::Zero(k+2);
+  Eigen::MatrixXd dsums_cov = Eigen::MatrixXd::Zero(k, k);
   double d1, d2, t, fi, wt, fm, ss1, ss2, dsum;
   fit_out fit;
 
@@ -144,15 +145,15 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   // ss1 - E[sig1**2]
   // ss2 - E[sig2**2]
   // fm - scaling constant
-  dsums *= 0;
+  // dsums *= 0;
+  // dsums_cov *= 0;
   dsum = 0;
-  dsums_cov *= 0;
   ss1 = 0;
   ss2 = 0;
   fm = -1.0e250;
   double dsumi, ss1i, ss2i;
-  Eigen::VectorXd dsumsi = Eigen::VectorXd(k+2);
-  Eigen::VectorXd dsum_xsi = Eigen::VectorXd(k+2);
+  Eigen::VectorXd dsumsi = Eigen::VectorXd::Zero(k+2);
+  Eigen::VectorXd dsum_xsi = Eigen::VectorXd::Zero(k+2);
   Eigen::MatrixXd dsums_covi = Eigen::MatrixXd::Zero(k, k);
   Eigen::MatrixXd xxti = Eigen::MatrixXd::Zero(k, k);
 
@@ -162,17 +163,8 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
     wt = whts_ts[nnt - 1 - i];
 
     // compute phi integral
-    eval_inner(nn, n, k1, k2, k, d1, d2, b, t, resid, ynew, dsumsi,
-	       dsumi, ss1i, ss2i, dsums_covi, dsum_xsi, xxti, fi);
-    //std::cout << "t: " << t << std::endl;
-    //std::cout << "dsumsi: " << dsumsi << std::endl;
-    //std::cout << "dsumi: " << dsumi << std::endl;
-    //std::cout << "fi: " << fi << std::endl;
-    //std::cout << "dsums_covi: " << dsums_covi << std::endl;
-    //std::cout << "dsum_xsi: " << dsum_xsi << std::endl;
-    //std::cout << "xxti: " << xxti << std::endl;
-    //std::cout << "ss1i: " << ss1i << std::endl;
-    //std::cout << "ss2i: " << ss2i << std::endl;
+    eval_inner(nn, n, k1, k2, k, d1, d2, b, t, resid, ynew,
+               dsumsi, dsumi, ss1i, ss2i, dsums_covi, dsum_xsi, xxti, fi);
 
     // due to underflow issues, integrate over theta by computing
     // a sum of the form \sum_i exp(fi)*gi such that at the end

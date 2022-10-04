@@ -163,3 +163,14 @@ fit1 <- fit_two_group_mixed(y, X_1, X_2, sd1 = 10)
 fit2 <- fit_two_group_mixed(y, X_1, X_2, sd1 = .1)
 expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
 
+
+
+# test that no NaNs in results --------------------------------------------
+
+n_runs <- 100
+has_NaNs <- rep(FALSE, n_runs)
+for (i in 1:n_runs) {
+  fit <- fit_two_group_mixed(y, X_1, X_2)
+  has_NaNs[i] <- any(sapply(fit, anyNA))
+}
+expect_true(sum(has_NaNs) == 0)
