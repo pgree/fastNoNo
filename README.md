@@ -7,7 +7,8 @@
 
 An R package that fits fast approximations to Bayesian hierarchical linear
 regression models using numerical linear algebra and low dimensional Gaussian
-quadrature. For more details see the following paper:
+quadrature. This is an implementation of the method described in Greengard et
+al. (2022).
 
 * Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of two-group normal-normal models. To appear, [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 
@@ -18,10 +19,10 @@ via Rcpp (a pre-compiled version will be available from CRAN in the future).
 
 We recommend setting the compiler optimization option `-O3` in your `Makevars`
 file in order to achieve the fastest speed possible when using the package. The
-easiest way to do this is to use the function `edit_r_makevars()` from the
-`usethis` package, which will automatically open the file you need to edit (or
-create it if it doesn't exist). Alternatively you can find or create the file
-yourself in your home directory at `.R/Makevars`.
+easiest way to do this is to use `usethis::edit_r_makevars()`, which will
+automatically open the file you need to edit (or create it if it doesn't exist).
+Alternatively, you can find or create the file yourself in your home directory
+at `.R/Makevars`.
 
 ```r
 # install.packages("usethis")
@@ -32,7 +33,8 @@ usethis::edit_r_makevars()
 # then close the file
 ```
 
-Then install the `fastNoNo` package from GitHub using the `remotes` package. 
+Then install the `fastNoNo` package from GitHub using
+`remotes::install_github()`.
 
 ```r
 # install.packages("remotes")
