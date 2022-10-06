@@ -165,7 +165,27 @@ expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
 
 
 
+# test that results haven't changed ---------------------------------------
+
+fit <- fit_two_group_mixed(y, X_1, X_2)
+# dump("fit", file = "inst/tinytest/answers/two_group_mixed-01.R")
+answer <- source("answers/two_group_mixed-01.R", local = TRUE)$value
+expect_equal(fit, answer)
+
+fit <- fit_two_group_mixed(y, X_1, X_2, ss = 2, sd_y = 2, sd1 = 2)
+# dump("fit", file = "inst/tinytest/answers/two_group_mixed-02.R")
+answer <- source("answers/two_group_mixed-02.R", local = TRUE)$value
+expect_equal(fit, answer)
+
+fit <- fit_two_group_mixed(y, X_1, X_2, nnt = 80)
+# dump("fit", file = "inst/tinytest/answers/two_group_mixed-03.R")
+answer <- source("answers/two_group_mixed-03.R", local = TRUE)$value
+expect_equal(fit, answer)
+
+
+
 # test that no NaNs in results --------------------------------------------
+# https://github.com/pgree/fastNoNo/issues/13
 
 n_runs <- 100
 has_NaNs <- rep(FALSE, n_runs)
@@ -174,3 +194,4 @@ for (i in 1:n_runs) {
   has_NaNs[i] <- any(sapply(fit, anyNA))
 }
 expect_true(sum(has_NaNs) == 0)
+
