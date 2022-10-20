@@ -1,7 +1,7 @@
-#' Fast two-group normal-normal model
+#' Fast normal-normal mixed effects model
 #'
 #' @description
-#' Fits a fast and accurate approximation to the Bayesian two-group hierarchical
+#' Fits a fast and accurate approximation to the Bayesian hierarchical
 #' linear regression model
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
@@ -16,8 +16,10 @@
 #'
 #' @export
 #' @param y (vector) The outcome variable.
-#' @param X1 (matrix) The data corresponding to group 1. Must have `length(y)` rows.
-#' @param X2 (matrix) The data corresponding to group 2. Must have `length(y)` rows.
+#' @param X1 (matrix) The design matrix for the "random effects" part of the
+#'   model. Must have `length(y)` rows.
+#' @param X2 (matrix) The design matrix for the "fixed effects" part of the
+#'   model. Must have `length(y)` rows.
 #' @param ss (positive reals) Scale parameter values for the prior on
 #'   \eqn{\beta_2}. Must have either one element or `ncol(X2)` elements. In the
 #'   former case the value is recycled.
@@ -50,8 +52,8 @@
 #' k1 <- 50
 #' k2 <- 60
 #'
-#' sigma_y <- 1
-#' sigma1 <- 0.5
+#' sigma_y <- abs(rnorm(1, 0, 1))
+#' sigma1 <- abs(rnorm(1, 0, 1))
 #' beta1 <- rnorm(k1, 0, sigma1)
 #' beta2 <- rnorm(k2, 0, 1)
 #'

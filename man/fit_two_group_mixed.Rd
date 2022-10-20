@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_two_group_mixed.R
 \name{fit_two_group_mixed}
 \alias{fit_two_group_mixed}
-\title{Fast two-group normal-normal model}
+\title{Fast normal-normal mixed effects model}
 \usage{
 fit_two_group_mixed(
   y,
@@ -17,9 +17,11 @@ fit_two_group_mixed(
 \arguments{
 \item{y}{(vector) The outcome variable.}
 
-\item{X1}{(matrix) The data corresponding to group 1. Must have \code{length(y)} rows.}
+\item{X1}{(matrix) The design matrix for the "random effects" part of the
+model. Must have \code{length(y)} rows.}
 
-\item{X2}{(matrix) The data corresponding to group 2. Must have \code{length(y)} rows.}
+\item{X2}{(matrix) The design matrix for the "fixed effects" part of the
+model. Must have \code{length(y)} rows.}
 
 \item{ss}{(positive reals) Scale parameter values for the prior on
 \eqn{\beta_2}. Must have either one element or \code{ncol(X2)} elements. In the
@@ -53,7 +55,7 @@ when running the \R function see \code{\link[=system.time]{system.time()}}.
 }
 }
 \description{
-Fits a fast and accurate approximation to the Bayesian two-group hierarchical
+Fits a fast and accurate approximation to the Bayesian hierarchical
 linear regression model
 
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
@@ -73,8 +75,8 @@ n <- 1000
 k1 <- 50
 k2 <- 60
 
-sigma_y <- 1
-sigma1 <- 0.5
+sigma_y <- abs(rnorm(1, 0, 1))
+sigma1 <- abs(rnorm(1, 0, 1))
 beta1 <- rnorm(k1, 0, sigma1)
 beta2 <- rnorm(k2, 0, 1)
 
