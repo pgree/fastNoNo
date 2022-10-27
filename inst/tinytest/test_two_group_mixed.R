@@ -218,3 +218,20 @@ expect_equal(rownames(fit$cov), c(colnames(X1_named), colnames(X2_named)))
 expect_equal(colnames(fit$cov), rownames(fit$cov))
 expect_equal(rownames(fit$errors), c(rownames(fit$beta1), rownames(fit$beta2), "sigma_y", "sigma_beta1"))
 
+X2_unnamed <- X2_named
+colnames(X2_unnamed) <- NULL
+fit <- fit_two_group_mixed(
+  y = mtcars$mpg,
+  X1_named,
+  X2_unnamed,
+  ss = 10,
+  sd1 = 5,
+  sd_y = 10,
+  nnt = 30
+)
+expect_equal(rownames(fit$beta1), colnames(X1_named))
+expect_equal(rownames(fit$beta2), colnames(X2_unnamed))
+expect_equal(rownames(fit$cov), c(colnames(X1_named), colnames(X2_unnamed)))
+expect_equal(colnames(fit$cov), rownames(fit$cov))
+expect_equal(rownames(fit$errors), c(rownames(fit$beta1), rownames(fit$beta2), "sigma_y", "sigma_beta1"))
+
