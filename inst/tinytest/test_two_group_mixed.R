@@ -230,8 +230,8 @@ fit <- fit_two_group_mixed(
   nnt = 30
 )
 expect_equal(rownames(fit$beta1), colnames(X1_named))
-expect_equal(rownames(fit$beta2), colnames(X2_unnamed))
-expect_equal(rownames(fit$cov), c(colnames(X1_named), colnames(X2_unnamed)))
+expect_equal(rownames(fit$beta2), paste0("beta2", "_", 1:nrow(fit$beta2)))
+expect_equal(rownames(fit$cov), c(rownames(fit$beta1), rownames(fit$beta2)))
 expect_equal(colnames(fit$cov), rownames(fit$cov))
 expect_equal(rownames(fit$errors), c(rownames(fit$beta1), rownames(fit$beta2), "sigma_y", "sigma_beta1"))
 
