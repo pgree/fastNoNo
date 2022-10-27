@@ -179,13 +179,7 @@ fit_two_group_mixed_formula <- function(data, fixed_formula, varying_intercept, 
   X1 <- stats::model.matrix(as.formula(paste("~ 0 + ", varying_intercept)), data = data)
   X2 <- stats::model.matrix(fixed_formula, data = data)
   y <- data[[as.character(fixed_formula[[2]])]]
-
   out <- fit_two_group_mixed(y, X1, X2, ...)
-  rownames(out$beta1) <- colnames(X1)
-  rownames(out$beta2) <- colnames(X2)
-  rownames(out$errors)[1:(nrow(out$beta1) + nrow(out$beta2))] <- c(rownames(out$beta1), rownames(out$beta2))
-  rownames(out$cov) <- colnames(out$cov) <- c(rownames(out$beta1), rownames(out$beta2))
-
   out$debug <- list(X1 = X1, X2 = X2) # temporary to help with debugging
   out
 }
