@@ -155,12 +155,12 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
 #' @param ... Arguments passed to [fit_two_group_mixed()], except for `y`, `X1`,
 #'   and `X2`, which are generated automatically from `data`, `fixed_formula`,
 #'   and `varying_intercept`.
-#' @value Same as [fit_two_group_mixed()], except variable names from the
-#'   formula are used as rownames for the data frames of estimates.
+#' @value See [fit_two_group_mixed()].
 #'
 #' @examples
-#' fit <- fit_two_group_mixed_formula(mtcars, mpg ~ wt, "cyl")
+#' fit <- fit_two_group_mixed_formula(mtcars, mpg ~ wt + as.factor(gear), "cyl")
 #' fit$beta1
+#' fit$beta2
 fit_two_group_mixed_formula <- function(data, fixed_formula, varying_intercept, ...) {
   stopifnot(
     is.data.frame(data),
