@@ -38,11 +38,13 @@ direction as described in Greengard et al. (2022).}
 A named list with the following components:
 \itemize{
 \item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
-posterior means and standard deviations for the vector \eqn{\beta_1} (the
-coefficients on \code{X1}).
+posterior means and standard deviations for the vector \eqn{\beta_1}. If \code{X1}
+has column names they are used as the row names for \code{beta1}, otherwise
+generic names are used (\code{beta1_1}, \code{beta1_2}, etc.).
 \item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
-posterior means and standard deviations for the vector \eqn{\beta_2} (the
-coefficients on \code{X2}).
+posterior means and standard deviations for the vector \eqn{\beta_2}. If \code{X2}
+has column names they are used as the row names for \code{beta2}, otherwise
+generic names are used (\code{beta2_1}, \code{beta2_2}, etc.).
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
 posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
 \item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
@@ -69,7 +71,7 @@ matrix. The algorithm for computing the fit uses numerical linear algebra and
 low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 }
 \examples{
-# Simulate data
+### Example with simulated data
 set.seed(1)
 n <- 1000
 k1 <- 50
@@ -91,6 +93,26 @@ str(fit)
 # Plot estimates of the betas vs "truth"
 plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
 plot(fit$beta2$mean, beta2, pch = 20); abline(0, 1, col = "red")
+
+
+### Example of varying intercept model using mtcars dataset
+
+# suppose we want to fit the following model (in lme4 syntax)
+# using the mtcars dataset that comes with R:
+#   mpg ~ wt + as.factor(gear) + (1|cyl)
+
+fit <- fit_two_group_mixed(
+  y = mtcars$mpg,
+  X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
+  X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
+  ss = 10,
+  sd1 = 5,
+  sd_y = 10,
+  nnt = 30
+)
+fit$beta1
+fit$beta2
+fit$sigma
 
 }
 \references{
