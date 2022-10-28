@@ -137,56 +137,9 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
 }
 
 
-#' Formula interface to `fit_two_group_mixed()`
-#'
-#' This function provides an alternative interface to the same model fit by
-#' [fit_two_group_mixed()].
-#'
-#' @export
-#' @param data (data frame) The data containing the variables used in the model.
-#' @param fixed_formula (formula) A formula in the style of [stats::lm()] that
-#'   specifies the outcome variable on the left side and the "fixed effects"
-#'   terms on the right side. This formula is used to construct the `X2` matrix
-#'   for [fit_two_group_mixed()].
-#' @param varying_intercept (string) The name of the grouping variable by which
-#'   the intercept should vary (with partial pooling). Currently only a single
-#'   varying intercept is supported via this argument. This variable is used to
-#'   construct the `X1` matrix for [fit_two_group_mixed()].
-#' @param ... Arguments passed to [fit_two_group_mixed()], except for `y`, `X1`,
-#'   and `X2`, which are generated automatically from `data`, `fixed_formula`,
-#'   and `varying_intercept`.
-#' @value See [fit_two_group_mixed()].
-#'
-#' @examples
-#' fit <- fit_two_group_mixed_formula(mtcars, mpg ~ wt + as.factor(gear), "cyl")
-#' fit$beta1
-#' fit$beta2
-fit_two_group_mixed_formula <- function(data, fixed_formula, varying_intercept, ...) {
-  stopifnot(
-    is.data.frame(data),
-    !anyNA(data),
-    inherits(fixed_formula, "formula"),
-    is.character(varying_intercept),
-    length(varying_intercept) == 1
-  )
-  dots <- list(...)
-  if (!is.null(dots$y) || !is.null(dots$X1) || !is.null(dots$X2)) {
-    stop("'y', 'X1', and 'X2' should not be specified.", call. = FALSE)
-  }
-  if (!is.factor(data[[varying_intercept]])) {
-    data[[varying_intercept]] <- as.factor(data[[varying_intercept]])
-  }
-  X1 <- stats::model.matrix(as.formula(paste("~ 0 + ", varying_intercept)), data = data)
-  X2 <- stats::model.matrix(fixed_formula, data = data)
-  y <- data[[as.character(fixed_formula[[2]])]]
-  out <- fit_two_group_mixed(y, X1, X2, ...)
-  out$debug <- list(X1 = X1, X2 = X2) # temporary to help with debugging
-  out
-}
-
-
 # internal ----------------------------------------------------------------
 
+# run the c++ code for the fastNoNo algorithm
 run_two_group_mixed <- function(y, X1, X2, ss, sd_y, sd1, nnt) {
   mixed_2group_cpp(
      nnt = as.integer(nnt),  # number of quadrature in theta direction
