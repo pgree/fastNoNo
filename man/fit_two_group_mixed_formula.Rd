@@ -10,15 +10,14 @@ fit_two_group_mixed_formula(formula, data, ...)
 fit_two_group_mixed_formula_2(data, fixed_formula, varying_intercept, ...)
 }
 \arguments{
-\item{formula}{An lme4-style model formula. Currently one a single varying
+\item{formula}{An \code{lmer}-style model formula. Currently only a single varying
 intercept or varying slope is supported in the "random effects" part of the
 model. To bypass this restriction use \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}} directly.}
 
 \item{data}{A data frame containing the variables used in the model.}
 
 \item{...}{Arguments passed to \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}}, except for \code{y}, \code{X1},
-and \code{X2}, which are generated automatically from \code{data}, \code{fixed_formula},
-and \code{varying_intercept}.}
+and \code{X2}, which are generated automatically.}
 
 \item{fixed_formula}{(formula) A formula in the style of \code{\link[stats:lm]{stats::lm()}} that
 specifies the outcome variable on the left side and the "fixed effects"
@@ -38,11 +37,24 @@ This function provides a formula interface to the model fit by
 \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}}.
 }
 \examples{
-fit <- fit_two_group_mixed_formula(mpg ~ wt + as.factor(gear) + (1|cyl), mtcars)
+fit <- fit_two_group_mixed_formula(
+  formula = mpg ~ wt + as.factor(gear) + (1|cyl),
+  data = mtcars,
+  ss = 10,
+  sd_y = 10,
+  sd1 = 5
+)
 fit$beta1
 fit$beta2
 
-fit2 <- fit_two_group_mixed_formula_2(mtcars, mpg ~ wt + as.factor(gear), "cyl")
+fit2 <- fit_two_group_mixed_formula_2(
+  data = mtcars,
+  fixed_formula = mpg ~ wt + as.factor(gear),
+  varying_intercept = "cyl",
+  ss = 10,
+  sd_y = 10,
+  sd1 = 5
+)
 fit2$beta1
 fit2$beta2
 

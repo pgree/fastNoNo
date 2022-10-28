@@ -4,21 +4,33 @@
 #' [fit_two_group_mixed()].
 #'
 #' @export
-#' @param formula An lme4-style model formula. Currently one a single varying
+#' @param formula An `lmer`-style model formula. Currently only a single varying
 #'   intercept or varying slope is supported in the "random effects" part of the
 #'   model. To bypass this restriction use [fit_two_group_mixed()] directly.
 #' @param data A data frame containing the variables used in the model.
 #' @param ... Arguments passed to [fit_two_group_mixed()], except for `y`, `X1`,
-#'   and `X2`, which are generated automatically from `data`, `fixed_formula`,
-#'   and `varying_intercept`.
+#'   and `X2`, which are generated automatically.
 #' @return See [fit_two_group_mixed()].
 #'
 #' @examples
-#' fit <- fit_two_group_mixed_formula(mpg ~ wt + as.factor(gear) + (1|cyl), mtcars)
+#' fit <- fit_two_group_mixed_formula(
+#'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
+#'   data = mtcars,
+#'   ss = 10,
+#'   sd_y = 10,
+#'   sd1 = 5
+#' )
 #' fit$beta1
 #' fit$beta2
 #'
-#' fit2 <- fit_two_group_mixed_formula_2(mtcars, mpg ~ wt + as.factor(gear), "cyl")
+#' fit2 <- fit_two_group_mixed_formula_2(
+#'   data = mtcars,
+#'   fixed_formula = mpg ~ wt + as.factor(gear),
+#'   varying_intercept = "cyl",
+#'   ss = 10,
+#'   sd_y = 10,
+#'   sd1 = 5
+#' )
 #' fit2$beta1
 #' fit2$beta2
 #'
@@ -31,7 +43,6 @@ fit_two_group_mixed_formula <- function(formula, data, ...) {
   if (!is.null(dots$y) || !is.null(dots$X1) || !is.null(dots$X2)) {
     stop("'y', 'X1', and 'X2' should not be specified.", call. = FALSE)
   }
-
   model_data <- parse_model_formula(formula, data)
   out <- fit_two_group_mixed(model_data$y, model_data$X1, model_data$X2, ...)
   out$debug <- list(X1 = model_data$X1, X2 = model_data$X2) # temporary to help with debugging
@@ -76,13 +87,22 @@ fit_two_group_mixed_formula_2 <- function(data, fixed_formula, varying_intercept
 
 # internal ----------------------------------------------------------------
 
-# Use lme4 to convert formula to `y`, `X1`, `X2`, trying to catch unsupported specifications.
-# Currently on a single varying intercept or varying slope is supported
-parse_model_formula <- function(formula, data) {
+#' Parse model formula and return data that can be passed to fastNoNo
+#'
+#' Uses lme4 to convert formula to `y`, `X1`, `X2`, trying to catch unsupported
+#' specifications. Currently only a single varying intercept or varying slope is
+#' supported.
+#'
+#' @noRd
+#' @param formula,data The model formula and data frame.
+#' @param ... Arguments passed to `lme4::lFormula()`.
+#' @return A list with vector `y` and matrices `X1` and `X2`.
+#'
+parse_model_formula <- function(formula, data, ...) {
   if (!requireNamespace("lme4", quietly = TRUE)) {
     stop("Please install the lme4 package.", call. = FALSE)
   }
-  lf <- lme4::lFormula(formula, data)
+  lf <- lme4::lFormula(formula, data, ...)
   bars <- lme4::findbars(lf$formula)
   if (length(bars) > 1) {
     stop("Only one varying term is currently supported.", call. = FALSE)

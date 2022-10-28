@@ -8,9 +8,9 @@ fit_two_group_mixed(
   y,
   X1,
   X2,
-  ss = rep(1, ncol(X2)),
   sd_y = 1,
   sd1 = 1,
+  ss = rep(1, ncol(X2)),
   nnt = 10
 )
 }
@@ -23,13 +23,13 @@ model. Must have \code{length(y)} rows.}
 \item{X2}{(matrix) The design matrix for the "fixed effects" part of the
 model. Must have \code{length(y)} rows.}
 
-\item{ss}{(positive reals) Scale parameter values for the prior on
-\eqn{\beta_2}. Must have either one element or \code{ncol(X2)} elements. In the
-former case the value is recycled.}
-
 \item{sd_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
 
 \item{sd1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
+
+\item{ss}{(positive reals) Scale parameter values for the prior on
+\eqn{\beta_2}. Must have either one element or \code{ncol(X2)} elements. In the
+former case the value is recycled.}
 
 \item{nnt}{(positive integer) Number of quadrature nodes in \eqn{\theta}
 direction as described in Greengard et al. (2022).}
@@ -105,9 +105,9 @@ fit <- fit_two_group_mixed(
   y = mtcars$mpg,
   X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
   X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
-  ss = 10,
-  sd1 = 5,
   sd_y = 10,
+  sd1 = 5,
+  ss = 10,
   nnt = 30
 )
 fit$beta1
