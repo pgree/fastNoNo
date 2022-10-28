@@ -30,11 +30,13 @@
 #'
 #' @return A named list with the following components:
 #' * `beta1`: A data frame with two columns (`mean`, `sd`) containing the
-#' posterior means and standard deviations for the vector \eqn{\beta_1} (the
-#' coefficients on `X1`).
+#' posterior means and standard deviations for the vector \eqn{\beta_1}. If `X1`
+#' has column names they are used as the row names for `beta1`, otherwise
+#' generic names are used (`beta1_1`, `beta1_2`, etc.).
 #' * `beta2`: A data frame with two columns (`mean`, `sd`)  containing the
-#' posterior means and standard deviations for the vector \eqn{\beta_2} (the
-#' coefficients on `X2`).
+#' posterior means and standard deviations for the vector \eqn{\beta_2}. If `X2`
+#' has column names they are used as the row names for `beta2`, otherwise
+#' generic names are used (`beta2_1`, `beta2_2`, etc.).
 #' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
 #' posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
 #' * `cov`: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
@@ -46,7 +48,7 @@
 #' when running the \R function see [system.time()].
 #'
 #' @examples
-#' # Simulate data
+#' ### Example with simulated data
 #' set.seed(1)
 #' n <- 1000
 #' k1 <- 50
@@ -68,6 +70,26 @@
 #' # Plot estimates of the betas vs "truth"
 #' plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
 #' plot(fit$beta2$mean, beta2, pch = 20); abline(0, 1, col = "red")
+#'
+#'
+#' ### Example of varying intercept model using mtcars dataset
+#'
+#' # suppose we want to fit the following model (in lme4 syntax)
+#' # using the mtcars dataset that comes with R:
+#' #   mpg ~ wt + as.factor(gear) + (1|cyl)
+#'
+#' fit <- fit_two_group_mixed(
+#'   y = mtcars$mpg,
+#'   X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
+#'   X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
+#'   ss = 10,
+#'   sd1 = 5,
+#'   sd_y = 10,
+#'   nnt = 30
+#' )
+#' fit$beta1
+#' fit$beta2
+#' fit$sigma
 #'
 #' @references
 #' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
@@ -103,24 +125,21 @@ fit_two_group_mixed <- function(y, X1, X2, ss = rep(1, ncol(X2)), sd_y = 1, sd1 
   k2 <- ncol(X2)
   k <- k1 + k2
 
-  errors <- data.frame(out1$means - out2$means, out1$sds - out2$sds)
-  rownames(errors) <- c(paste0("beta1_", 1:k1),
-                        paste0("beta2_", 1:k2),
-                        "sigma_y",
-                        "sigma_beta1")
-  colnames(errors) <- c("error_mean", "error_sd")
-
   beta1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
-  rownames(beta1) <- paste0("beta1_", 1:k1)
+  rownames(beta1) <- if (!is.null(colnames(X1))) colnames(X1) else paste0("beta1_", 1:k1)
   colnames(beta1) <- c("mean", "sd")
 
   beta2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
-  rownames(beta2) <- paste0("beta2_", 1:k2)
+  rownames(beta2) <- if (!is.null(colnames(X2))) colnames(X2) else paste0("beta2_", 1:k2)
   colnames(beta2) <- c("mean", "sd")
 
   sigma <- data.frame(out2$means[(k + 1):(k + 2)], out2$sds[(k + 1):(k + 2)])
   rownames(sigma) <- c("sigma_y", "sigma_beta1")
   colnames(sigma) <- c("mean", "sd")
+
+  errors <- data.frame(out1$means - out2$means, out1$sds - out2$sds)
+  rownames(errors) <- c(rownames(beta1), rownames(beta2), "sigma_y", "sigma_beta1")
+  colnames(errors) <- c("error_mean", "error_sd")
 
   cov <- matrix(data = out2$cov, nrow = k, ncol = k)
   rownames(cov) <- c(rownames(beta1), rownames(beta2))
