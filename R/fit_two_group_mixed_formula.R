@@ -16,9 +16,9 @@
 #' fit <- fit_two_group_mixed_formula(
 #'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
 #'   data = mtcars,
-#'   ss = 10,
+#'   sd_beta2 = 10,
 #'   sd_sigma_y = 10,
-#'   sd1 = 5
+#'   sd_sigma1 = 5
 #' )
 #' fit$beta1
 #' fit$beta2
@@ -166,7 +166,7 @@ check_formula_unsupported_terms <- function(formula, on_failed_check = c("error"
       error = stop("Only one varying term is currently supported.", call. = FALSE),
       warning = warning(
         "Multiple varying terms detected. ",
-        "Currently the same prior standard deviation (sd1) is used for all varying terms .",
+        "Currently the same prior standard deviation (sd_sigma1) is used for all varying terms .",
         call. = FALSE
       )
     )
@@ -186,7 +186,7 @@ check_formula_unsupported_terms <- function(formula, on_failed_check = c("error"
         ),
         warning = warning(
           "Currently terms like (1 + x|g) result in the varying intercepts ",
-          "and slopes having the same prior standard deviation (sd1).",
+          "and slopes having the same prior standard deviation (sd_sigma1).",
           call. = FALSE
         )
       )

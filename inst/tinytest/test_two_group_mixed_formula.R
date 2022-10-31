@@ -3,8 +3,8 @@
 
 X2 <- model.matrix(~ wt + disp + factor(gear), data = mtcars)
 X1 <- model.matrix(~ 0 + as.factor(cyl), data = mtcars)
-fit <- fit_two_group_mixed(mtcars$mpg, X1, X2, nnt = 100, ss = 10)
-fit_formula <- fit_two_group_mixed_formula(mpg ~ wt + disp + factor(gear) + (1|cyl), mtcars, nnt = 100, ss = 10)
+fit <- fit_two_group_mixed(mtcars$mpg, X1, X2, nnt = 100, sd_beta2 = 10)
+fit_formula <- fit_two_group_mixed_formula(mpg ~ wt + disp + factor(gear) + (1|cyl), mtcars, nnt = 100, sd_beta2 = 10)
 
 # for beta1 avoid checking rownames (they will currently differ for beta1)
 expect_equal(fit_formula$beta1, fit$beta1, check.attributes = FALSE)

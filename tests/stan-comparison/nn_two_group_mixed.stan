@@ -5,9 +5,9 @@ data {
   vector[n] y;
   matrix[n,k1] X1;
   matrix[n,k2] X2;
-  vector[k2] ss;
+  vector[k2] sd_beta2;
   real sdy;
-  real sd1;
+  real sd_sigma1;
 }
 parameters {
   real<lower=0> sigma_y;
@@ -18,7 +18,7 @@ parameters {
 model {
   y ~ normal(X1*beta1 + X2*beta2, sigma_y);
   beta1 ~ normal(0, sigma_beta1);
-  beta2 ~ normal(0, ss);
+  beta2 ~ normal(0, sd_beta2);
   sigma_y ~ normal(0, sdy);
-  sigma_beta1 ~ normal(0, sd1);
+  sigma_beta1 ~ normal(0, sd_sigma1);
 }

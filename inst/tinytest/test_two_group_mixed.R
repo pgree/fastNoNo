@@ -38,8 +38,8 @@ expect_error(
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, ss = -1),
-  "all(ss > 0) is not TRUE",
+  fit_two_group_mixed(y, X_1, X_2, sd_beta2 = -1),
+  "all(sd_beta2 > 0) is not TRUE",
   fixed = TRUE
 )
 expect_error(
@@ -48,8 +48,8 @@ expect_error(
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd1 = -1),
-  "sd1 > 0 is not TRUE",
+  fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = -1),
+  "sd_sigma1 > 0 is not TRUE",
   fixed = TRUE
 )
 expect_error(
@@ -81,8 +81,8 @@ expect_error(
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, ss = c(1, 2, 3)),
-  "length(ss) == 1 || length(ss) == ncol(X2) is not TRUE",
+  fit_two_group_mixed(y, X_1, X_2, sd_beta2 = c(1, 2, 3)),
+  "length(sd_beta2) == 1 || length(sd_beta2) == ncol(X2) is not TRUE",
   fixed = TRUE
 )
 expect_error(
@@ -91,8 +91,8 @@ expect_error(
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd1 = c(1, 2)),
-  "length(sd1) == 1 is not TRUE",
+  fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = c(1, 2)),
+  "length(sd_sigma1) == 1 is not TRUE",
   fixed = TRUE
 )
 expect_error(
@@ -140,8 +140,8 @@ expect_equal(length(fit$time), 1)
 # test algorithm is deterministic -----------------------------------------
 
 # with the same inputs we should get the same answers if we refit
-fit1 <- fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_sigma_y = 1, sd1 = 1)
-fit2 <- fit_two_group_mixed(y, X_1, X_2, ss = 1, sd_sigma_y = 1, sd1 = 1)
+fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
+fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
 
 expect_equal(fit1$beta1, fit2$beta1)
 expect_equal(fit1$beta2, fit2$beta2)
@@ -159,8 +159,8 @@ fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma_y = 10)
 fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma_y = .1)
 expect_true(all(fit1$sigma["sigma_y", ] > fit2$sigma["sigma_y", ]))
 
-fit1 <- fit_two_group_mixed(y, X_1, X_2, sd1 = 10)
-fit2 <- fit_two_group_mixed(y, X_1, X_2, sd1 = .1)
+fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = 10)
+fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = .1)
 expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
 
 
@@ -172,7 +172,7 @@ fit <- fit_two_group_mixed(y, X_1, X_2)
 answer <- source("answers/two_group_mixed-01.R", local = TRUE)$value
 expect_equal(fit, answer)
 
-fit <- fit_two_group_mixed(y, X_1, X_2, ss = 2, sd_sigma_y = 2, sd1 = 2)
+fit <- fit_two_group_mixed(y, X_1, X_2, sd_beta2 = 2, sd_sigma_y = 2, sd_sigma1 = 2)
 # dump("fit", file = "inst/tinytest/answers/two_group_mixed-02.R")
 answer <- source("answers/two_group_mixed-02.R", local = TRUE)$value
 expect_equal(fit, answer)
@@ -207,8 +207,8 @@ fit <- fit_two_group_mixed(
   y = mtcars$mpg,
   X1_named,
   X2_named,
-  ss = 10,
-  sd1 = 5,
+  sd_beta2 = 10,
+  sd_sigma1 = 5,
   sd_sigma_y = 10,
   nnt = 30
 )
@@ -224,8 +224,8 @@ fit <- fit_two_group_mixed(
   y = mtcars$mpg,
   X1_named,
   X2_unnamed,
-  ss = 10,
-  sd1 = 5,
+  sd_beta2 = 10,
+  sd_sigma1 = 5,
   sd_sigma_y = 10,
   nnt = 30
 )

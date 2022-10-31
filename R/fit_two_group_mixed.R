@@ -6,11 +6,11 @@
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
-#' \deqn{\beta_2 ~ normal(0, ss * I)}
+#' \deqn{\beta_2 ~ normal(0, sd_beta2 * I)}
 #' \deqn{\sigma_y ~ normal+(0, sd_sigma_y)}
 #' \deqn{\sigma_1 ~ normal+(0, sd_1)}
 #'
-#' where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
+#' where \eqn{sd_beta2} is a vector of positive numbers and \eqn{I} is the identity
 #' matrix. The algorithm for computing the fit uses numerical linear algebra and
 #' low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 #'
@@ -21,8 +21,8 @@
 #' @param X2 (matrix) The design matrix for the "fixed effects" part of the
 #'   model. Must have `length(y)` rows.
 #' @param sd_sigma_y (positive real) Scale parameter value for the prior on \eqn{\sigma_y}.
-#' @param sd1 (positive real) Scale parameter value for the prior on \eqn{\sigma_1}.
-#' @param ss (positive reals) Scale parameter values for the prior on
+#' @param sd_sigma1 (positive real) Scale parameter value for the prior on \eqn{\sigma_1}.
+#' @param sd_beta2 (positive reals) Scale parameter values for the prior on
 #'   \eqn{\beta_2}. Must have either one element or `ncol(X2)` elements. In the
 #'   former case the value is recycled.
 #' @param nnt (positive integer) Number of quadrature nodes in \eqn{\theta}
@@ -64,7 +64,7 @@
 #' y <- rnorm(n, X1 %*% beta1 + X2 %*% beta2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_sigma_y = 1, sd1 = 1, nnt = 20)
+#' fit <- fit_two_group_mixed(y, X1, X2, sd_beta2 = rep(1, k2), sd_sigma_y = 1, sd_sigma1 = 1, nnt = 20)
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
@@ -83,8 +83,8 @@
 #'   X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
 #'   X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
 #'   sd_sigma_y = 10,
-#'   sd1 = 5,
-#'   ss = 10,
+#'   sd_sigma1 = 5,
+#'   sd_beta2 = 10,
 #'   nnt = 30
 #' )
 #' fit$beta1
@@ -97,29 +97,29 @@
 #' two-group normal-normal models. To appear,
 #' [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 #'
-fit_two_group_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd1 = 1, ss = rep(1, ncol(X2)), nnt = 10) {
+fit_two_group_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)), nnt = 10) {
   stopifnot(
     !anyNA(y),
     !anyNA(X1),
     !anyNA(X2),
     nrow(X1) == nrow(X2),
     length(y) == nrow(X1),
-    length(ss) == 1 || length(ss) == ncol(X2),
+    length(sd_beta2) == 1 || length(sd_beta2) == ncol(X2),
     length(sd_sigma_y) == 1,
-    length(sd1) == 1,
+    length(sd_sigma1) == 1,
     length(nnt) == 1,
-    all(ss > 0),
+    all(sd_beta2 > 0),
     sd_sigma_y > 0,
-    sd1 > 0,
+    sd_sigma1 > 0,
     nnt > 0,
     nnt == as.integer(nnt)
   )
-  if (length(ss) == 1) {
-    ss <- rep(ss, ncol(X2))
+  if (length(sd_beta2) == 1) {
+    sd_beta2 <- rep(sd_beta2, ncol(X2))
   }
 
-  out1 <- run_two_group_mixed(y, X1, X2, ss, sd_sigma_y, sd1, nnt)
-  out2 <- run_two_group_mixed(y, X1, X2, ss, sd_sigma_y, sd1, nnt = 2 * nnt)
+  out1 <- run_two_group_mixed(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt)
+  out2 <- run_two_group_mixed(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt = 2 * nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
@@ -159,7 +159,7 @@ fit_two_group_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd1 = 1, ss = rep(1, 
 # internal ----------------------------------------------------------------
 
 # run the c++ code for the fastNoNo algorithm
-run_two_group_mixed <- function(y, X1, X2, ss, sd_sigma_y, sd1, nnt) {
+run_two_group_mixed <- function(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt) {
   mixed_2group_cpp(
      nnt = as.integer(nnt),  # number of quadrature in theta direction
      nn = as.integer(80),    # number of quadrature nodes in other directions
@@ -169,9 +169,9 @@ run_two_group_mixed <- function(y, X1, X2, ss, sd_sigma_y, sd1, nnt) {
      k = ncol(X1) + ncol(X2),
      a = cbind(X1, X2),
      y = y,
-     ss = as.double(ss),
+     sd_beta2 = as.double(sd_beta2),
      sigy = as.double(sd_sigma_y),
-     sig1 = as.double(sd1)
+     sig1 = as.double(sd_sigma1)
   )
 }
 
