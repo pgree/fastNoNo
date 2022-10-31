@@ -1,0 +1,54 @@
+
+# test that formula interface returns same results as original ------------
+
+X2 <- model.matrix(~ wt + disp + factor(gear), data = mtcars)
+X1 <- model.matrix(~ 0 + as.factor(cyl), data = mtcars)
+fit <- fit_two_group_mixed(mtcars$mpg, X1, X2, nnt = 100, ss = 10)
+fit_formula <- fit_two_group_mixed_formula(mpg ~ wt + disp + factor(gear) + (1|cyl), mtcars, nnt = 100, ss = 10)
+
+# for beta1 avoid checking rownames (they will currently differ for beta1)
+expect_equal(fit_formula$beta1, fit$beta1, check.attributes = FALSE)
+expect_equal(fit_formula$beta2, fit$beta2)
+expect_equal(fit_formula$sigma, fit$sigma)
+expect_equal(fit_formula$errors, fit$errors, check.attributes = FALSE)
+expect_equal(fit_formula$cov, fit$cov, check.attributes = FALSE)
+
+
+# test that errors thrown for unsupported formula terms -------------------
+
+# valid formulas
+expect_silent(
+  fit_two_group_mixed_formula(mpg ~ (1 | cyl), data = mtcars)
+)
+expect_silent(
+  fit_two_group_mixed_formula(mpg ~ (0 + wt | cyl), data = mtcars)
+)
+
+# currently invalid formulas
+expect_error(
+  fit_two_group_mixed_formula(mpg ~ (1 + wt | cyl), data = mtcars),
+  "Currently only a single varying intercept or varying slope is supported, but not both."
+)
+expect_error(
+  fit_two_group_mixed_formula(mpg ~ (1 | cyl/gear), data = mtcars),
+  "Only one varying term is currently supported."
+)
+expect_error(
+  fit_two_group_mixed_formula(mpg ~ (1|cyl) + (1|gear), data = mtcars),
+  "Only one varying term is currently supported."
+)
+expect_error(
+  fit_two_group_mixed_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars),
+  "Only one varying term is currently supported."
+)
+
+# strict = FALSE allows formulas with unsupported terms when using parse_model_formula()
+expect_silent(
+  parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, strict = FALSE),
+)
+expect_error(
+  parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, strict = TRUE),
+  "Only one varying term is currently supported."
+)
+
+

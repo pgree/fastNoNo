@@ -148,16 +148,19 @@ make_X1_matrix <- function(reTrms) {
 #' repeat.
 #'
 #' @noRd
+#'
+#' @note This function isn't really needed given that we currently only allow 1
+#'   varying term, but it will be useful if we eventually allow more complicated
+#'   model formulas.
+#'
 #' @param reTrms The `reTrms` object returned by `lme4::lFormula()`.
+#'
 #' @return Character vector of column names to use for `X1`. Names are of the
 #'   form `(Intercept)_g:level` for varying intercepts by level of grouping
 #'   variable `g`, and `x_g:level` for varying slopes on a variable `x` by level
 #'   of grouping variable `g`. For example, with the `mtcars` data and a model
 #'   formula `~ (1|cyl) + (1+disp|gear)` we get names like `(Intercept)_cyl:4`,
 #'   `(Intercept)_gear:3`, `disp_gear:3`, etc.
-#' @note This function isn't really needed given that we currently only allow 1
-#'   varying term, but it will be useful if we eventually allow more complicated
-#'   model formulas.
 #'
 make_X1_colnames <- function(reTrms) {
   X1_colnames <- c()
@@ -171,8 +174,11 @@ make_X1_colnames <- function(reTrms) {
 }
 
 
-#' Create `control` argument for `lme4::lFormula()`
+#' Create model and data checking specifications for lme4 formula parser
+#'
 #' @noRd
+#' @return A list that can be passed to the `control` argument of `lme4::lFormula()`.
+#'
 make_lmer_control <- function() {
   lme4::lmerControl(
     check.nlev.gtreq.5 = "ignore",
@@ -185,7 +191,13 @@ make_lmer_control <- function() {
 
 
 #' Error if model formula has unsupported terms
+#'
+#' Currently formulas are restricted to a single varying intercept or slope,
+#' e.g. `(1|g)` or `(0 + x|g)`.
+#'
 #' @noRd
+#' @return Errors if formula is not ok, otherwise returns `TRUE` invisibly.
+#'
 check_formula_unsupported_terms <- function(formula) {
   bars <- lme4::findbars(formula)
   if (length(bars) > 1) {
@@ -198,4 +210,5 @@ check_formula_unsupported_terms <- function(formula) {
     stop("Currently only a single varying intercept or varying slope is supported, but not both.",
          call. = FALSE)
   }
+  invisible(TRUE)
 }
