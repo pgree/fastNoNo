@@ -4269,4 +4269,4 @@ list(beta1 = structure(list(mean = c(-0.28812167802745148, -0.10907740878346232,
     "beta2_45", "beta2_46", "beta2_47", "beta2_48", "beta2_49", 
     "beta2_50", "beta2_51", "beta2_52", "beta2_53", "beta2_54", 
     "beta2_55", "beta2_56", "beta2_57", "beta2_58", "beta2_59", 
-    "beta2_60", "sigma_y", "sigma_beta1")), time = 0.058501254000000003)
+    "beta2_60", "sigma_y", "sigma_beta1")), time = 0.077111405000000008)

@@ -19,4 +19,4 @@ Roxygen: list(markdown = TRUE)
 NeedsCompilation: yes
 Imports: Rcpp (>= 1.0.8.3), RcppEigen
 LinkingTo: Rcpp, RcppEigen
-Suggests: tinytest
+Suggests: lme4, tinytest
