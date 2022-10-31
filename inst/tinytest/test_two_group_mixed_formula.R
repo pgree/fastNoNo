@@ -27,7 +27,8 @@ expect_silent(
 # currently invalid formulas
 expect_error(
   fit_two_group_mixed_formula(mpg ~ (1 + wt | cyl), data = mtcars),
-  "Currently only a single varying intercept or varying slope is supported, but not both."
+  "Currently only terms (1 | g) and (0 + x | g) are supported. (1 + x|g) is not yet implemented.",
+  fixed = TRUE
 )
 expect_error(
   fit_two_group_mixed_formula(mpg ~ (1 | cyl/gear), data = mtcars),
@@ -44,10 +45,10 @@ expect_error(
 
 # strict = FALSE allows formulas with unsupported terms when using parse_model_formula()
 expect_silent(
-  parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, strict = FALSE),
+  parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, on_failed_check = "ignore"),
 )
 expect_error(
-  parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, strict = TRUE),
+  parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, on_failed_check = "error"),
   "Only one varying term is currently supported."
 )
 

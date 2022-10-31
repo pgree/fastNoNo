@@ -2,7 +2,6 @@
 
 export(fit_two_group_mixed)
 export(fit_two_group_mixed_formula)
-export(fit_two_group_mixed_formula_2)
 import(RcppEigen)
 importFrom(Rcpp,evalCpp)
 useDynLib(fastNoNo)

@@ -2,12 +2,9 @@
 % Please edit documentation in R/fit_two_group_mixed_formula.R
 \name{fit_two_group_mixed_formula}
 \alias{fit_two_group_mixed_formula}
-\alias{fit_two_group_mixed_formula_2}
 \title{Formula interface to \code{fit_two_group_mixed()}}
 \usage{
 fit_two_group_mixed_formula(formula, data, ...)
-
-fit_two_group_mixed_formula_2(data, fixed_formula, varying_intercept, ...)
 }
 \arguments{
 \item{formula}{An \code{lmer}-style model formula. Currently only a single varying
@@ -18,16 +15,6 @@ model. To bypass this restriction use \code{\link[=fit_two_group_mixed]{fit_two_
 
 \item{...}{Arguments passed to \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}}, except for \code{y}, \code{X1},
 and \code{X2}, which are generated automatically.}
-
-\item{fixed_formula}{(formula) A formula in the style of \code{\link[stats:lm]{stats::lm()}} that
-specifies the outcome variable on the left side and the "fixed effects"
-terms on the right side. This formula is used to construct the \code{X2} matrix
-for \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}}.}
-
-\item{varying_intercept}{(string) The name of the grouping variable by which
-the intercept should vary (with partial pooling). Currently only a single
-varying intercept is supported via this argument. This variable is used to
-construct the \code{X1} matrix for \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}}.}
 }
 \value{
 See \code{\link[=fit_two_group_mixed]{fit_two_group_mixed()}}.
@@ -46,16 +33,5 @@ fit <- fit_two_group_mixed_formula(
 )
 fit$beta1
 fit$beta2
-
-fit2 <- fit_two_group_mixed_formula_2(
-  data = mtcars,
-  fixed_formula = mpg ~ wt + as.factor(gear),
-  varying_intercept = "cyl",
-  ss = 10,
-  sd_y = 10,
-  sd1 = 5
-)
-fit2$beta1
-fit2$beta2
 
 }
