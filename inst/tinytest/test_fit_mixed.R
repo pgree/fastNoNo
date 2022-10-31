@@ -23,42 +23,42 @@ X_1_NA[1,1] <- NA
 X_2_NA[1,1] <- NA
 
 expect_error(
-  fit_two_group_mixed(y_NA, X_1, X_2),
+  fit_mixed(y_NA, X_1, X_2),
   "!anyNA(y) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1_NA, X_2),
+  fit_mixed(y, X_1_NA, X_2),
   "!anyNA(X1) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2_NA),
+  fit_mixed(y, X_1, X_2_NA),
   "!anyNA(X2) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd_beta2 = -1),
+  fit_mixed(y, X_1, X_2, sd_beta2 = -1),
   "all(sd_beta2 > 0) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd_sigma_y = -1),
+  fit_mixed(y, X_1, X_2, sd_sigma_y = -1),
   "sd_sigma_y > 0 is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = -1),
+  fit_mixed(y, X_1, X_2, sd_sigma1 = -1),
   "sd_sigma1 > 0 is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, nnt = -20),
+  fit_mixed(y, X_1, X_2, nnt = -20),
   "nnt > 0 is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, nnt = pi),
+  fit_mixed(y, X_1, X_2, nnt = pi),
   "nnt == as.integer(nnt) is not TRUE",
   fixed = TRUE
 )
@@ -66,44 +66,44 @@ expect_error(
 
 # incorrect sizes
 expect_error(
-  fit_two_group_mixed(y[-1], X_1, X_2),
+  fit_mixed(y[-1], X_1, X_2),
   "length(y) == nrow(X1) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1[-1, ], X_2),
+  fit_mixed(y, X_1[-1, ], X_2),
   "nrow(X1) == nrow(X2) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2[-1, ]),
+  fit_mixed(y, X_1, X_2[-1, ]),
   "nrow(X1) == nrow(X2) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd_beta2 = c(1, 2, 3)),
+  fit_mixed(y, X_1, X_2, sd_beta2 = c(1, 2, 3)),
   "length(sd_beta2) == 1 || length(sd_beta2) == ncol(X2) is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd_sigma_y = c(1, 2)),
+  fit_mixed(y, X_1, X_2, sd_sigma_y = c(1, 2)),
   "length(sd_sigma_y) == 1 is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = c(1, 2)),
+  fit_mixed(y, X_1, X_2, sd_sigma1 = c(1, 2)),
   "length(sd_sigma1) == 1 is not TRUE",
   fixed = TRUE
 )
 expect_error(
-  fit_two_group_mixed(y, X_1, X_2, nnt = c(1, 2)),
+  fit_mixed(y, X_1, X_2, nnt = c(1, 2)),
   "length(nnt) == 1 is not TRUE",
   fixed = TRUE
 )
 
 
 # test contents of fit object ---------------------------------------------
-fit <- fit_two_group_mixed(y, X_1, X_2)
+fit <- fit_mixed(y, X_1, X_2)
 
 expect_equal(names(fit), c("beta1", "beta2", "sigma", "cov", "errors", "time"))
 
@@ -140,8 +140,8 @@ expect_equal(length(fit$time), 1)
 # test algorithm is deterministic -----------------------------------------
 
 # with the same inputs we should get the same answers if we refit
-fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
-fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
+fit1 <- fit_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
+fit2 <- fit_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
 
 expect_equal(fit1$beta1, fit2$beta1)
 expect_equal(fit1$beta2, fit2$beta2)
@@ -155,31 +155,31 @@ expect_equal(fit1$cov, fit2$cov)
 
 # these are just sanity checks, nothing precise
 
-fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma_y = 10)
-fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma_y = .1)
+fit1 <- fit_mixed(y, X_1, X_2, sd_sigma_y = 10)
+fit2 <- fit_mixed(y, X_1, X_2, sd_sigma_y = .1)
 expect_true(all(fit1$sigma["sigma_y", ] > fit2$sigma["sigma_y", ]))
 
-fit1 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = 10)
-fit2 <- fit_two_group_mixed(y, X_1, X_2, sd_sigma1 = .1)
+fit1 <- fit_mixed(y, X_1, X_2, sd_sigma1 = 10)
+fit2 <- fit_mixed(y, X_1, X_2, sd_sigma1 = .1)
 expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
 
 
 
 # test that results haven't changed ---------------------------------------
 
-fit <- fit_two_group_mixed(y, X_1, X_2)
-# dump("fit", file = "inst/tinytest/answers/two_group_mixed-01.R")
-answer <- source("answers/two_group_mixed-01.R", local = TRUE)$value
+fit <- fit_mixed(y, X_1, X_2)
+# dump("fit", file = "inst/tinytest/answers/fit_mixed-01.R")
+answer <- source("answers/fit_mixed-01.R", local = TRUE)$value
 expect_equal(fit, answer)
 
-fit <- fit_two_group_mixed(y, X_1, X_2, sd_beta2 = 2, sd_sigma_y = 2, sd_sigma1 = 2)
-# dump("fit", file = "inst/tinytest/answers/two_group_mixed-02.R")
-answer <- source("answers/two_group_mixed-02.R", local = TRUE)$value
+fit <- fit_mixed(y, X_1, X_2, sd_beta2 = 2, sd_sigma_y = 2, sd_sigma1 = 2)
+# dump("fit", file = "inst/tinytest/answers/fit_mixed-02.R")
+answer <- source("answers/fit_mixed-02.R", local = TRUE)$value
 expect_equal(fit, answer)
 
-fit <- fit_two_group_mixed(y, X_1, X_2, nnt = 80)
-# dump("fit", file = "inst/tinytest/answers/two_group_mixed-03.R")
-answer <- source("answers/two_group_mixed-03.R", local = TRUE)$value
+fit <- fit_mixed(y, X_1, X_2, nnt = 80)
+# dump("fit", file = "inst/tinytest/answers/fit_mixed-03.R")
+answer <- source("answers/fit_mixed-03.R", local = TRUE)$value
 expect_equal(fit, answer)
 
 
@@ -190,7 +190,7 @@ expect_equal(fit, answer)
 n_runs <- 100
 has_NaNs <- rep(FALSE, n_runs)
 for (i in 1:n_runs) {
-  fit <- fit_two_group_mixed(y, X_1, X_2)
+  fit <- fit_mixed(y, X_1, X_2)
   has_NaNs[i] <- any(sapply(fit, anyNA))
 }
 expect_true(sum(has_NaNs) == 0)
@@ -203,7 +203,7 @@ expect_true(sum(has_NaNs) == 0)
 
 X1_named <- stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars)
 X2_named <- stats::model.matrix(~ wt + as.factor(gear), data = mtcars)
-fit <- fit_two_group_mixed(
+fit <- fit_mixed(
   y = mtcars$mpg,
   X1_named,
   X2_named,
@@ -220,7 +220,7 @@ expect_equal(rownames(fit$errors), c(rownames(fit$beta1), rownames(fit$beta2), "
 
 X2_unnamed <- X2_named
 colnames(X2_unnamed) <- NULL
-fit <- fit_two_group_mixed(
+fit <- fit_mixed(
   y = mtcars$mpg,
   X1_named,
   X2_unnamed,

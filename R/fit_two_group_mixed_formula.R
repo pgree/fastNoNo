@@ -1,19 +1,19 @@
-#' Formula interface to `fit_two_group_mixed()`
+#' Formula interface to `fit_mixed()`
 #'
 #' This function provides a formula interface to the model fit by
-#' [fit_two_group_mixed()].
+#' [fit_mixed()].
 #'
 #' @export
 #' @param formula An `lmer`-style model formula. Currently only a single varying
 #'   intercept or varying slope is supported in the "random effects" part of the
-#'   model. To bypass this restriction use [fit_two_group_mixed()] directly.
+#'   model. To bypass this restriction use [fit_mixed()] directly.
 #' @param data A data frame containing the variables used in the model.
-#' @param ... Arguments passed to [fit_two_group_mixed()], except for `y`, `X1`,
+#' @param ... Arguments passed to [fit_mixed()], except for `y`, `X1`,
 #'   and `X2`, which are generated automatically.
-#' @return See [fit_two_group_mixed()].
+#' @return See [fit_mixed()].
 #'
 #' @examples
-#' fit <- fit_two_group_mixed_formula(
+#' fit <- fit_mixed_formula(
 #'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
 #'   data = mtcars,
 #'   sd_beta2 = 10,
@@ -23,7 +23,7 @@
 #' fit$beta1
 #' fit$beta2
 #'
-fit_two_group_mixed_formula <- function(formula, data, ...) {
+fit_mixed_formula <- function(formula, data, ...) {
   stopifnot(
     is.data.frame(data),
     !anyNA(data)
@@ -33,7 +33,7 @@ fit_two_group_mixed_formula <- function(formula, data, ...) {
     stop("'y', 'X1', and 'X2' should not be specified.", call. = FALSE)
   }
   model_data <- parse_model_formula(formula, data, on_failed_check = "error")
-  out <- fit_two_group_mixed(model_data$y, model_data$X1, model_data$X2, ...)
+  out <- fit_mixed(model_data$y, model_data$X1, model_data$X2, ...)
   out$debug <- list(X1 = model_data$X1, X2 = model_data$X2) # temporary to help with debugging
   out
 }

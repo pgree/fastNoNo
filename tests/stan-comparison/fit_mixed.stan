@@ -6,7 +6,7 @@ data {
   matrix[n,k1] X1;
   matrix[n,k2] X2;
   vector[k2] sd_beta2;
-  real sdy;
+  real sd_sigma_y;
   real sd_sigma1;
 }
 parameters {
@@ -19,6 +19,6 @@ model {
   y ~ normal(X1*beta1 + X2*beta2, sigma_y);
   beta1 ~ normal(0, sigma_beta1);
   beta2 ~ normal(0, sd_beta2);
-  sigma_y ~ normal(0, sdy);
+  sigma_y ~ normal(0, sd_sigma_y);
   sigma_beta1 ~ normal(0, sd_sigma1);
 }

@@ -6,11 +6,11 @@
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
-#' \deqn{\beta_2 ~ normal(0, sd_beta2 * I)}
-#' \deqn{\sigma_y ~ normal+(0, sd_sigma_y)}
-#' \deqn{\sigma_1 ~ normal+(0, sd_1)}
+#' \deqn{\beta_2 ~ normal(0, sd_\beta_2 * I)}
+#' \deqn{\sigma_y ~ normal+(0, sd_\sigma_y)}
+#' \deqn{\sigma_1 ~ normal+(0, sd_\sigma_1)}
 #'
-#' where \eqn{sd_beta2} is a vector of positive numbers and \eqn{I} is the identity
+#' where \eqn{sd_\beta_2} is a vector of positive numbers and \eqn{I} is the identity
 #' matrix. The algorithm for computing the fit uses numerical linear algebra and
 #' low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 #'
@@ -64,7 +64,7 @@
 #' y <- rnorm(n, X1 %*% beta1 + X2 %*% beta2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_two_group_mixed(y, X1, X2, sd_beta2 = rep(1, k2), sd_sigma_y = 1, sd_sigma1 = 1, nnt = 20)
+#' fit <- fit_mixed(y, X1, X2, sd_beta2 = rep(1, k2), sd_sigma_y = 1, sd_sigma1 = 1, nnt = 20)
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
@@ -78,7 +78,7 @@
 #' # using the mtcars dataset that comes with R:
 #' #   mpg ~ wt + as.factor(gear) + (1|cyl)
 #'
-#' fit <- fit_two_group_mixed(
+#' fit <- fit_mixed(
 #'   y = mtcars$mpg,
 #'   X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
 #'   X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
@@ -97,7 +97,7 @@
 #' two-group normal-normal models. To appear,
 #' [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 #'
-fit_two_group_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)), nnt = 10) {
+fit_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)), nnt = 10) {
   stopifnot(
     !anyNA(y),
     !anyNA(X1),
@@ -169,7 +169,7 @@ run_two_group_mixed <- function(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt)
      k = ncol(X1) + ncol(X2),
      a = cbind(X1, X2),
      y = y,
-     sd_beta2 = as.double(sd_beta2),
+     ss = as.double(sd_beta2),
      sigy = as.double(sd_sigma_y),
      sig1 = as.double(sd_sigma1)
   )
