@@ -28,25 +28,27 @@ model. Must have \code{length(y)} rows.}
 \item{sd_sigma1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
 
 \item{sd_beta2}{(positive reals) Scale parameter values for the prior on
-\eqn{\beta_2}. Must have either one element or \code{ncol(X2)} elements. In the
-former case the value is recycled.}
+\eqn{\beta_2} ("fixed effects" coefficients). Must have either one element
+or \code{ncol(X2)} elements. In the former case the value is recycled.}
 
 \item{nnt}{(positive integer) Number of quadrature nodes in \eqn{\theta}
-direction as described in Greengard et al. (2022).}
+direction as described in Greengard et al. (2022). \code{nnt} can be increased
+to improve the accuracy of the estimates if errors are large (see \code{errors}
+slot in returned fitted model object).}
 }
 \value{
 A named list with the following components:
 \itemize{
 \item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
-posterior means and standard deviations for the vector \eqn{\beta_1}. If \code{X1}
-has column names they are used as the row names for \code{beta1}, otherwise
-generic names are used (\code{beta1_1}, \code{beta1_2}, etc.).
+posterior means and standard deviations for the vector \eqn{\beta_1} (the
+"random effects").
 \item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
-posterior means and standard deviations for the vector \eqn{\beta_2}. If \code{X2}
-has column names they are used as the row names for \code{beta2}, otherwise
-generic names are used (\code{beta2_1}, \code{beta2_2}, etc.).
+posterior means and standard deviations for the vector \eqn{\beta_2} (the
+"fixed effects").
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
-posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
+posterior means and standard deviations for \eqn{\sigma_y} (the residual
+standard deviation) and \eqn{\sigma_1} (the standard deviation of
+\eqn{\beta_1}).
 \item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
 \item \code{errors}: A data frame with two columns (\code{error_mean}, \code{error_sd})
 containing the approximate accuracy of the posterior mean and standard

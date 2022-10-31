@@ -4,14 +4,14 @@
 #' [fit_mixed()].
 #'
 #' @export
-#' @param formula An `lmer`-style model formula. Currently only a single varying
-#'   intercept or varying slope is supported in the "random effects" part of the
-#'   model. To bypass this restriction use [fit_mixed()] directly.
-#' @param data A data frame containing the variables used in the model.
-#' @param ... Arguments passed to [fit_mixed()], except for `y`, `X1`,
-#'   and `X2`, which are generated automatically.
-#' @return See [fit_mixed()].
-#'
+#' @param formula (formula) An `lmer`-style model formula. Currently only a
+#'   single varying intercept or varying slope is supported in the "random
+#'   effects" part of the model. To bypass this restriction use [fit_mixed()]
+#'   directly.
+#' @param data (data frame) The data containing the variables used in the model.
+#' @param ... Currently only for internal use.
+#' @inheritParams fit_mixed
+#' @inherit fit_mixed return
 #' @examples
 #' fit <- fit_mixed_formula(
 #'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
@@ -22,19 +22,29 @@
 #' )
 #' fit$beta1
 #' fit$beta2
+#' fit$sigma
 #'
-fit_mixed_formula <- function(formula, data, ...) {
+fit_mixed_formula <- function(formula, data, ...,
+                              sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1,
+                              nnt = 10) {
   stopifnot(
     is.data.frame(data),
     !anyNA(data)
   )
-  dots <- list(...)
-  if (!is.null(dots$y) || !is.null(dots$X1) || !is.null(dots$X2)) {
-    stop("'y', 'X1', and 'X2' should not be specified.", call. = FALSE)
-  }
   model_data <- parse_model_formula(formula, data, on_failed_check = "error")
-  out <- fit_mixed(model_data$y, model_data$X1, model_data$X2, ...)
-  out$debug <- list(X1 = model_data$X1, X2 = model_data$X2) # temporary to help with debugging
+  out <- fit_mixed(
+    y = model_data$y,
+    X1 = model_data$X1,
+    X2 = model_data$X2,
+    sd_sigma_y = sd_sigma_y,
+    sd_sigma1 = sd_sigma1,
+    sd_beta2 = sd_beta2,
+    nnt = nnt
+  )
+  dots <- list(...)
+  if (isTRUE(dots$debug)) { # temporary to help with debugging
+    out$debug <- list(X1 = model_data$X1, X2 = model_data$X2)
+  }
   out
 }
 
@@ -61,7 +71,13 @@ parse_model_formula <- function(formula, data, ..., on_failed_check = c("error",
   lf <- lme4::lFormula(
     formula = formula,
     data = data,
-    control = make_lmer_control(),
+    control = lme4::lmerControl(
+      check.nlev.gtreq.5 = "ignore",
+      check.nobs.vs.rankZ = "ignore",
+      check.nobs.vs.nlev = "ignore",
+      check.nobs.vs.nRE = "ignore",
+      check.scaleX = "ignore"
+    ),
     ...
   )
   check_formula_unsupported_terms(lf$formula, on_failed_check = match.arg(on_failed_check))
@@ -124,23 +140,6 @@ make_X1_colnames <- function(reTrms) {
   }
   X1_colnames
 }
-
-
-#' Create model and data checking specifications for lme4 formula parser
-#'
-#' @noRd
-#' @return A list that can be passed to the `control` argument of `lme4::lFormula()`.
-#'
-make_lmer_control <- function() {
-  lme4::lmerControl(
-    check.nlev.gtreq.5 = "ignore",
-    check.nobs.vs.rankZ = "ignore",
-    check.nobs.vs.nlev = "ignore",
-    check.nobs.vs.nRE = "ignore",
-    check.scaleX = "ignore"
-  )
-}
-
 
 #' Check if model formula has unsupported terms
 #'

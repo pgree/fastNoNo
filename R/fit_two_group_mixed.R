@@ -23,22 +23,24 @@
 #' @param sd_sigma_y (positive real) Scale parameter value for the prior on \eqn{\sigma_y}.
 #' @param sd_sigma1 (positive real) Scale parameter value for the prior on \eqn{\sigma_1}.
 #' @param sd_beta2 (positive reals) Scale parameter values for the prior on
-#'   \eqn{\beta_2}. Must have either one element or `ncol(X2)` elements. In the
-#'   former case the value is recycled.
+#'   \eqn{\beta_2} ("fixed effects" coefficients). Must have either one element
+#'   or `ncol(X2)` elements. In the former case the value is recycled.
 #' @param nnt (positive integer) Number of quadrature nodes in \eqn{\theta}
-#'   direction as described in Greengard et al. (2022).
+#'   direction as described in Greengard et al. (2022). `nnt` can be increased
+#'   to improve the accuracy of the estimates if errors are large (see `errors`
+#'   slot in returned fitted model object).
 #'
 #' @return A named list with the following components:
 #' * `beta1`: A data frame with two columns (`mean`, `sd`) containing the
-#' posterior means and standard deviations for the vector \eqn{\beta_1}. If `X1`
-#' has column names they are used as the row names for `beta1`, otherwise
-#' generic names are used (`beta1_1`, `beta1_2`, etc.).
+#' posterior means and standard deviations for the vector \eqn{\beta_1} (the
+#' "random effects").
 #' * `beta2`: A data frame with two columns (`mean`, `sd`)  containing the
-#' posterior means and standard deviations for the vector \eqn{\beta_2}. If `X2`
-#' has column names they are used as the row names for `beta2`, otherwise
-#' generic names are used (`beta2_1`, `beta2_2`, etc.).
+#' posterior means and standard deviations for the vector \eqn{\beta_2} (the
+#' "fixed effects").
 #' * `sigma`: A data frame with two columns (`mean`, `sd`) containing the
-#' posterior means and standard deviations for \eqn{\sigma_y} and \eqn{\sigma_1}.
+#' posterior means and standard deviations for \eqn{\sigma_y} (the residual
+#' standard deviation) and \eqn{\sigma_1} (the standard deviation of
+#' \eqn{\beta_1}).
 #' * `cov`: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
 #' * `errors`: A data frame with two columns (`error_mean`, `error_sd`)
 #' containing the approximate accuracy of the posterior mean and standard

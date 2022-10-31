@@ -4,20 +4,60 @@
 \alias{fit_mixed_formula}
 \title{Formula interface to \code{fit_mixed()}}
 \usage{
-fit_mixed_formula(formula, data, ...)
+fit_mixed_formula(
+  formula,
+  data,
+  ...,
+  sd_sigma_y = 1,
+  sd_sigma1 = 1,
+  sd_beta2 = 1,
+  nnt = 10
+)
 }
 \arguments{
-\item{formula}{An \code{lmer}-style model formula. Currently only a single varying
-intercept or varying slope is supported in the "random effects" part of the
-model. To bypass this restriction use \code{\link[=fit_mixed]{fit_mixed()}} directly.}
+\item{formula}{(formula) An \code{lmer}-style model formula. Currently only a
+single varying intercept or varying slope is supported in the "random
+effects" part of the model. To bypass this restriction use \code{\link[=fit_mixed]{fit_mixed()}}
+directly.}
 
-\item{data}{A data frame containing the variables used in the model.}
+\item{data}{(data frame) The data containing the variables used in the model.}
 
-\item{...}{Arguments passed to \code{\link[=fit_mixed]{fit_mixed()}}, except for \code{y}, \code{X1},
-and \code{X2}, which are generated automatically.}
+\item{...}{Currently only for internal use.}
+
+\item{sd_sigma_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
+
+\item{sd_sigma1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
+
+\item{sd_beta2}{(positive reals) Scale parameter values for the prior on
+\eqn{\beta_2} ("fixed effects" coefficients). Must have either one element
+or \code{ncol(X2)} elements. In the former case the value is recycled.}
+
+\item{nnt}{(positive integer) Number of quadrature nodes in \eqn{\theta}
+direction as described in Greengard et al. (2022). \code{nnt} can be increased
+to improve the accuracy of the estimates if errors are large (see \code{errors}
+slot in returned fitted model object).}
 }
 \value{
-See \code{\link[=fit_mixed]{fit_mixed()}}.
+A named list with the following components:
+\itemize{
+\item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
+posterior means and standard deviations for the vector \eqn{\beta_1} (the
+"random effects").
+\item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
+posterior means and standard deviations for the vector \eqn{\beta_2} (the
+"fixed effects").
+\item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
+posterior means and standard deviations for \eqn{\sigma_y} (the residual
+standard deviation) and \eqn{\sigma_1} (the standard deviation of
+\eqn{\beta_1}).
+\item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
+\item \code{errors}: A data frame with two columns (\code{error_mean}, \code{error_sd})
+containing the approximate accuracy of the posterior mean and standard
+deviation estimates.
+\item \code{time}: The execution time of the algorithm in seconds. This only includes
+the time taken to run the internal C++ code. To include the full time elapsed
+when running the \R function see \code{\link[=system.time]{system.time()}}.
+}
 }
 \description{
 This function provides a formula interface to the model fit by
@@ -33,5 +73,6 @@ fit <- fit_mixed_formula(
 )
 fit$beta1
 fit$beta2
+fit$sigma
 
 }
