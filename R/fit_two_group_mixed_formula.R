@@ -12,6 +12,8 @@
 #' @param ... Currently only for internal use.
 #' @inheritParams fit_mixed
 #' @inherit fit_mixed return
+#'
+#' @seealso [fit_mixed()]
 #' @examples
 #' fit <- fit_mixed_formula(
 #'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
@@ -165,7 +167,7 @@ check_formula_unsupported_terms <- function(formula, on_failed_check = c("error"
       error = stop("Only one varying term is currently supported.", call. = FALSE),
       warning = warning(
         "Multiple varying terms detected. ",
-        "Currently the same prior standard deviation (sd_sigma1) is used for all varying terms .",
+        "Currently the same prior standard deviation (sigma1) is estimated for all varying terms.",
         call. = FALSE
       )
     )
@@ -184,8 +186,8 @@ check_formula_unsupported_terms <- function(formula, on_failed_check = c("error"
           call. = FALSE
         ),
         warning = warning(
-          "Currently terms like (1 + x|g) result in the varying intercepts ",
-          "and slopes having the same prior standard deviation (sd_sigma1).",
+          "Multiple varying terms detected. ",
+          "Currently the same prior standard deviation (sigma1) is estimated for all varying terms.",
           call. = FALSE
         )
       )

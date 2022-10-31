@@ -123,3 +123,6 @@ Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
 two-group normal-normal models. To appear,
 \href{http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf}{Bayesian Analysis}
 }
+\seealso{
+\code{\link[=fit_mixed_formula]{fit_mixed_formula()}}
+}

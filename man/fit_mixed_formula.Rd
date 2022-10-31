@@ -76,3 +76,6 @@ fit$beta2
 fit$sigma
 
 }
+\seealso{
+\code{\link[=fit_mixed]{fit_mixed()}}
+}

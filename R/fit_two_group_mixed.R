@@ -49,6 +49,13 @@
 #' the time taken to run the internal C++ code. To include the full time elapsed
 #' when running the \R function see [system.time()].
 #'
+#' @references
+#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
+#' Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
+#' two-group normal-normal models. To appear,
+#' [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
+#'
+#' @seealso [fit_mixed_formula()]
 #' @examples
 #' ### Example with simulated data
 #' set.seed(1)
@@ -92,12 +99,6 @@
 #' fit$beta1
 #' fit$beta2
 #' fit$sigma
-#'
-#' @references
-#' Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
-#' Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
-#' two-group normal-normal models. To appear,
-#' [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
 #'
 fit_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)), nnt = 10) {
   stopifnot(
