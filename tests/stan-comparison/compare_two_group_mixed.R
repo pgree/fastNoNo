@@ -25,7 +25,7 @@ stan_estimates <- as.data.frame(posterior_summary[, c("mean", "sd")])
 rownames(stan_estimates) <- posterior_summary$variable
 
 # fastNoNo posterior means and sds ----------------------------------------
-fit_fastnono <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_y = sdy, sd1 = sd1, nnt = 20)
+fit_fastnono <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_sigma_y = sdy, sd1 = sd1, nnt = 20)
 fastnono_estimates <- rbind(fit_fastnono$sigma, fit_fastnono$beta1, fit_fastnono$beta2)
 rownames(fastnono_estimates) <- rownames(stan_estimates)
 

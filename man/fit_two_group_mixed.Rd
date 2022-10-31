@@ -8,7 +8,7 @@ fit_two_group_mixed(
   y,
   X1,
   X2,
-  sd_y = 1,
+  sd_sigma_y = 1,
   sd1 = 1,
   ss = rep(1, ncol(X2)),
   nnt = 10
@@ -23,7 +23,7 @@ model. Must have \code{length(y)} rows.}
 \item{X2}{(matrix) The design matrix for the "fixed effects" part of the
 model. Must have \code{length(y)} rows.}
 
-\item{sd_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
+\item{sd_sigma_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
 
 \item{sd1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
 
@@ -63,7 +63,7 @@ linear regression model
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 \deqn{\beta_1 ~ normal(0, \sigma_1)}
 \deqn{\beta_2 ~ normal(0, ss * I)}
-\deqn{\sigma_y ~ normal+(0, sd_y)}
+\deqn{\sigma_y ~ normal+(0, sd_sigma_y)}
 \deqn{\sigma_1 ~ normal+(0, sd_1)}
 
 where \eqn{ss} is a vector of positive numbers and \eqn{I} is the identity
@@ -87,7 +87,7 @@ X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
 y <- rnorm(n, X1 \%*\% beta1 + X2 \%*\% beta2, sigma_y)
 
 # Fit model
-fit <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_y = 1, sd1 = 1, nnt = 20)
+fit <- fit_two_group_mixed(y, X1, X2, ss = rep(1, k2), sd_sigma_y = 1, sd1 = 1, nnt = 20)
 str(fit)
 
 # Plot estimates of the betas vs "truth"
@@ -105,7 +105,7 @@ fit <- fit_two_group_mixed(
   y = mtcars$mpg,
   X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
   X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
-  sd_y = 10,
+  sd_sigma_y = 10,
   sd1 = 5,
   ss = 10,
   nnt = 30

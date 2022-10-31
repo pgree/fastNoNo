@@ -28,7 +28,7 @@ fit <- fit_two_group_mixed_formula(
   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
   data = mtcars,
   ss = 10,
-  sd_y = 10,
+  sd_sigma_y = 10,
   sd1 = 5
 )
 fit$beta1

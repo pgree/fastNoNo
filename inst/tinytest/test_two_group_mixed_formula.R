@@ -43,7 +43,7 @@ expect_error(
   "Only one varying term is currently supported."
 )
 
-# strict = FALSE allows formulas with unsupported terms when using parse_model_formula()
+# on_failed_check = "ignore" allows formulas with unsupported terms when using parse_model_formula()
 expect_silent(
   parse_model_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars, on_failed_check = "ignore"),
 )
