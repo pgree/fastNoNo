@@ -96,14 +96,98 @@ fit_two_group_mixed_formula_2 <- function(data, fixed_formula, varying_intercept
 #' @noRd
 #' @param formula,data The model formula and data frame.
 #' @param ... Arguments passed to `lme4::lFormula()`.
+#' @param strict If `TRUE` (the default) then an error is thrown if the model
+#'   formula includes unsupported terms.
 #' @return A list with vector `y` and matrices `X1` and `X2`.
 #'
-parse_model_formula <- function(formula, data, ...) {
+parse_model_formula <- function(formula, data, ..., strict = TRUE) {
   if (!requireNamespace("lme4", quietly = TRUE)) {
     stop("Please install the lme4 package.", call. = FALSE)
   }
-  lf <- lme4::lFormula(formula, data, ...)
-  bars <- lme4::findbars(lf$formula)
+  lf <- lme4::lFormula(
+    formula = formula,
+    data = data,
+    control = make_lmer_control(),
+    ...
+  )
+  if (strict) {
+    check_formula_unsupported_terms(lf$formula)
+  }
+  list(
+    y = stats::model.response(lf$fr),
+    X1 = make_X1_matrix(lf$reTrms),
+    X2 = lf$X
+  )
+}
+
+#' Make the `X1` matrix to pass to fastNoNo
+#' @noRd
+#' @param reTrms The `reTrms` object returned by `lme4::lFormula()`.
+#' @return The `X1` matrix to pass to fastNoNo.
+#'
+make_X1_matrix <- function(reTrms) {
+  # for now we have to convert Zt from sparse to dense in order to pass a matrix
+  # (and not a dgCMatrix object) to fastNoNo, but maybe we can preserve the
+  # sparse matrix in the future
+  X1_t <- as.matrix(reTrms$Zt)
+  X1 <- t(X1_t)
+  colnames(X1) <- make_X1_colnames(reTrms)
+  X1
+}
+
+#' Generate informative column names for X1 matrix
+#'
+#' The Z matrix in lme4 (our X1 matrix) only uses levels of the grouping
+#' variable as column names, so the names will repeat if there are a
+#' varying intercept and slope by the same grouping variable (e.g. `(1+x|g)`)
+#' or if there are multiple varying intercepts and the grouping variables happen
+#' to have overlapping level names (e.g. `(1|g) + (1|f)` and both `g` and `f`
+#' share level names). In these cases `Z` will have repetitive column names,
+#' which prevents using those names as parameter names when returning fastNoNo
+#' estimates to the user. This function creates informative names that don't
+#' repeat.
+#'
+#' @noRd
+#' @param reTrms The `reTrms` object returned by `lme4::lFormula()`.
+#' @return Character vector of column names to use for `X1`. Names are of the
+#'   form `(Intercept)_g:level` for varying intercepts by level of grouping
+#'   variable `g`, and `x_g:level` for varying slopes on a variable `x` by level
+#'   of grouping variable `g`. For example, with the `mtcars` data and a model
+#'   formula `~ (1|cyl) + (1+disp|gear)` we get names like `(Intercept)_cyl:4`,
+#'   `(Intercept)_gear:3`, `disp_gear:3`, etc.
+#' @note This function isn't really needed given that we currently only allow 1
+#'   varying term, but it will be useful if we eventually allow more complicated
+#'   model formulas.
+#'
+make_X1_colnames <- function(reTrms) {
+  X1_colnames <- c()
+  for (i in seq_along(reTrms$Ztlist)) {
+    nms <- reTrms$Ztlist[[i]]@Dimnames[[1]]
+    nms <- paste0(names(reTrms$cnms)[i], ":", nms)
+    nms <- paste0(rep(reTrms$cnms[[i]], times = length(unique(nms))), "_", nms)
+    X1_colnames <- c(X1_colnames, nms)
+  }
+  X1_colnames
+}
+
+
+#' Create `control` argument for `lme4::lFormula()`
+#' @noRd
+make_lmer_control <- function() {
+  lme4::lmerControl(
+    check.nlev.gtreq.5 = "ignore",
+    check.nobs.vs.rankZ = "ignore",
+    check.nobs.vs.nlev = "ignore",
+    check.nobs.vs.nRE = "ignore",
+    check.scaleX = "ignore"
+  )
+}
+
+
+#' Error if model formula has unsupported terms
+#' @noRd
+check_formula_unsupported_terms <- function(formula) {
+  bars <- lme4::findbars(formula)
   if (length(bars) > 1) {
     stop("Only one varying term is currently supported.", call. = FALSE)
   }
@@ -111,12 +195,7 @@ parse_model_formula <- function(formula, data, ...) {
   pre_bar <- as.character(bars)[2] # pull out terms on lhs of bar
   if (pre_bar != "1" && !grepl("0 +", pre_bar, fixed = TRUE)) {
     # only allow terms like (1 | g) and (0 + x | g)
-    stop("Currently only a varying intercept or varying slope is supported, but not both.",
+    stop("Currently only a single varying intercept or varying slope is supported, but not both.",
          call. = FALSE)
   }
-  list(
-    y = stats::model.response(lf$fr),
-    X1 = t(as.matrix(lf$reTrms$Zt)),
-    X2 = lf$X
-  )
 }
