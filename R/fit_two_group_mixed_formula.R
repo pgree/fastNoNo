@@ -61,12 +61,11 @@ fit_mixed_formula <- function(formula, data, ...,
 #'
 #' @noRd
 #' @param formula,data The model formula and data frame.
-#' @param ... Arguments passed to `lme4::lFormula()`.
 #' @param on_failed_check What to do if the formula contains unsupported
 #'   terms. Can be `"error"`, `"warning"`, or `"ignore"`.
 #' @return A list with vector `y` and matrices `X1` and `X2`.
 #'
-parse_model_formula <- function(formula, data, ..., on_failed_check = c("error", "warning", "ignore")) {
+parse_model_formula <- function(formula, data, on_failed_check = c("error", "warning", "ignore")) {
   if (!requireNamespace("lme4", quietly = TRUE)) {
     stop("Please install the lme4 package.", call. = FALSE)
   }
@@ -79,10 +78,12 @@ parse_model_formula <- function(formula, data, ..., on_failed_check = c("error",
       check.nobs.vs.nlev = "ignore",
       check.nobs.vs.nRE = "ignore",
       check.scaleX = "ignore"
-    ),
-    ...
+    )
   )
-  check_formula_unsupported_terms(lf$formula, on_failed_check = match.arg(on_failed_check))
+  check_formula_unsupported_terms(
+    formula = lf$formula,
+    on_failed_check = match.arg(on_failed_check)
+  )
   list(
     y = stats::model.response(lf$fr),
     X1 = make_X1_matrix(lf$reTrms),
@@ -164,34 +165,37 @@ check_formula_unsupported_terms <- function(formula, on_failed_check = c("error"
   if (length(bars) > 1) {
     switch(
       action,
-      error = stop("Only one varying term is currently supported.", call. = FALSE),
-      warning = warning(
-        "Multiple varying terms detected. ",
-        "Currently the same prior standard deviation (sigma1) is estimated for all varying terms.",
-        call. = FALSE
-      )
+      warning = warn_multiple_varying_terms(),
+      error = stop("Only one varying term is currently supported.", call. = FALSE)
     )
   }
 
   # check that all terms are of the form (1 | g) or (0 + x | g)
+  # (currently bars is always length one but this may change)
   for (j in seq_along(bars)) {
     bars_j <- bars[[j]]
     pre_bar <- as.character(bars_j)[2] # pull out terms on lhs of bar
     if (pre_bar != "1" && !grepl("0 +", pre_bar, fixed = TRUE)) {
       switch(
         action,
+        warning = warn_multiple_varying_terms(),
         error = stop(
           "Currently only terms (1 | g) and (0 + x | g) are supported. ",
           "(1 + x|g) is not yet implemented.",
-          call. = FALSE
-        ),
-        warning = warning(
-          "Multiple varying terms detected. ",
-          "Currently the same prior standard deviation (sigma1) is estimated for all varying terms.",
           call. = FALSE
         )
       )
     }
   }
   invisible(TRUE)
+}
+
+warn_multiple_varying_terms <- function() {
+  warning(
+    "Multiple varying terms with partial pooling detected: \n",
+    "Currently, we advise using this function with partial pooling for only a ",
+    "single varying intercept or slope because this implementation of the fastNoNo ",
+    "algorithm uses same standard deviation parameter (sigma1) for all varying terms.",
+    call. = FALSE
+  )
 }
