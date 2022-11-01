@@ -17,8 +17,8 @@ fit_mixed_formula(
 \arguments{
 \item{formula}{(formula) An \code{lmer}-style model formula. Currently only a
 single varying intercept or varying slope is supported in the "random
-effects" part of the model. To bypass this restriction use \code{\link[=fit_mixed]{fit_mixed()}}
-directly.}
+effects" part of the model formula. To bypass this restriction use
+\code{\link[=fit_mixed]{fit_mixed()}} directly.}
 
 \item{data}{(data frame) The data containing the variables used in the model.}
 
@@ -60,8 +60,9 @@ when running the \R function see \code{\link[=system.time]{system.time()}}.
 }
 }
 \description{
-This function provides a formula interface to the model fit by
-\code{\link[=fit_mixed]{fit_mixed()}}.
+This function provides a limited \code{lmer}-style formula interface to the model
+fit by \code{\link[=fit_mixed]{fit_mixed()}}. Currently only a small subset of possible formula
+specifications are supported.
 }
 \examples{
 fit <- fit_mixed_formula(

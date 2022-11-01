@@ -1,13 +1,14 @@
 #' Formula interface to `fit_mixed()`
 #'
-#' This function provides a formula interface to the model fit by
-#' [fit_mixed()].
+#' This function provides a limited `lmer`-style formula interface to the model
+#' fit by [fit_mixed()]. Currently only a small subset of possible formula
+#' specifications are supported.
 #'
 #' @export
 #' @param formula (formula) An `lmer`-style model formula. Currently only a
 #'   single varying intercept or varying slope is supported in the "random
-#'   effects" part of the model. To bypass this restriction use [fit_mixed()]
-#'   directly.
+#'   effects" part of the model formula. To bypass this restriction use
+#'   [fit_mixed()] directly.
 #' @param data (data frame) The data containing the variables used in the model.
 #' @param ... Currently only for internal use.
 #' @inheritParams fit_mixed
