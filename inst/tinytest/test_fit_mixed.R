@@ -184,7 +184,7 @@ expect_equal(fit, answer, tolerance = 0.01)
 # fit_dump <- fit_mixed(y, X_1, X_2, nnt = 80)
 # dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-03.R")
 fit <- fit_mixed(y, X_1, X_2, nnt = 80)
-answer <- source("inst/tinytest/answers/fit_mixed-03.R", local = TRUE)$value
+answer <- source("answers/fit_mixed-03.R", local = TRUE)$value
 fit$time <- answer$time <- NULL
 expect_equal(fit, answer, tolerance = 0.01)
 

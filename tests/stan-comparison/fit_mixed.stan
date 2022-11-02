@@ -12,7 +12,7 @@ data {
 parameters {
   real<lower=0> sigma_y;
   real<lower=0> sigma_beta1;
-  vector[k1] beta1;
+  vector<multiplier=sigma_beta1>[k1] beta1;
   vector[k2] beta2;
 }
 model {
