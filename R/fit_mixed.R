@@ -1,8 +1,8 @@
 #' Fast normal-normal mixed effects model
 #'
 #' @description
-#' Fits a fast and accurate approximation to the Bayesian hierarchical
-#' linear regression model
+#' Fits a fast and accurate approximation to the Bayesian linear regression
+#' model
 #'
 #' \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
 #' \deqn{\beta_1 ~ normal(0, \sigma_1)}
@@ -10,9 +10,10 @@
 #' \deqn{\sigma_y ~ normal+(0, sd_\sigma_y)}
 #' \deqn{\sigma_1 ~ normal+(0, sd_\sigma_1)}
 #'
-#' where \eqn{sd_\beta_2} is a vector of positive numbers and \eqn{I} is the identity
-#' matrix. The algorithm for computing the fit uses numerical linear algebra and
-#' low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
+#' where \eqn{sd_\beta_2} is a vector of positive numbers and \eqn{I} is the
+#' identity matrix. The algorithm for computing the fit uses numerical linear
+#' algebra and low dimensional Gaussian quadrature. See Greengard et al. (2022)
+#' for details.
 #'
 #' @export
 #' @param y (vector) The outcome variable.
@@ -99,7 +100,7 @@
 #' fit <- fit_mixed(
 #'   y = mtcars$mpg,
 #'   X1 = stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars),
-#'   X2 = stats::model.matrix(~ wt + as.factor(gear), data = mtcars),
+#'   X2 = stats::model.matrix(~ 1 + wt + as.factor(gear), data = mtcars),
 #'   sd_sigma_y = 10,
 #'   sd_sigma1 = 5,
 #'   sd_beta2 = 10,
@@ -175,7 +176,7 @@ fit_mixed <- function(y, X1, X2, ...,
 # run the c++ code for the fastNoNo algorithm
 run_two_group_mixed <- function(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt) {
   mixed_2group_cpp(
-     nnt = as.integer(nnt),  # number of quadrature in theta direction
+     nnt = as.integer(nnt),  # number of quadrature nodes in theta direction
      nn = as.integer(80),    # number of quadrature nodes in other directions
      n = length(y),
      k1 = ncol(X1),

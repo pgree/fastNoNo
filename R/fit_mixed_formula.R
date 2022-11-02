@@ -27,6 +27,20 @@
 #' fit$beta2
 #' fit$sigma
 #'
+#' # check accuracy of estimates
+#' fit$errors
+#'
+#' # refitting using more quadrature nodes improves accuracy
+#' fit <- fit_mixed_formula(
+#'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
+#'   data = mtcars,
+#'   sd_beta2 = 10,
+#'   sd_sigma_y = 10,
+#'   sd_sigma1 = 5,
+#'   nnt = 50
+#' )
+#' fit$errors
+#'
 fit_mixed_formula <- function(formula, data, ...,
                               sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1,
                               nnt = 10) {
