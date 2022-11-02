@@ -167,20 +167,26 @@ expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
 
 # test that results haven't changed ---------------------------------------
 
+# fit_dump <- fit_mixed(y, X_1, X_2)
+# dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-01.R")
 fit <- fit_mixed(y, X_1, X_2)
-# dump("fit", file = "inst/tinytest/answers/fit_mixed-01.R")
 answer <- source("answers/fit_mixed-01.R", local = TRUE)$value
-expect_equal(fit, answer)
+fit$time <- answer$time <- NULL
+expect_equal(fit, answer, tolerance = 0.01)
 
+# fit_dump <- fit_mixed(y, X_1, X_2, sd_beta2 = 2, sd_sigma_y = 2, sd_sigma1 = 2)
+# dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-02.R")
 fit <- fit_mixed(y, X_1, X_2, sd_beta2 = 2, sd_sigma_y = 2, sd_sigma1 = 2)
-# dump("fit", file = "inst/tinytest/answers/fit_mixed-02.R")
 answer <- source("answers/fit_mixed-02.R", local = TRUE)$value
-expect_equal(fit, answer)
+fit$time <- answer$time <- NULL
+expect_equal(fit, answer, tolerance = 0.01)
 
-fit <- fit_mixed(y, X_1, X_2, nnt = 80)
+# fit_dump <- fit_mixed(y, X_1, X_2, nnt = 80)
 # dump("fit", file = "inst/tinytest/answers/fit_mixed-03.R")
-answer <- source("answers/fit_mixed-03.R", local = TRUE)$value
-expect_equal(fit, answer)
+fit <- fit_mixed(y, X_1, X_2, nnt = 80)
+answer <- source("inst/tinytest/answers/fit_mixed-03.R", local = TRUE)$value
+fit$time <- answer$time <- NULL
+expect_equal(fit, answer, tolerance = 0.01)
 
 
 

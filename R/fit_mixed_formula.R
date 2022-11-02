@@ -32,7 +32,7 @@
 #'
 #' # refitting using more quadrature nodes improves accuracy
 #' fit <- fit_mixed_formula(
-#'   formula = mpg ~ wt + as.factor(gear) + (1|cyl),
+#'   formula = mpg ~ wt + as.factor(gear) + (1 | cyl),
 #'   data = mtcars,
 #'   sd_beta2 = 10,
 #'   sd_sigma_y = 10,
