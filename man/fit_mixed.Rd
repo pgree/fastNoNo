@@ -8,6 +8,7 @@ fit_mixed(
   y,
   X1,
   X2,
+  ...,
   sd_sigma_y = 1,
   sd_sigma1 = 1,
   sd_beta2 = rep(1, ncol(X2)),
@@ -22,6 +23,8 @@ model. Must have \code{length(y)} rows.}
 
 \item{X2}{(matrix) The design matrix for the "fixed effects" part of the
 model. Must have \code{length(y)} rows.}
+
+\item{...}{Currently for internal use only.}
 
 \item{sd_sigma_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
 
@@ -75,7 +78,7 @@ low dimensional Gaussian quadrature. See Greengard et al. (2022) for details.
 \examples{
 ### Example with simulated data
 set.seed(1)
-n <- 1000
+n <- 10000
 k1 <- 50
 k2 <- 60
 
@@ -89,7 +92,15 @@ X2 <- matrix(rnorm(n * k2, -1, 5), ncol = k2)
 y <- rnorm(n, X1 \%*\% beta1 + X2 \%*\% beta2, sigma_y)
 
 # Fit model
-fit <- fit_mixed(y, X1, X2, sd_beta2 = rep(1, k2), sd_sigma_y = 1, sd_sigma1 = 1, nnt = 20)
+fit <- fit_mixed(
+  y,
+  X1,
+  X2,
+  sd_sigma_y = 1,
+  sd_sigma1 = 1,
+  sd_beta2 = rep(1, k2),
+  nnt = 20
+)
 str(fit)
 
 # Plot estimates of the betas vs "truth"

@@ -22,7 +22,7 @@ effects" part of the model formula. To bypass this restriction use
 
 \item{data}{(data frame) The data containing the variables used in the model.}
 
-\item{...}{Currently only for internal use.}
+\item{...}{Currently for internal use only.}
 
 \item{sd_sigma_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
 

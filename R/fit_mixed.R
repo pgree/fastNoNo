@@ -20,6 +20,7 @@
 #'   model. Must have `length(y)` rows.
 #' @param X2 (matrix) The design matrix for the "fixed effects" part of the
 #'   model. Must have `length(y)` rows.
+#' @param ... Currently for internal use only.
 #' @param sd_sigma_y (positive real) Scale parameter value for the prior on \eqn{\sigma_y}.
 #' @param sd_sigma1 (positive real) Scale parameter value for the prior on \eqn{\sigma_1}.
 #' @param sd_beta2 (positive reals) Scale parameter values for the prior on
@@ -59,7 +60,7 @@
 #' @examples
 #' ### Example with simulated data
 #' set.seed(1)
-#' n <- 1000
+#' n <- 10000
 #' k1 <- 50
 #' k2 <- 60
 #'
@@ -73,7 +74,15 @@
 #' y <- rnorm(n, X1 %*% beta1 + X2 %*% beta2, sigma_y)
 #'
 #' # Fit model
-#' fit <- fit_mixed(y, X1, X2, sd_beta2 = rep(1, k2), sd_sigma_y = 1, sd_sigma1 = 1, nnt = 20)
+#' fit <- fit_mixed(
+#'   y,
+#'   X1,
+#'   X2,
+#'   sd_sigma_y = 1,
+#'   sd_sigma1 = 1,
+#'   sd_beta2 = rep(1, k2),
+#'   nnt = 20
+#' )
 #' str(fit)
 #'
 #' # Plot estimates of the betas vs "truth"
@@ -100,7 +109,9 @@
 #' fit$beta2
 #' fit$sigma
 #'
-fit_mixed <- function(y, X1, X2, sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)), nnt = 10) {
+fit_mixed <- function(y, X1, X2, ...,
+                      sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)),
+                      nnt = 10) {
   stopifnot(
     !anyNA(y),
     !anyNA(X1),

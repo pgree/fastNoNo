@@ -131,6 +131,7 @@ expect_inherits(fit$cov, "matrix")
 expect_equal(dim(fit$cov), c(k_1 + k_2, k_1 + k_2))
 expect_equal(rownames(fit$cov), c(rownames(fit$beta1), rownames(fit$beta2)))
 expect_equal(rownames(fit$cov), colnames(fit$cov))
+expect_equal(unname(diag(fit$cov)), c(fit$beta1$sd, fit$beta2$sd)^2)
 
 expect_inherits(fit$time, "numeric")
 expect_equal(length(fit$time), 1)
@@ -162,7 +163,6 @@ expect_true(all(fit1$sigma["sigma_y", ] > fit2$sigma["sigma_y", ]))
 fit1 <- fit_mixed(y, X_1, X_2, sd_sigma1 = 10)
 fit2 <- fit_mixed(y, X_1, X_2, sd_sigma1 = .1)
 expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
-
 
 
 # test that results haven't changed ---------------------------------------
@@ -199,7 +199,7 @@ expect_true(sum(has_NaNs) == 0)
 
 # test informative row names ----------------------------------------------
 
-# if X1, X2 have column names they should be used as row names for beta1, beta2 results
+# if X1, X2 have column names they should be used as row names for beta1, beta2
 
 X1_named <- stats::model.matrix(~ 0 + as.factor(cyl), data = mtcars)
 X2_named <- stats::model.matrix(~ wt + as.factor(gear), data = mtcars)

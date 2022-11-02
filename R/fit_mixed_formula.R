@@ -10,7 +10,7 @@
 #'   effects" part of the model formula. To bypass this restriction use
 #'   [fit_mixed()] directly.
 #' @param data (data frame) The data containing the variables used in the model.
-#' @param ... Currently only for internal use.
+#' @param ... Currently for internal use only.
 #' @inheritParams fit_mixed
 #' @inherit fit_mixed return
 #'
@@ -44,8 +44,7 @@ fit_mixed_formula <- function(formula, data, ...,
     sd_beta2 = sd_beta2,
     nnt = nnt
   )
-  dots <- list(...)
-  if (isTRUE(dots$debug)) { # temporary to help with debugging
+  if (isTRUE(list(...)$debug)) { # temporary to help with debugging
     out$debug <- list(X1 = model_data$X1, X2 = model_data$X2)
   }
   out
