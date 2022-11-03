@@ -26,33 +26,39 @@ model. Must have \code{length(y)} rows.}
 
 \item{...}{Currently for internal use only.}
 
-\item{sd_sigma_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
+\item{sd_sigma_y}{(positive real) Scale parameter value for the prior on
+\eqn{\sigma_y}. The default is \code{1}, but we strongly recommend setting the
+value yourself.}
 
-\item{sd_sigma1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
+\item{sd_sigma1}{(positive real) Scale parameter value for the prior on
+\eqn{\sigma1}. The default is \code{1}, but we strongly recommend setting the
+value yourself.}
 
-\item{sd_beta2}{(positive reals) Scale parameter values for the prior on
-\eqn{\beta_2} ("fixed effects" coefficients). Must have either one element
-or \code{ncol(X2)} elements. In the former case the value is recycled.}
+\item{sd_beta2}{(positive reals) Scale parameter values for the priors on
+\eqn{\beta2} ("fixed effects" coefficients). Must have either one element
+or \code{ncol(X2)} elements. In the former case the value is recycled. The
+default is \code{1} for each element, but we strongly recommend setting the
+values yourself.}
 
 \item{nnt}{(positive integer) Number of quadrature nodes in \eqn{\theta}
-direction as described in Greengard et al. (2022). \code{nnt} can be increased
-to improve the accuracy of the estimates if errors are large (see \code{errors}
-slot in returned fitted model object).}
+direction as described in Greengard et al. (2022). We recommend increasing
+\code{nnt} to improve the accuracy of the estimates if the errors are too large
+(see \code{errors} slot in returned fitted model object).}
 }
 \value{
 A named list with the following components:
 \itemize{
 \item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
-posterior means and standard deviations for the vector \eqn{\beta_1} (the
+posterior means and standard deviations for the vector \eqn{\beta1} (the
 "random effects").
 \item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
-posterior means and standard deviations for the vector \eqn{\beta_2} (the
+posterior means and standard deviations for the vector \eqn{\beta2} (the
 "fixed effects").
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
 posterior means and standard deviations for \eqn{\sigma_y} (the residual
-standard deviation) and \eqn{\sigma_1} (the standard deviation of
-\eqn{\beta_1}).
-\item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
+standard deviation) and \eqn{\sigma1} (the standard deviation of
+\eqn{\beta1}).
+\item \code{cov}: The posterior covariance matrix of \eqn{[\beta1, \beta2]}.
 \item \code{errors}: A data frame with two columns (\code{error_mean}, \code{error_sd})
 containing the approximate accuracy of the posterior mean and standard
 deviation estimates.
@@ -66,12 +72,12 @@ Fits a fast and accurate approximation to the Bayesian linear regression
 model
 
 \deqn{y ~ normal(X_1 \beta_1 + X_2 \beta_2, \sigma_y)}
-\deqn{\beta_1 ~ normal(0, \sigma_1)}
-\deqn{\beta_2 ~ normal(0, sd_\beta_2 * I)}
+\deqn{\beta1 ~ normal(0, \sigma1)}
+\deqn{\beta2 ~ normal(0, sd_\beta2 * I)}
 \deqn{\sigma_y ~ normal+(0, sd_\sigma_y)}
-\deqn{\sigma_1 ~ normal+(0, sd_\sigma_1)}
+\deqn{\sigma1 ~ normal+(0, sd_\sigma1)}
 
-where \eqn{sd_\beta_2} is a vector of positive numbers and \eqn{I} is the
+where \eqn{sd_\beta2} is a vector of positive numbers and \eqn{I} is the
 identity matrix. The algorithm for computing the fit uses numerical linear
 algebra and low dimensional Gaussian quadrature. See Greengard et al. (2022)
 for details.

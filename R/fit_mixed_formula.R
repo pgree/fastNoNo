@@ -13,6 +13,7 @@
 #' @param ... Currently for internal use only.
 #' @inheritParams fit_mixed
 #' @inherit fit_mixed return
+#' @inherit fit_mixed references
 #'
 #' @seealso [fit_mixed()]
 #' @examples
@@ -37,7 +38,7 @@
 #'   sd_beta2 = 10,
 #'   sd_sigma_y = 10,
 #'   sd_sigma1 = 5,
-#'   nnt = 50
+#'   nnt = 30
 #' )
 #' fit$errors
 #'

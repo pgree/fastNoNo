@@ -24,33 +24,39 @@ effects" part of the model formula. To bypass this restriction use
 
 \item{...}{Currently for internal use only.}
 
-\item{sd_sigma_y}{(positive real) Scale parameter value for the prior on \eqn{\sigma_y}.}
+\item{sd_sigma_y}{(positive real) Scale parameter value for the prior on
+\eqn{\sigma_y}. The default is \code{1}, but we strongly recommend setting the
+value yourself.}
 
-\item{sd_sigma1}{(positive real) Scale parameter value for the prior on \eqn{\sigma_1}.}
+\item{sd_sigma1}{(positive real) Scale parameter value for the prior on
+\eqn{\sigma1}. The default is \code{1}, but we strongly recommend setting the
+value yourself.}
 
-\item{sd_beta2}{(positive reals) Scale parameter values for the prior on
-\eqn{\beta_2} ("fixed effects" coefficients). Must have either one element
-or \code{ncol(X2)} elements. In the former case the value is recycled.}
+\item{sd_beta2}{(positive reals) Scale parameter values for the priors on
+\eqn{\beta2} ("fixed effects" coefficients). Must have either one element
+or \code{ncol(X2)} elements. In the former case the value is recycled. The
+default is \code{1} for each element, but we strongly recommend setting the
+values yourself.}
 
 \item{nnt}{(positive integer) Number of quadrature nodes in \eqn{\theta}
-direction as described in Greengard et al. (2022). \code{nnt} can be increased
-to improve the accuracy of the estimates if errors are large (see \code{errors}
-slot in returned fitted model object).}
+direction as described in Greengard et al. (2022). We recommend increasing
+\code{nnt} to improve the accuracy of the estimates if the errors are too large
+(see \code{errors} slot in returned fitted model object).}
 }
 \value{
 A named list with the following components:
 \itemize{
 \item \code{beta1}: A data frame with two columns (\code{mean}, \code{sd}) containing the
-posterior means and standard deviations for the vector \eqn{\beta_1} (the
+posterior means and standard deviations for the vector \eqn{\beta1} (the
 "random effects").
 \item \code{beta2}: A data frame with two columns (\code{mean}, \code{sd})  containing the
-posterior means and standard deviations for the vector \eqn{\beta_2} (the
+posterior means and standard deviations for the vector \eqn{\beta2} (the
 "fixed effects").
 \item \code{sigma}: A data frame with two columns (\code{mean}, \code{sd}) containing the
 posterior means and standard deviations for \eqn{\sigma_y} (the residual
-standard deviation) and \eqn{\sigma_1} (the standard deviation of
-\eqn{\beta_1}).
-\item \code{cov}: The posterior covariance matrix of coefficients \eqn{[\beta_1, \beta_2]}.
+standard deviation) and \eqn{\sigma1} (the standard deviation of
+\eqn{\beta1}).
+\item \code{cov}: The posterior covariance matrix of \eqn{[\beta1, \beta2]}.
 \item \code{errors}: A data frame with two columns (\code{error_mean}, \code{error_sd})
 containing the approximate accuracy of the posterior mean and standard
 deviation estimates.
@@ -81,15 +87,21 @@ fit$errors
 
 # refitting using more quadrature nodes improves accuracy
 fit <- fit_mixed_formula(
-  formula = mpg ~ wt + as.factor(gear) + (1|cyl),
+  formula = mpg ~ wt + as.factor(gear) + (1 | cyl),
   data = mtcars,
   sd_beta2 = 10,
   sd_sigma_y = 10,
   sd_sigma1 = 5,
-  nnt = 50
+  nnt = 30
 )
 fit$errors
 
+}
+\references{
+Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew
+Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of
+two-group normal-normal models. To appear,
+\href{http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf}{Bayesian Analysis}
 }
 \seealso{
 \code{\link[=fit_mixed]{fit_mixed()}}
