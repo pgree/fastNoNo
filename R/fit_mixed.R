@@ -23,16 +23,12 @@
 #'   model. Must have `length(y)` rows.
 #' @param ... Currently for internal use only.
 #' @param sd_sigma_y (positive real) Scale parameter value for the prior on
-#'   \eqn{\sigma_y}. The default is `1`, but we strongly recommend setting the
-#'   value yourself.
+#'   \eqn{\sigma_y}.
 #' @param sd_sigma1 (positive real) Scale parameter value for the prior on
-#'   \eqn{\sigma1}. The default is `1`, but we strongly recommend setting the
-#'   value yourself.
+#'   \eqn{\sigma1}.
 #' @param sd_beta2 (positive reals) Scale parameter values for the priors on
 #'   \eqn{\beta2} ("fixed effects" coefficients). Must have either one element
-#'   or `ncol(X2)` elements. In the former case the value is recycled. The
-#'   default is `1` for each element, but we strongly recommend setting the
-#'   values yourself.
+#'   or `ncol(X2)` elements. In the former case the value is recycled.
 #' @param nnt (positive integer) Number of quadrature nodes in \eqn{\theta}
 #'   direction as described in Greengard et al. (2022). We recommend increasing
 #'   `nnt` to improve the accuracy of the estimates if the errors are too large
@@ -117,7 +113,7 @@
 #' fit$sigma
 #'
 fit_mixed <- function(y, X1, X2, ...,
-                      sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = rep(1, ncol(X2)),
+                      sd_sigma_y, sd_sigma1, sd_beta2,
                       nnt = 10) {
   stopifnot(
     !anyNA(y),
