@@ -17,7 +17,11 @@ sd_sigma_y <- 1.0
 sd_sigma1 <- 2.0
 
 # Stan posterior means and sds --------------------------------------------
-data_list <- list(n=n, k1=k1, k2=k2, y=y, sd_beta2=sd_beta2, sd_sigma_y=sd_sigma_y, sd_sigma1=sd_sigma1, X1=X1, X2=X2)
+data_list <- list(
+  n = n, k1 = k1, k2 = k2,
+  y = y, X1 = X1, X2 = X2,
+  sd_beta2 = sd_beta2, sd_sigma_y = sd_sigma_y, sd_sigma1 = sd_sigma1
+)
 mod <- cmdstan_model("tests/stan-comparison/fit_mixed.stan")
 fit_stan <- mod$sample(data = data_list, seed = 1, parallel_chains = 4, iter_sampling = 1e4)
 posterior_summary <- fit_stan$summary()[-1, ] # drop lp__

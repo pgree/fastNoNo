@@ -2,28 +2,34 @@
 
 # valid formulas
 expect_silent(
-  fit_mixed_formula(mpg ~ (1 | cyl), data = mtcars)
+  fit_mixed_formula(mpg ~ (1 | cyl), data = mtcars,
+                    sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1)
 )
 expect_silent(
-  fit_mixed_formula(mpg ~ (0 + wt | cyl), data = mtcars)
+  fit_mixed_formula(mpg ~ (0 + wt | cyl), data = mtcars,
+                    sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1)
 )
 
 # currently invalid formulas
 expect_error(
-  fit_mixed_formula(mpg ~ (1 + wt | cyl), data = mtcars),
+  fit_mixed_formula(mpg ~ (1 + wt | cyl), data = mtcars,
+                    sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1),
   "Currently only terms (1 | g) and (0 + x | g) are supported. (1 + x|g) is not yet implemented.",
   fixed = TRUE
 )
 expect_error(
-  fit_mixed_formula(mpg ~ (1 | cyl/gear), data = mtcars),
+  fit_mixed_formula(mpg ~ (1 | cyl/gear), data = mtcars,
+                    sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1),
   "Only one varying term is currently supported."
 )
 expect_error(
-  fit_mixed_formula(mpg ~ (1|cyl) + (1|gear), data = mtcars),
+  fit_mixed_formula(mpg ~ (1|cyl) + (1|gear), data = mtcars,
+                    sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1),
   "Only one varying term is currently supported."
 )
 expect_error(
-  fit_mixed_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars),
+  fit_mixed_formula(mpg ~ (1 + wt|cyl) + (1|gear), data = mtcars,
+                    sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1),
   "Only one varying term is currently supported."
 )
 
@@ -46,9 +52,11 @@ expect_warning(
 
 X2 <- model.matrix(~ wt + disp + factor(gear), data = mtcars)
 X1 <- model.matrix(~ 0 + as.factor(cyl), data = mtcars)
-fit <- fit_mixed(mtcars$mpg, X1, X2, nnt = 100, sd_beta2 = 10)
+fit <- fit_mixed(mtcars$mpg, X1, X2, nnt = 100,
+                 sd_beta2 = 10, sd_sigma_y = 1, sd_sigma1 = 1)
 fit_formula <- fit_mixed_formula(mpg ~ wt + disp + factor(gear) + (1|cyl),
-                                 data = mtcars, nnt = 100, sd_beta2 = 10)
+                                 data = mtcars, nnt = 100,
+                                 sd_beta2 = 10, sd_sigma_y = 1, sd_sigma1 = 1)
 
 # for beta1 avoid checking rownames (they will currently differ for beta1)
 expect_equal(fit_formula$beta1, fit$beta1, check.attributes = FALSE)
@@ -66,7 +74,7 @@ expect_equal(fit_formula$cov, fit$cov, check.attributes = FALSE)
 # so we use this as a sanity check
 if (requireNamespace("lme4", quietly = TRUE)) {
   fit <- fit_mixed_formula(mpg ~ wt + factor(gear) + (1|cyl), data = mtcars,
-                           sd_sigma1 = 3, sd_beta2 = 10, nnt = 100)
+                           sd_sigma_y = 1, sd_sigma1 = 3, sd_beta2 = 10, nnt = 100)
   fit_lmer <- lme4::lmer(mpg ~ wt + factor(gear) + (1|cyl), data = mtcars)
   expect_equal(
     fit$beta1$mean,

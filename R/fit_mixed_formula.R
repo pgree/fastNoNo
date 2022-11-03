@@ -43,7 +43,7 @@
 #' fit$errors
 #'
 fit_mixed_formula <- function(formula, data, ...,
-                              sd_sigma_y = 1, sd_sigma1 = 1, sd_beta2 = 1,
+                              sd_sigma_y, sd_sigma1, sd_beta2,
                               nnt = 10) {
   stopifnot(
     is.data.frame(data),
