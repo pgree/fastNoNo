@@ -185,11 +185,10 @@ expect_equal(fit, answer, tolerance = 0.01)
 # dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-03.R")
 fit <- fit_mixed(y, X_1, X_2, nnt = 80, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
 answer <- source("answers/fit_mixed-03.R", local = TRUE)$value
-fit$time <- answer$time <- NULL
 expect_equal(fit$beta1, answer$beta1, tolerance = 1e-6)
 expect_equal(fit$beta2, answer$beta2, tolerance = 1e-6)
 expect_equal(fit$sigma, answer$sigma, tolerance = 1e-6)
-
+expect_equal(fit$cov, answer$cov, tolerance = 1e-6)
 
 
 # test that no NaNs in results --------------------------------------------

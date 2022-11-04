@@ -75,12 +75,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   tt1 = std::chrono::high_resolution_clock::now();
 
   // adjust for fixed priors on coefficients k1+1 to k1+k2
-  Eigen::MatrixXd a2 = a;
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < k2; j++) {
-      a2(i, k1 + j) = a2(i, k1 + j) * pow(ss[j], 2);
-    }
-  }
+  a.rightCols(k2) = a.rightCols(k2).array().rowwise() * ss.array().square().transpose().array();
 
   // hyperpriors -- variances, not standard deviations
   d1 = pow(sigy, 2);
@@ -90,7 +85,7 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   // ax = y as well as projection of y onto the columns of a
   // an improved (and uglier) a^t * a
   Eigen::MatrixXd ata(Eigen::MatrixXd(k, k).setZero().
-		      selfadjointView<Eigen::Lower>().rankUpdate(a2.adjoint()));
+		      selfadjointView<Eigen::Lower>().rankUpdate(a.adjoint()));
 
   // eigendecomposition of a^t * a
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(ata);
@@ -118,35 +113,26 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   Eigen::MatrixXd b(k, k);
   b = s0.asDiagonal() * es.eigenvectors().transpose();
 
-  // v * s_inv * vt * a2t * y
+  // v * s_inv * vt * at * y
   Eigen::VectorXd x1(k);
-  //x1 = es.eigenvectors() * s_inv.asDiagonal() * es.eigenvectors().transpose() \
-  //* a2.transpose() * y;
-  x1 = v0 * s_inv.asDiagonal() * v0.transpose() * a2.transpose() * y;
+  x1 = v0 * s_inv.asDiagonal() * v0.transpose() * a.transpose() * y;
 
-  Eigen::VectorXd ynew(k), tmp_vec(k);
-  tmp_vec = es.eigenvectors().transpose() * x1;
-  for (int i=0; i<k; i++) {
-    ynew[i] = s0[i] * tmp_vec[i];
-  }
+  Eigen::VectorXd ynew(k);
+  // component-wise multiplication of s0 and vt * x1
+  ynew = s0.cwiseProduct(es.eigenvectors().transpose() * x1);
 
   double resid;
-  resid = (a2 * x1 - y).norm();
+  resid = (a * x1 - y).norm();
   resid = pow(resid, 2);
-  //std::cout << "resid: " << resid << std::endl;
 
   double t0=0, t1 = M_PI / 2.0;
   Eigen::VectorXd ts(nnt), whts_ts(nnt);
   lege_nodes_whts(nnt, t0, t1, ts, whts_ts);
 
   // initialize sums (integrals) to be computed
-  // dsums - expectations
-  // dsums_cov - covariance
-  // ss1 - E[sig1**2]
-  // ss2 - E[sig2**2]
+  // dsums - expectations, dsums_cov - covariance
+  // ss1 - E[sig1**2], ss2 - E[sig2**2]
   // fm - scaling constant
-  // dsums *= 0;
-  // dsums_cov *= 0;
   dsum = 0;
   ss1 = 0;
   ss2 = 0;
@@ -233,9 +219,6 @@ fit_out mixed_2group(int nnt, int nn, int n, int k1, int k2, int k,
   fit.cov = dsums_cov;
   fit.time = duration.count()/1e3;
 
-  //std::cout << "stds: " << stds << std::endl;
-  //std::cout << "dsums: " << dsums << std::endl;
-  //std::cout << "dsum: " << dsum << std::endl;
   return fit;
 }
 
@@ -307,7 +290,6 @@ void eval_inner(int nn, int n, int k1, int k2, int k, double d1,
 
     // compute determinant of jacobian
     eval_jac_det(rho, phi, t, djac);
-
 
     // for fixed theta, compute integral over phi by a sum of
     // the form \sum_i exp(fi)*gi so that
@@ -462,12 +444,9 @@ void get_phi(int nn, int n, int k, double t, Eigen::VectorXd ysmall,
     rho = sqrt(sig12 + sig22 + 1);
 
     eval_jac_det(rho, phi, t, djac);
-    //std::cout << "djac: " << djac << std::endl;
     eval_logdens_rho(n, rho, a1, exp_fact, f);
-    //std::cout << "f: " << f << std::endl;
 
     fs(j) = prefact + f - log(djac);
-    //std::cout << "fs(j): " << fs(j) << std::endl;
   }
 
   // get bounds of integration
