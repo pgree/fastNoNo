@@ -10,7 +10,7 @@ regression models using numerical linear algebra and low dimensional Gaussian
 quadrature. This is an implementation of the method described in Greengard et
 al. (2022).
 
-* Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of two-group normal-normal models. To appear, [Bayesian Analysis](http://www.stat.columbia.edu/~gelman/research/published/two_group_fastnono.pdf)
+* Philip Greengard, Jeremy Hoskins, Charles C. Margossian, Jonah Gabry, Andrew Gelman, and Aki Vehtari. (2022). Fast methods for posterior inference of two-group normal-normal models. [Bayesian Analysis](https://projecteuclid.org/journals/bayesian-analysis/advance-publication/Fast-Methods-for-Posterior-Inference-of-Two-Group-Normal-Normal/10.1214/22-BA1329.full)
 
 ### Installation
 
