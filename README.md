@@ -57,12 +57,13 @@ fit <- fit_mixed_formula(
   sd_sigma1 = 5,
   nnt = 40  # the number of quadrature nodes. increasing nnt will increase accuracy and runtime.
 )
-fit$beta1
-fit$beta2
-fit$sigma
+print(fit$beta1, digits=2)
+print(fit$beta2, digits=2)
+print(fit$sigma, digits=2)
 
 # check accuracy of estimates
-fit$errors
+print(fit$errors, digits=2)
+
 
 # refitting using more quadrature nodes improves accuracy
 fit <- fit_mixed_formula(
@@ -73,7 +74,7 @@ fit <- fit_mixed_formula(
   sd_sigma1 = 5,
   nnt = 80
 )
-fit$errors
+print(fit$errors, digits=2)
 ```
 
 The other model/data-specification involves using data matrices
@@ -95,9 +96,9 @@ fit <- fit_mixed(
   sd_beta2 = 10,
   nnt = 30
 )
-fit$beta1
-fit$beta2
-fit$sigma
+print(fit$beta1, digits=2)
+print(fit$beta2, digits=2)
+print(fit$sigma, digits=2)
 ```
 
 ### Example with simulated data
@@ -129,7 +130,9 @@ fit <- fit_mixed(
   sd_beta2 = rep(1, k2),
   nnt = 20
 )
-str(fit)
+print(fit$beta1, digits=2)
+print(fit$beta2, digits=2)
+print(fit$sigma, digits=2)
 
 # Plot estimates of the betas vs "truth"
 plot(fit$beta1$mean, beta1, pch = 20); abline(0, 1, col = "red")
