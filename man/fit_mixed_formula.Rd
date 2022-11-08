@@ -11,7 +11,7 @@ fit_mixed_formula(
   sd_sigma_y,
   sd_sigma1,
   sd_beta2,
-  nnt = 10
+  nnt = 20
 )
 }
 \arguments{

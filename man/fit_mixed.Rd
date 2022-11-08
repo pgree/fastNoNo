@@ -4,7 +4,7 @@
 \alias{fit_mixed}
 \title{Fast normal-normal mixed effects model}
 \usage{
-fit_mixed(y, X1, X2, ..., sd_sigma_y, sd_sigma1, sd_beta2, nnt = 10)
+fit_mixed(y, X1, X2, ..., sd_sigma_y, sd_sigma1, sd_beta2, nnt = 20)
 }
 \arguments{
 \item{y}{(vector) The outcome variable.}
