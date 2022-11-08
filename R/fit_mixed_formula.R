@@ -44,7 +44,7 @@
 #'
 fit_mixed_formula <- function(formula, data, ...,
                               sd_sigma_y, sd_sigma1, sd_beta2,
-                              nnt = 10) {
+                              nnt = 20) {
   stopifnot(
     is.data.frame(data),
     !anyNA(data)
