@@ -143,7 +143,6 @@ expect_equal(length(fit$time), 1)
 # with the same inputs we should get the same answers if we refit
 fit1 <- fit_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
 fit2 <- fit_mixed(y, X_1, X_2, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
-
 expect_equal(fit1$beta1, fit2$beta1)
 expect_equal(fit1$beta2, fit2$beta2)
 expect_equal(fit1$sigma, fit2$sigma)
@@ -169,21 +168,21 @@ expect_true(all(fit1$sigma["sigma_beta1", ] > fit2$sigma["sigma_beta1", ]))
 
 # fit_dump <- fit_mixed(y, X_1, X_2, sd_sigma_y = 1, sd_beta2 = 1, sd_sigma1 = 1)
 # dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-01.R")
-fit <- fit_mixed(y, X_1, X_2, sd_sigma_y = 1, sd_beta2 = 1, sd_sigma1 = 1)
+fit <- fit_mixed(y, X_1, X_2, sd_sigma_y = 1, sd_beta2 = 1, sd_sigma1 = 1, nnt = 10)
 answer <- source("answers/fit_mixed-01.R", local = TRUE)$value
 fit$time <- answer$time <- NULL
 expect_equal(fit, answer, tolerance = 0.01)
 
 # fit_dump <- fit_mixed(y, X_1, X_2, sd_sigma_y = 2, sd_beta2 = 2, sd_sigma1 = 2)
 # dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-02.R")
-fit <- fit_mixed(y, X_1, X_2, sd_sigma_y = 2, sd_beta2 = 2, sd_sigma1 = 2)
+fit <- fit_mixed(y, X_1, X_2, sd_sigma_y = 2, sd_beta2 = 2, sd_sigma1 = 2, nnt = 10)
 answer <- source("answers/fit_mixed-02.R", local = TRUE)$value
 fit$time <- answer$time <- NULL
 expect_equal(fit, answer, tolerance = 0.01)
 
 # fit_dump <- fit_mixed(y, X_1, X_2, nnt = 80, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
 # dump("fit_dump", file = "inst/tinytest/answers/fit_mixed-03.R")
-fit <- fit_mixed(y, X_1, X_2, nnt = 80, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1)
+fit <- fit_mixed(y, X_1, X_2, nnt = 80, sd_beta2 = 1, sd_sigma_y = 1, sd_sigma1 = 1, nnt = 10)
 answer <- source("answers/fit_mixed-03.R", local = TRUE)$value
 expect_equal(fit$beta1, answer$beta1, tolerance = 1e-6)
 expect_equal(fit$beta2, answer$beta2, tolerance = 1e-6)
