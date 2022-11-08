@@ -11,5 +11,7 @@ Rcpp::List mixed_2group_cpp(int nnt, int nn, int n, int k1, int k2, int k,
   return Rcpp::List::create(Rcpp::Named("means") = fit.means,
                             Rcpp::Named("sds") = fit.sds,
                             Rcpp::Named("cov") = fit.cov,
+                            Rcpp::Named("mean_errors") = fit.mean_errors,
+                            Rcpp::Named("sd_errors") = fit. sd_errors,
                             Rcpp::Named("time") = fit.time);
 }

@@ -114,7 +114,7 @@
 #'
 fit_mixed <- function(y, X1, X2, ...,
                       sd_sigma_y, sd_sigma1, sd_beta2,
-                      nnt = 10) {
+                      nnt = 20) {
   stopifnot(
     !anyNA(y),
     !anyNA(X1),
@@ -135,30 +135,29 @@ fit_mixed <- function(y, X1, X2, ...,
     sd_beta2 <- rep(sd_beta2, ncol(X2))
   }
 
-  out1 <- run_two_group_mixed(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt)
-  out2 <- run_two_group_mixed(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt = 2 * nnt)
+  out <- run_two_group_mixed(y, X1, X2, sd_beta2, sd_sigma_y, sd_sigma1, nnt)
 
   k1 <- ncol(X1)
   k2 <- ncol(X2)
   k <- k1 + k2
 
-  beta1 <- data.frame(out2$means[1:k1], out2$sds[1:k1])
+  beta1 <- data.frame(out$means[1:k1], out$sds[1:k1])
   rownames(beta1) <- if (!is.null(colnames(X1))) colnames(X1) else paste0("beta1_", 1:k1)
   colnames(beta1) <- c("mean", "sd")
 
-  beta2 <- data.frame(out2$means[(k1 + 1):k], out2$sds[(k1 + 1):k])
+  beta2 <- data.frame(out$means[(k1 + 1):k], out$sds[(k1 + 1):k])
   rownames(beta2) <- if (!is.null(colnames(X2))) colnames(X2) else paste0("beta2_", 1:k2)
   colnames(beta2) <- c("mean", "sd")
 
-  sigma <- data.frame(out2$means[(k + 1):(k + 2)], out2$sds[(k + 1):(k + 2)])
+  sigma <- data.frame(out$means[(k + 1):(k + 2)], out$sds[(k + 1):(k + 2)])
   rownames(sigma) <- c("sigma_y", "sigma_beta1")
   colnames(sigma) <- c("mean", "sd")
 
-  errors <- data.frame(out1$means - out2$means, out1$sds - out2$sds)
+  errors <- data.frame(out$mean_errors, out$sd_errors)
   rownames(errors) <- c(rownames(beta1), rownames(beta2), "sigma_y", "sigma_beta1")
   colnames(errors) <- c("error_mean", "error_sd")
 
-  cov <- matrix(data = out2$cov, nrow = k, ncol = k)
+  cov <- matrix(data = out$cov, nrow = k, ncol = k)
   rownames(cov) <- c(rownames(beta1), rownames(beta2))
   colnames(cov) <- rownames(cov)
 
@@ -168,7 +167,7 @@ fit_mixed <- function(y, X1, X2, ...,
     sigma = sigma,
     cov = cov,
     errors = errors,
-    time = out1$time
+    time = out$time
   )
 }
 
