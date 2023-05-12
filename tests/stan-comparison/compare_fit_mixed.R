@@ -3,18 +3,21 @@ library(fastNoNo)
 
 # Generate data and parameter values --------------------------------------
 set.seed(1)
-n <- 100
+n <- 25
 k1 <- 10
 k2 <- 10
+sd_beta2 <- sample.int(3, k2, replace = TRUE)
+sd_sigma_y <- 1.0
+sd_sigma1 <- 2.0
 X1 <- rnorm(n * k1, mean = 0, sd = 1)
 X1 <- matrix(data = X1, nrow = n, ncol = k1)
 X2 <- rnorm(n * k2, mean = 0, sd = 1)
 X2 <- matrix(data = X2, nrow = n, ncol = k2)
 X <- cbind(X1, X2)
-y <- rnorm(n, mean = 0, sd = 1)
-sd_beta2 <- sample.int(3, k2, replace = TRUE)
-sd_sigma_y <- 1.0
-sd_sigma1 <- 2.0
+beta1 <- rnorm(k1, mean = 0, sd = sd_sigma1)
+beta2 <- rnorm(k2, mean = 0, sd = sd_beta2)
+beta <- c(beta1, beta2)
+y <- array(X %*% beta + rnorm(n, mean = 0, sd = sd_sigma_y))
 
 # Stan posterior means and sds --------------------------------------------
 data_list <- list(
@@ -22,7 +25,7 @@ data_list <- list(
   y = y, X1 = X1, X2 = X2,
   sd_beta2 = sd_beta2, sd_sigma_y = sd_sigma_y, sd_sigma1 = sd_sigma1
 )
-mod <- cmdstan_model("tests/stan-comparison/fit_mixed.stan")
+mod <- cmdstan_model("~/posterior_calib/fit_mixed.stan")
 fit_stan <- mod$sample(data = data_list, seed = 1, parallel_chains = 4, iter_sampling = 1e4)
 posterior_summary <- fit_stan$summary()[-1, ] # drop lp__
 stan_estimates <- as.data.frame(posterior_summary[, c("mean", "sd")])
@@ -34,4 +37,5 @@ fastnono_estimates <- rbind(fit_fastnono$sigma, fit_fastnono$beta1, fit_fastnono
 rownames(fastnono_estimates) <- rownames(stan_estimates)
 
 # differences between Stan and fastNoNo -----------------------------------
-(diffs <- stan_estimates - fastnono_estimates)
+diffs <- (stan_estimates - fastnono_estimates) / fastnono_estimates
+diffs
